@@ -8,7 +8,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::libc::{free, malloc, realloc};
+use super::libc::{aligned_alloc, free, malloc, realloc};
 use super::fail::abort;
 
 #[inline]
@@ -21,6 +21,16 @@ pub unsafe fn free_raw(ptr: *mut u8) {
 #[lang = "exchange_malloc"]
 pub unsafe fn malloc_raw(size: uint) -> *mut u8 {
     let ptr = malloc(size);
+    if ptr == 0 as *mut u8 {
+        out_of_memory()
+    }
+    ptr
+}
+
+
+#[inline]
+pub unsafe fn aligned_alloc_raw(align: uint, size: uint) -> *mut u8 {
+    let ptr = aligned_alloc(align, size);
     if ptr == 0 as *mut u8 {
         out_of_memory()
     }

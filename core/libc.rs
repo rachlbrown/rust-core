@@ -12,4 +12,5 @@ extern {
     pub fn malloc(size: uint) -> *mut u8;
     pub fn realloc(ptr: *mut u8, size: uint) -> *mut u8;
     pub fn free(ptr: *mut u8);
+    pub fn aligned_alloc(align: uint, size: uint) -> *mut u8;
 }
