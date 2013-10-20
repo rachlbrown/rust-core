@@ -8,13 +8,13 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use core::intrinsics::{move_val_init, size_of, transmute};
-use core::heap::{out_of_memory, realloc_raw};
-use core::kinds::{Freeze, Send};
-use core::ops::Drop;
-use core::libc::free;
-use core::slice::Slice;
-use core::ptr::{offset, read_ptr};
+use super::intrinsics::{move_val_init, size_of, transmute};
+use super::heap::{out_of_memory, realloc_raw};
+use super::kinds::{Freeze, Send};
+use super::ops::Drop;
+use super::libc::free;
+use super::slice::Slice;
+use super::ptr::{offset, read_ptr};
 
 pub struct Vec<T> {
     priv len: uint,

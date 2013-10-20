@@ -8,8 +8,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use core::libc::{free, malloc, realloc};
-use core::fail::abort;
+use super::libc::{free, malloc, realloc};
+use super::fail::abort;
 
 #[inline]
 #[lang = "exchange_free"]

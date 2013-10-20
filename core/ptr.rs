@@ -8,8 +8,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use core::intrinsics;
-use core::ops::{Eq, Ord};
+use super::intrinsics;
+use super::ops::{Eq, Ord};
 
 mod detail {
     extern "rust-intrinsic" {

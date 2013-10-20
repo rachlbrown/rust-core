@@ -8,11 +8,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use core::fail::fail_borrowed;
-use core::intrinsics::transmute;
-use core::ops::{Drop, Eq};
-use core::kinds::{Freeze, Send};
-use core::clone::{Clone, DeepClone};
+use super::fail::fail_borrowed;
+use super::intrinsics::transmute;
+use super::ops::{Drop, Eq};
+use super::kinds::{Freeze, Send};
+use super::clone::{Clone, DeepClone};
 
 struct RcBox<T> {
     value: T,
