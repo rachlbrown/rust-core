@@ -7,3 +7,33 @@
 // <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
+
+#[cfg(target_word_size = "32")]
+pub fn bswap(x: int) -> int {
+    super::i32::bswap(x as i32) as int
+}
+
+#[cfg(target_word_size = "64")]
+pub fn bswap(x: int) -> int {
+    super::i64::bswap(x as i64) as int
+}
+
+#[cfg(target = "big")]
+pub fn to_be(x: int) -> int {
+    x
+}
+
+#[cfg(target = "little")]
+pub fn to_be(x: int) -> int {
+    bswap(x)
+}
+
+#[cfg(target = "big")]
+pub fn to_le(x: int) -> int {
+    bswap(x)
+}
+
+#[cfg(target = "little")]
+pub fn to_le(x: int) -> int {
+    x
+}

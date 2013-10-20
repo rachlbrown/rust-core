@@ -88,10 +88,6 @@ extern "rust-intrinsic" {
     pub fn cttz32(x: i32) -> i32;
     pub fn cttz64(x: i64) -> i64;
 
-    pub fn bswap16(x: i16) -> i16;
-    pub fn bswap32(x: i32) -> i32;
-    pub fn bswap64(x: i64) -> i64;
-
     pub fn i8_add_with_overflow(x: i8, y: i8) -> (i8, bool);
     pub fn i16_add_with_overflow(x: i16, y: i16) -> (i16, bool);
     pub fn i32_add_with_overflow(x: i32, y: i32) -> (i32, bool);

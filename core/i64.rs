@@ -7,3 +7,31 @@
 // <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
+
+extern "rust-intrinsic" {
+    fn bswap64(x: i64) -> i64;
+}
+
+pub fn bswap(x: i64) -> i64 {
+    unsafe { bswap64(x) }
+}
+
+#[cfg(target = "big")]
+pub fn to_be(x: i64) -> i64 {
+    x
+}
+
+#[cfg(target = "little")]
+pub fn to_be(x: i64) -> i64 {
+    bswap(x)
+}
+
+#[cfg(target = "big")]
+pub fn to_le(x: i64) -> i64 {
+    bswap(x)
+}
+
+#[cfg(target = "little")]
+pub fn to_le(x: i64) -> i64 {
+    x
+}

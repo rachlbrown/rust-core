@@ -7,3 +7,27 @@
 // <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
+
+pub fn bswap(x: u32) -> u32 {
+    super::i32::bswap(x as i32) as u32
+}
+
+#[cfg(target = "big")]
+pub fn to_be(x: u32) -> u32 {
+    x
+}
+
+#[cfg(target = "little")]
+pub fn to_be(x: u32) -> u32 {
+    bswap(x)
+}
+
+#[cfg(target = "big")]
+pub fn to_le(x: u32) -> u32 {
+    bswap(x)
+}
+
+#[cfg(target = "little")]
+pub fn to_le(x: u32) -> u32 {
+    x
+}
