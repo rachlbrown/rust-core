@@ -8,8 +8,6 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::option::{Option, Some, None};
-
 mod detail {
     extern "rust-intrinsic" {
         pub fn sqrtf32(x: f32) -> f32;
@@ -38,11 +36,11 @@ pub unsafe fn sqrt_unchecked(x: f32) -> f32 {
     detail::sqrtf32(x)
 }
 
-pub fn sqrt(x: f32) -> Option<f32> {
+pub fn sqrt(x: f32) -> f32 {
     if x < -0.0 {
-        None
+        0.0 / 0.0 // evaluate to NaN and raise `FE_INVALID`
     } else {
-        Some(unsafe { detail::sqrtf32(x) })
+        unsafe { detail::sqrtf32(x) }
     }
 }
 
