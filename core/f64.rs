@@ -24,9 +24,13 @@ mod detail {
         pub fn log2f64(x: f64) -> f64;
         pub fn fmaf64(a: f64, b: f64, c: f64) -> f64;
         pub fn fabsf64(x: f64) -> f64;
+        pub fn copysignf64(x: f64, y: f64) -> f64;
         pub fn floorf64(x: f64) -> f64;
         pub fn ceilf64(x: f64) -> f64;
         pub fn truncf64(x: f64) -> f64;
+        pub fn rintf64(x: f64) -> f64;
+        pub fn nearbyintf64(x: f64) -> f64;
+        pub fn roundf64(x: f64) -> f64;
     }
 }
 
@@ -86,6 +90,10 @@ pub fn abs(x: f64) -> f64 {
     unsafe { detail::fabsf64(x) }
 }
 
+pub fn copysign(x: f64, y: f64) -> f64 {
+    unsafe { detail::copysignf64(x, y) }
+}
+
 pub fn floor(x: f64) -> f64 {
     unsafe { detail::floorf64(x) }
 }
@@ -96,4 +104,16 @@ pub fn ceil(x: f64) -> f64 {
 
 pub fn trunc(x: f64) -> f64 {
     unsafe { detail::truncf64(x) }
+}
+
+pub fn rint(x: f64) -> f64 {
+    unsafe { detail::rintf64(x) }
+}
+
+pub fn nearbyint(x: f64) -> f64 {
+    unsafe { detail::nearbyintf64(x) }
+}
+
+pub fn round(x: f64) -> f64 {
+    unsafe { detail::roundf64(x) }
 }

@@ -24,9 +24,13 @@ mod detail {
         pub fn log2f32(x: f32) -> f32;
         pub fn fmaf32(a: f32, b: f32, c: f32) -> f32;
         pub fn fabsf32(x: f32) -> f32;
+        pub fn copysignf32(x: f32, y: f32) -> f32;
         pub fn floorf32(x: f32) -> f32;
         pub fn ceilf32(x: f32) -> f32;
         pub fn truncf32(x: f32) -> f32;
+        pub fn rintf32(x: f32) -> f32;
+        pub fn nearbyintf32(x: f32) -> f32;
+        pub fn roundf32(x: f32) -> f32;
     }
 }
 
@@ -86,6 +90,10 @@ pub fn abs(x: f32) -> f32 {
     unsafe { detail::fabsf32(x) }
 }
 
+pub fn copysign(x: f32, y: f32) -> f32 {
+    unsafe { detail::copysignf32(x, y) }
+}
+
 pub fn floor(x: f32) -> f32 {
     unsafe { detail::floorf32(x) }
 }
@@ -96,4 +104,16 @@ pub fn ceil(x: f32) -> f32 {
 
 pub fn trunc(x: f32) -> f32 {
     unsafe { detail::truncf32(x) }
+}
+
+pub fn rint(x: f32) -> f32 {
+    unsafe { detail::rintf32(x) }
+}
+
+pub fn nearbyint(x: f32) -> f32 {
+    unsafe { detail::nearbyintf32(x) }
+}
+
+pub fn round(x: f32) -> f32 {
+    unsafe { detail::roundf32(x) }
 }
