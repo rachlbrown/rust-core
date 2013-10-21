@@ -9,7 +9,7 @@
 // except according to those terms.
 
 use super::fail::fail_borrowed;
-use super::intrinsics::transmute;
+use super::mem::transmute;
 use super::ops::{Drop, Eq};
 use super::kinds::{Freeze, Send};
 use super::clone::{Clone, DeepClone};

@@ -8,7 +8,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::intrinsics::{move_val_init, size_of, transmute};
+use super::mem::{move_val_init, size_of, transmute};
 use super::heap::{out_of_memory, realloc_raw};
 use super::kinds::{Freeze, Send};
 use super::ops::Drop;

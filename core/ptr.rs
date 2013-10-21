@@ -8,7 +8,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::intrinsics;
+use super::mem::{forget, uninit};
 use super::ops::{Eq, Ord};
 
 mod detail {
@@ -66,20 +66,20 @@ pub unsafe fn set_memory<T>(dst: *mut T, c: u8, count: uint) {
 
 #[inline]
 pub unsafe fn read_ptr<T>(src: *T) -> T {
-    let mut tmp: T = intrinsics::uninit();
+    let mut tmp: T = uninit();
     copy_nonoverlapping_memory(&mut tmp, src, 1);
     tmp
 }
 
 #[inline]
 pub unsafe fn swap_ptr<T>(x: *mut T, y: *mut T) {
-    let mut tmp: T = intrinsics::uninit();
+    let mut tmp: T = uninit();
 
     copy_nonoverlapping_memory(&mut tmp, x as *T, 1);
     copy_memory(x, y as *T, 1); // `x` and `y` may overlap
     copy_nonoverlapping_memory(y, &tmp, 1);
 
-    intrinsics::forget(tmp);
+    forget(tmp);
 }
 
 impl<T> Eq for *T {

@@ -8,26 +8,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-mod detail {
-    extern "rust-intrinsic" {
-        pub fn size_of<T>() -> uint;
-    }
-}
-
-#[inline]
-pub fn size_of<T>() -> uint {
-    unsafe { detail::size_of::<T>() }
-}
-
 extern "rust-intrinsic" {
-    pub fn forget<T>(_: T) -> ();
-    pub fn transmute<T, U>(thing: T) -> U;
-
-    pub fn init<T>() -> T;
-    pub fn uninit<T>() -> T;
-
-    pub fn move_val_init<T>(dst: &mut T, src: T);
-
     pub fn sqrtf32(x: f32) -> f32;
     pub fn sqrtf64(x: f64) -> f64;
 
