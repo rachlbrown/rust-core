@@ -7,6 +7,45 @@ Rust lacks support for static linking and whole program optimization, so the
 `#[no_std]` crate. When these limitations are fixed, it will become a regular
 crate usable in a multi-crate project.
 
-Configuration:
+In the short term, this project aims to ease the use of Rust in freestanding
+and real-time use cases. Identifying any language issues specific to these
+niches is important.
 
-* If the C standard library is available, pass `--cfg libc` to `rustc`
+The long-term goal is for the necessary changes to be adopted by the Rust
+standard library to ease the maintenance burden. However, exploring the area in
+a separate repository is easier.
+
+# Configuration
+
+If the C standard library is available, pass `--cfg libc` to `rustc`.
+
+# C standard library
+
+Support for the C11 standard is currently assumed, and workarounds can be done
+on a case-by-case basis. Functionality from C will be reused wherever it makes
+sense.
+
+# Unwinding and out-of-memory
+
+The library currently makes use of `abort` in out-of-memory conditions like the
+Rust standard library. Some errors dealt with using linked failure in the Rust
+standard library are also currently dealt with using abort.
+
+Unwinding in these cases can become a configuration flag after threads are
+exposed and some very minor work to preserve safety during vector reallocations
+is done.
+
+# Stack safety
+
+A stack safety strategy is currently not implemented. For systems with an MMU,
+the likely solution will be a combination of guard pages and leveraging LLVM to
+handle functions with large stack frames.
+
+The prelude check system used for segmented stacks would work fine on a system
+with no MMU. Segmented stacks are unlikely, because lack of a userland
+scheduler is the main differentiation from the standard library.
+
+# Allocators
+
+Flexible support for custom allocators while preserving safety is very
+difficult, so it is unlikely to be an immediate priority.
