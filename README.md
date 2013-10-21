@@ -19,6 +19,14 @@ a separate repository is easier.
 
 If the C standard library is available, pass `--cfg libc` to `rustc`.
 
+# Building
+
+Currently, building to bytecode with `--emit-llvm` and then compiling/linking
+with `clang` is recommended. The Rust compiler is missing switches like
+`-ffreestanding`, `-fno-builtin` and a way to avoid linking in support
+libraries. Using `clang` also allows whole program optimization across a mixed
+Rust and C codebase.
+
 # C standard library
 
 Support for the C11 standard is currently assumed, and workarounds can be done
