@@ -8,6 +8,12 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+extern "rust-intrinsic" {
+    pub fn u32_add_with_overflow(x: u32, y: u32) -> (u32, bool);
+    pub fn u32_sub_with_overflow(x: u32, y: u32) -> (u32, bool);
+    pub fn u32_mul_with_overflow(x: u32, y: u32) -> (u32, bool);
+}
+
 pub fn bswap(x: u32) -> u32 {
     super::i32::bswap(x as i32) as u32
 }

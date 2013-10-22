@@ -8,6 +8,12 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+extern "rust-intrinsic" {
+    pub fn u64_add_with_overflow(x: u64, y: u64) -> (u64, bool);
+    pub fn u64_sub_with_overflow(x: u64, y: u64) -> (u64, bool);
+    pub fn u64_mul_with_overflow(x: u64, y: u64) -> (u64, bool);
+}
+
 pub fn bswap(x: u64) -> u64 {
     super::i64::bswap(x as i64) as u64
 }

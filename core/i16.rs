@@ -10,6 +10,12 @@
 
 extern "rust-intrinsic" {
     fn bswap16(x: i16) -> i16;
+    pub fn ctpop16(x: i16) -> i16;
+    pub fn ctlz16(x: i16) -> i16;
+    pub fn cttz16(x: i16) -> i16;
+    pub fn i16_add_with_overflow(x: i16, y: i16) -> (i16, bool);
+    pub fn i16_sub_with_overflow(x: i16, y: i16) -> (i16, bool);
+    pub fn i16_mul_with_overflow(x: i16, y: i16) -> (i16, bool);
 }
 
 pub fn bswap(x: i16) -> i16 {

@@ -10,6 +10,12 @@
 
 extern "rust-intrinsic" {
     fn bswap64(x: i64) -> i64;
+    pub fn ctpop64(x: i64) -> i64;
+    pub fn ctlz64(x: i64) -> i64;
+    pub fn cttz64(x: i64) -> i64;
+    pub fn i64_add_with_overflow(x: i64, y: i64) -> (i64, bool);
+    pub fn i64_sub_with_overflow(x: i64, y: i64) -> (i64, bool);
+    pub fn i64_mul_with_overflow(x: i64, y: i64) -> (i64, bool);
 }
 
 pub fn bswap(x: i64) -> i64 {

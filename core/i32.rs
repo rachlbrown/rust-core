@@ -10,6 +10,12 @@
 
 extern "rust-intrinsic" {
     fn bswap32(x: i32) -> i32;
+    pub fn ctpop32(x: i32) -> i32;
+    pub fn ctlz32(x: i32) -> i32;
+    pub fn cttz32(x: i32) -> i32;
+    pub fn i32_add_with_overflow(x: i32, y: i32) -> (i32, bool);
+    pub fn i32_sub_with_overflow(x: i32, y: i32) -> (i32, bool);
+    pub fn i32_mul_with_overflow(x: i32, y: i32) -> (i32, bool);
 }
 
 pub fn bswap(x: i32) -> i32 {

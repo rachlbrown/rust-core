@@ -12,7 +12,6 @@
 
 pub mod clone;
 pub mod fail;
-pub mod intrinsics;
 pub mod kinds;
 pub mod mem;
 pub mod ops;
