@@ -33,7 +33,9 @@ pub mod i16;
 pub mod i32;
 pub mod i64;
 
+#[cfg(libc)]
 pub mod f32;
+#[cfg(libc)]
 pub mod f64;
 
 #[cfg(libc)]
