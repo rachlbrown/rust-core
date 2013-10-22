@@ -30,6 +30,24 @@ mod detail {
         pub fn nearbyintf32(x: f32) -> f32;
         pub fn roundf32(x: f32) -> f32;
     }
+
+    extern {
+        pub fn exp2m1f(x: f32) -> f32;
+        pub fn cbrtf(x: f32) -> f32;
+        pub fn asinf(x: f32) -> f32;
+        pub fn acosf(x: f32) -> f32;
+        pub fn atanf(x: f32) -> f32;
+        pub fn atan2f(x: f32, y: f32) -> f32;
+        pub fn sinhf(x: f32) -> f32;
+        pub fn coshf(x: f32) -> f32;
+        pub fn tanhf(x: f32) -> f32;
+        pub fn asinhf(x: f32) -> f32;
+        pub fn acoshf(x: f32) -> f32;
+        pub fn atanhf(x: f32) -> f32;
+        pub fn erff(x: f32) -> f32;
+        pub fn erfcf(x: f32) -> f32;
+        pub fn tgammaf(x: f32) -> f32;
+    }
 }
 
 pub unsafe fn sqrt_unchecked(x: f32) -> f32 {
@@ -42,6 +60,10 @@ pub fn sqrt(x: f32) -> f32 {
     } else {
         unsafe { detail::sqrtf32(x) }
     }
+}
+
+pub fn cbrt(x: f32) -> f32 {
+    unsafe { detail::cbrtf(x) }
 }
 
 pub fn powi(x: f32, i: i32) -> f32 {
@@ -66,6 +88,10 @@ pub fn exp(x: f32) -> f32 {
 
 pub fn exp2(x: f32) -> f32 {
     unsafe { detail::exp2f32(x) }
+}
+
+pub fn exp2m1(x: f32) -> f32 {
+    unsafe { detail::exp2m1f(x) }
 }
 
 pub fn log(x: f32) -> f32 {
@@ -114,4 +140,56 @@ pub fn nearbyint(x: f32) -> f32 {
 
 pub fn round(x: f32) -> f32 {
     unsafe { detail::roundf32(x) }
+}
+
+pub fn asin(x: f32) -> f32 {
+    unsafe { detail::asinf(x) }
+}
+
+pub fn acos(x: f32) -> f32 {
+    unsafe { detail::acosf(x) }
+}
+
+pub fn atan(x: f32) -> f32 {
+    unsafe { detail::atanf(x) }
+}
+
+pub fn atan2(x: f32, y: f32) -> f32 {
+    unsafe { detail::atan2f(x, y) }
+}
+
+pub fn sinh(x: f32) -> f32 {
+    unsafe { detail::sinhf(x) }
+}
+
+pub fn cosh(x: f32) -> f32 {
+    unsafe { detail::coshf(x) }
+}
+
+pub fn tanh(x: f32) -> f32 {
+    unsafe { detail::tanhf(x) }
+}
+
+pub fn asinh(x: f32) -> f32 {
+    unsafe { detail::asinhf(x) }
+}
+
+pub fn acosh(x: f32) -> f32 {
+    unsafe { detail::acoshf(x) }
+}
+
+pub fn atanh(x: f32) -> f32 {
+    unsafe { detail::atanhf(x) }
+}
+
+pub fn erf(x: f32) -> f32 {
+    unsafe { detail::erff(x) }
+}
+
+pub fn erfc(x: f32) -> f32 {
+    unsafe { detail::erfcf(x) }
+}
+
+pub fn tgamma(x: f32) -> f32 {
+    unsafe { detail::tgammaf(x) }
 }

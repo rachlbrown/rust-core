@@ -30,6 +30,24 @@ mod detail {
         pub fn nearbyintf64(x: f64) -> f64;
         pub fn roundf64(x: f64) -> f64;
     }
+
+    extern {
+        pub fn exp2m1(x: f64) -> f64;
+        pub fn cbrt(x: f64) -> f64;
+        pub fn asin(x: f64) -> f64;
+        pub fn acos(x: f64) -> f64;
+        pub fn atan(x: f64) -> f64;
+        pub fn atan2(x: f64, y: f64) -> f64;
+        pub fn sinh(x: f64) -> f64;
+        pub fn cosh(x: f64) -> f64;
+        pub fn tanh(x: f64) -> f64;
+        pub fn asinh(x: f64) -> f64;
+        pub fn acosh(x: f64) -> f64;
+        pub fn atanh(x: f64) -> f64;
+        pub fn erf(x: f64) -> f64;
+        pub fn erfc(x: f64) -> f64;
+        pub fn tgamma(x: f64) -> f64;
+    }
 }
 
 pub unsafe fn sqrt_unchecked(x: f64) -> f64 {
@@ -42,6 +60,10 @@ pub fn sqrt(x: f64) -> f64 {
     } else {
         unsafe { detail::sqrtf64(x) }
     }
+}
+
+pub fn cbrt(x: f64) -> f64 {
+    unsafe { detail::cbrt(x) }
 }
 
 pub fn powi(x: f64, i: i32) -> f64 {
@@ -66,6 +88,10 @@ pub fn exp(x: f64) -> f64 {
 
 pub fn exp2(x: f64) -> f64 {
     unsafe { detail::exp2f64(x) }
+}
+
+pub fn exp2m1(x: f64) -> f64 {
+    unsafe { detail::exp2m1(x) }
 }
 
 pub fn log(x: f64) -> f64 {
@@ -114,4 +140,56 @@ pub fn nearbyint(x: f64) -> f64 {
 
 pub fn round(x: f64) -> f64 {
     unsafe { detail::roundf64(x) }
+}
+
+pub fn asin(x: f64) -> f64 {
+    unsafe { detail::asin(x) }
+}
+
+pub fn acos(x: f64) -> f64 {
+    unsafe { detail::acos(x) }
+}
+
+pub fn atan(x: f64) -> f64 {
+    unsafe { detail::atan(x) }
+}
+
+pub fn atan2(x: f64, y: f64) -> f64 {
+    unsafe { detail::atan2(x, y) }
+}
+
+pub fn sinh(x: f64) -> f64 {
+    unsafe { detail::sinh(x) }
+}
+
+pub fn cosh(x: f64) -> f64 {
+    unsafe { detail::cosh(x) }
+}
+
+pub fn tanh(x: f64) -> f64 {
+    unsafe { detail::tanh(x) }
+}
+
+pub fn asinh(x: f64) -> f64 {
+    unsafe { detail::asinh(x) }
+}
+
+pub fn acosh(x: f64) -> f64 {
+    unsafe { detail::acosh(x) }
+}
+
+pub fn atanh(x: f64) -> f64 {
+    unsafe { detail::atanh(x) }
+}
+
+pub fn erf(x: f64) -> f64 {
+    unsafe { detail::erf(x) }
+}
+
+pub fn erfc(x: f64) -> f64 {
+    unsafe { detail::erfc(x) }
+}
+
+pub fn tgamma(x: f64) -> f64 {
+    unsafe { detail::tgamma(x) }
 }
