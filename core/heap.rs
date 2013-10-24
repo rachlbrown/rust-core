@@ -25,7 +25,7 @@ extern {
 #[inline(always)]
 #[lang = "exchange_free"]
 pub unsafe fn free(ptr: *mut u8) {
-    free(ptr)
+    detail::free(ptr)
 }
 
 #[inline]
