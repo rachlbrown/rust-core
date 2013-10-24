@@ -38,3 +38,9 @@ extern "rust-intrinsic" {
     pub fn uninit<T>() -> T;
     pub fn move_val_init<T>(dst: &mut T, src: T);
 }
+
+pub trait Allocator {
+    unsafe fn alloc(&mut self, size: uint) -> *mut u8;
+    unsafe fn free(&mut self, ptr: *mut u8);
+    unsafe fn realloc(&mut self, ptr: *mut u8, size: uint) -> *mut u8;
+}
