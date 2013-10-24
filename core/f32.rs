@@ -32,7 +32,7 @@ mod detail {
     }
 
     extern {
-        pub fn exp2m1f(x: f32) -> f32;
+        pub fn expm1f(x: f32) -> f32;
         pub fn cbrtf(x: f32) -> f32;
         pub fn asinf(x: f32) -> f32;
         pub fn acosf(x: f32) -> f32;
@@ -90,8 +90,8 @@ pub fn exp2(x: f32) -> f32 {
     unsafe { detail::exp2f32(x) }
 }
 
-pub fn exp2m1(x: f32) -> f32 {
-    unsafe { detail::exp2m1f(x) }
+pub fn expm1(x: f32) -> f32 {
+    unsafe { detail::expm1f(x) }
 }
 
 pub fn log(x: f32) -> f32 {
