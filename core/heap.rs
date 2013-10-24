@@ -8,12 +8,23 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::libc::{aligned_alloc, free, malloc, realloc};
 use super::fail::abort;
 
-#[inline]
+mod detail {
+    extern {
+        pub fn free(ptr: *mut u8);
+    }
+}
+
+extern {
+    pub fn malloc(size: uint) -> *mut u8;
+    pub fn realloc(ptr: *mut u8, size: uint) -> *mut u8;
+    pub fn aligned_alloc(align: uint, size: uint) -> *mut u8;
+}
+
+#[inline(always)]
 #[lang = "exchange_free"]
-pub unsafe fn free_raw(ptr: *mut u8) {
+pub unsafe fn free(ptr: *mut u8) {
     free(ptr)
 }
 

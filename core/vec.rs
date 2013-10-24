@@ -9,10 +9,9 @@
 // except according to those terms.
 
 use super::mem::{move_val_init, size_of, transmute};
-use super::heap::{out_of_memory, realloc_raw};
+use super::heap::{out_of_memory, realloc_raw, free};
 use super::kinds::{Freeze, Send};
 use super::ops::Drop;
-use super::libc::free;
 use super::slice::Slice;
 use super::ptr::{offset, read_ptr};
 
