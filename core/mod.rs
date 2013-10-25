@@ -32,6 +32,14 @@ pub mod i16;
 pub mod i32;
 pub mod i64;
 
+#[cfg(target_os="linux", target_arch="x86")]
+#[path="platform/linux-x86/mod.rs"]
+pub mod platform;
+
+#[cfg(target_os="linux", target_arch="x86_64")]
+#[path="platform/linux-x86_64/mod.rs"]
+pub mod platform;
+
 #[cfg(libc)]
 pub mod f32;
 #[cfg(libc)]
