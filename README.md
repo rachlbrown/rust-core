@@ -55,5 +55,18 @@ scheduler is the main differentiation from the standard library.
 
 # Allocators
 
-Flexible support for custom allocators while preserving safety is very
-difficult, so it is unlikely to be an immediate priority.
+Containers with support for custom allocators will require
+[issue #4252](https://github.com/mozilla/rust/issues/4252) to be fixed, but
+the initial design is already worked out.
+
+The `core::mem::Allocator` trait defines the allocator interface. A generic
+container takes an allocator type parameter, with `core::heap::Heap` as the
+default allocator for a container constructed with the `new` static method.
+
+A container can be constructed using `Container::with_alloc(allocator)`, and
+will store the allocator instance internally. Since Rust has zero-size types,
+this has no overhead for allocators with no instance state.
+
+Sharing stateful allocator instances between containers can be done with
+`RcMut` or unsafely with an `*mut` pointer. Containers are already expensive to
+clone, so reference counting shouldn't be much of an issue.
