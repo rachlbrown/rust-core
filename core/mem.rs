@@ -40,7 +40,18 @@ extern "rust-intrinsic" {
 }
 
 pub trait Allocator {
-    unsafe fn alloc(&mut self, size: uint) -> *mut u8;
+    /// Allocate at least `size` bytes of memory.
+    ///
+    /// The `size` parameter must be non-zero. Return a pointer to the memory
+    /// allocation and the usable size.
+    unsafe fn alloc(&mut self, size: uint) -> (*mut u8, uint);
+
+    /// Change the size of the memory allocation pointed to by `ptr` to `size`.
+    ///
+    /// The `size` parameter must be non-zero. Return a pointer to the memory
+    /// allocation and the usable size.
+    unsafe fn realloc(&mut self, ptr: *mut u8, size: uint) -> (*mut u8, uint);
+
+    /// Free the memory allocation pointed to by `ptr`.
     unsafe fn free(&mut self, ptr: *mut u8);
-    unsafe fn realloc(&mut self, ptr: *mut u8, size: uint) -> *mut u8;
 }

@@ -66,15 +66,15 @@ pub unsafe fn out_of_memory() -> ! {
 pub struct Heap;
 
 impl Allocator for Heap {
-    unsafe fn alloc(&mut self, size: uint) -> *mut u8 {
-        malloc_raw(size)
+    unsafe fn alloc(&mut self, size: uint) -> (*mut u8, uint) {
+        (malloc_raw(size), size)
+    }
+
+    unsafe fn realloc(&mut self, ptr: *mut u8, size: uint) -> (*mut u8, uint) {
+        (realloc_raw(ptr, size), size)
     }
 
     unsafe fn free(&mut self, ptr: *mut u8) {
         free(ptr)
-    }
-
-    unsafe fn realloc(&mut self, ptr: *mut u8, size: uint) -> *mut u8 {
-        realloc_raw(ptr, size)
     }
 }
