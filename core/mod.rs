@@ -49,3 +49,6 @@ pub mod f64;
 pub mod heap;
 #[cfg(libc)]
 pub mod vec;
+
+#[cfg(libc)]
+pub mod os;
