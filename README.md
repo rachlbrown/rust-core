@@ -33,6 +33,22 @@ Support for the C11 standard is currently assumed, and workarounds can be done
 on a case-by-case basis. Functionality from C will be reused wherever it makes
 sense.
 
+# Freestanding
+
+For freestanding use, simply omit the `libc` configuration switch.
+
+LLVM will emit calls to `memcpy`, `memmove` and `memset`. Until [the
+fix](https://github.com/mozilla/rust/pull/9945) for symbol visibility lands,
+these must be provided by the auxilliary `support.rs` module.
+
+The `support.rs` module must be compiled with `rustc --lib --emit-llvm -passes
+inline` and then linked against the bytecode for the main module with `clang
+-flto -O2 main.bc support.bc`.
+
+The `inline` pass *must* be run separately to due to
+[issue #10116](https://github.com/mozilla/rust/issues/10116) or LLVM will
+generate infinitely recursive functions.
+
 # Unwinding and out-of-memory
 
 The library currently makes use of `abort` in out-of-memory conditions like the
