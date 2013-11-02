@@ -33,7 +33,10 @@ mod detail {
 
     extern {
         pub fn expm1f(x: f32) -> f32;
+        pub fn log1pf(x: f32) -> f32;
         pub fn cbrtf(x: f32) -> f32;
+        pub fn hypotf(x: f32, y: f32) -> f32;
+        pub fn tanf(x: f32) -> f32;
         pub fn asinf(x: f32) -> f32;
         pub fn acosf(x: f32) -> f32;
         pub fn atanf(x: f32) -> f32;
@@ -66,6 +69,10 @@ pub fn cbrt(x: f32) -> f32 {
     unsafe { detail::cbrtf(x) }
 }
 
+pub fn hypot(x: f32, y: f32) -> f32 {
+    unsafe { detail::hypotf(x, y) }
+}
+
 pub fn powi(x: f32, i: i32) -> f32 {
     unsafe { detail::powif32(x, i) }
 }
@@ -76,6 +83,10 @@ pub fn sin(x: f32) -> f32 {
 
 pub fn cos(x: f32) -> f32 {
     unsafe { detail::cosf32(x) }
+}
+
+pub fn tan(x: f32) -> f32 {
+    unsafe { detail::tanf(x) }
 }
 
 pub fn pow(x: f32, y: f32) -> f32 {
@@ -100,6 +111,10 @@ pub fn log(x: f32) -> f32 {
 
 pub fn log10(x: f32) -> f32 {
     unsafe { detail::log10f32(x) }
+}
+
+pub fn log1p(x: f32) -> f32 {
+    unsafe { detail::log1pf(x) }
 }
 
 pub fn log2(x: f32) -> f32 {

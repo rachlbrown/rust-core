@@ -33,7 +33,10 @@ mod detail {
 
     extern {
         pub fn expm1(x: f64) -> f64;
+        pub fn log1p(x: f64) -> f64;
         pub fn cbrt(x: f64) -> f64;
+        pub fn hypot(x: f64, y: f64) -> f64;
+        pub fn tan(x: f64) -> f64;
         pub fn asin(x: f64) -> f64;
         pub fn acos(x: f64) -> f64;
         pub fn atan(x: f64) -> f64;
@@ -66,6 +69,10 @@ pub fn cbrt(x: f64) -> f64 {
     unsafe { detail::cbrt(x) }
 }
 
+pub fn hypot(x: f64, y: f64) -> f64 {
+    unsafe { detail::hypot(x, y) }
+}
+
 pub fn powi(x: f64, i: i32) -> f64 {
     unsafe { detail::powif64(x, i) }
 }
@@ -76,6 +83,10 @@ pub fn sin(x: f64) -> f64 {
 
 pub fn cos(x: f64) -> f64 {
     unsafe { detail::cosf64(x) }
+}
+
+pub fn tan(x: f64) -> f64 {
+    unsafe { detail::tan(x) }
 }
 
 pub fn pow(x: f64, y: f64) -> f64 {
@@ -100,6 +111,10 @@ pub fn log(x: f64) -> f64 {
 
 pub fn log10(x: f64) -> f64 {
     unsafe { detail::log10f64(x) }
+}
+
+pub fn log1p(x: f64) -> f64 {
+    unsafe { detail::log1p(x) }
 }
 
 pub fn log2(x: f64) -> f64 {
