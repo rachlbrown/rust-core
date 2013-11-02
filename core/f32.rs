@@ -53,6 +53,7 @@ mod detail {
     }
 }
 
+#[inline(always)]
 pub unsafe fn sqrt_unchecked(x: f32) -> f32 {
     detail::sqrtf32(x)
 }
@@ -65,146 +66,182 @@ pub fn sqrt(x: f32) -> f32 {
     }
 }
 
+#[inline(always)]
 pub fn cbrt(x: f32) -> f32 {
     unsafe { detail::cbrtf(x) }
 }
 
+#[inline(always)]
 pub fn hypot(x: f32, y: f32) -> f32 {
     unsafe { detail::hypotf(x, y) }
 }
 
+#[inline(always)]
 pub fn powi(x: f32, i: i32) -> f32 {
     unsafe { detail::powif32(x, i) }
 }
 
+#[inline(always)]
 pub fn pow(x: f32, y: f32) -> f32 {
     unsafe { detail::powf32(x, y) }
 }
 
+#[inline(always)]
 pub fn exp(x: f32) -> f32 {
     unsafe { detail::expf32(x) }
 }
 
+#[inline(always)]
 pub fn exp2(x: f32) -> f32 {
     unsafe { detail::exp2f32(x) }
 }
 
+#[inline(always)]
 pub fn expm1(x: f32) -> f32 {
     unsafe { detail::expm1f(x) }
 }
 
+#[inline(always)]
 pub fn log(x: f32) -> f32 {
     unsafe { detail::logf32(x) }
 }
 
+#[inline(always)]
 pub fn log10(x: f32) -> f32 {
     unsafe { detail::log10f32(x) }
 }
 
+#[inline(always)]
 pub fn log1p(x: f32) -> f32 {
     unsafe { detail::log1pf(x) }
 }
 
+#[inline(always)]
 pub fn log2(x: f32) -> f32 {
     unsafe { detail::log2f32(x) }
 }
 
+#[inline(always)]
 pub fn fma(a: f32, b: f32, c: f32) -> f32 {
     unsafe { detail::fmaf32(a, b, c) }
 }
 
+#[inline(always)]
 pub fn abs(x: f32) -> f32 {
     unsafe { detail::fabsf32(x) }
 }
 
+#[inline(always)]
 pub fn copysign(x: f32, y: f32) -> f32 {
     unsafe { detail::copysignf32(x, y) }
 }
 
+#[inline(always)]
 pub fn floor(x: f32) -> f32 {
     unsafe { detail::floorf32(x) }
 }
 
+#[inline(always)]
 pub fn ceil(x: f32) -> f32 {
     unsafe { detail::ceilf32(x) }
 }
 
+#[inline(always)]
 pub fn trunc(x: f32) -> f32 {
     unsafe { detail::truncf32(x) }
 }
 
+#[inline(always)]
 pub fn rint(x: f32) -> f32 {
     unsafe { detail::rintf32(x) }
 }
 
+#[inline(always)]
 pub fn nearbyint(x: f32) -> f32 {
     unsafe { detail::nearbyintf32(x) }
 }
 
+#[inline(always)]
 pub fn round(x: f32) -> f32 {
     unsafe { detail::roundf32(x) }
 }
 
+#[inline(always)]
 pub fn sin(x: f32) -> f32 {
     unsafe { detail::sinf32(x) }
 }
 
+#[inline(always)]
 pub fn cos(x: f32) -> f32 {
     unsafe { detail::cosf32(x) }
 }
 
+#[inline(always)]
 pub fn tan(x: f32) -> f32 {
     unsafe { detail::tanf(x) }
 }
 
+#[inline(always)]
 pub fn asin(x: f32) -> f32 {
     unsafe { detail::asinf(x) }
 }
 
+#[inline(always)]
 pub fn acos(x: f32) -> f32 {
     unsafe { detail::acosf(x) }
 }
 
+#[inline(always)]
 pub fn atan(x: f32) -> f32 {
     unsafe { detail::atanf(x) }
 }
 
+#[inline(always)]
 pub fn atan2(x: f32, y: f32) -> f32 {
     unsafe { detail::atan2f(x, y) }
 }
 
+#[inline(always)]
 pub fn sinh(x: f32) -> f32 {
     unsafe { detail::sinhf(x) }
 }
 
+#[inline(always)]
 pub fn cosh(x: f32) -> f32 {
     unsafe { detail::coshf(x) }
 }
 
+#[inline(always)]
 pub fn tanh(x: f32) -> f32 {
     unsafe { detail::tanhf(x) }
 }
 
+#[inline(always)]
 pub fn asinh(x: f32) -> f32 {
     unsafe { detail::asinhf(x) }
 }
 
+#[inline(always)]
 pub fn acosh(x: f32) -> f32 {
     unsafe { detail::acoshf(x) }
 }
 
+#[inline(always)]
 pub fn atanh(x: f32) -> f32 {
     unsafe { detail::atanhf(x) }
 }
 
+#[inline(always)]
 pub fn erf(x: f32) -> f32 {
     unsafe { detail::erff(x) }
 }
 
+#[inline(always)]
 pub fn erfc(x: f32) -> f32 {
     unsafe { detail::erfcf(x) }
 }
 
+#[inline(always)]
 pub fn tgamma(x: f32) -> f32 {
     unsafe { detail::tgammaf(x) }
 }

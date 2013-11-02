@@ -80,24 +80,24 @@ pub trait Index<Index, Result> {
 
 #[lang="eq"]
 pub trait Eq {
-    #[inline]
+    #[inline(always)]
     fn eq(&self, other: &Self) -> bool { !self.ne(other) }
 
-    #[inline]
+    #[inline(always)]
     fn ne(&self, other: &Self) -> bool { !self.eq(other) }
 }
 
 #[lang="ord"]
 pub trait Ord {
-    #[inline]
+    #[inline(always)]
     fn lt(&self, other: &Self) -> bool { other.gt(self) }
 
-    #[inline]
+    #[inline(always)]
     fn le(&self, other: &Self) -> bool { !other.lt(self) }
 
-    #[inline]
+    #[inline(always)]
     fn gt(&self, other: &Self) -> bool { other.lt(self) }
 
-    #[inline]
+    #[inline(always)]
     fn ge(&self, other: &Self) -> bool { !self.lt(other) }
 }

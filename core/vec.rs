@@ -27,12 +27,12 @@ impl<T: Send + Freeze> Vec<T> {
         Vec { len: 0, cap: 0, ptr: 0 as *mut T }
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn len(&self) -> uint {
         self.len
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn capacity(&self) -> uint {
         self.cap
     }

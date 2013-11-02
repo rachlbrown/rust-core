@@ -28,37 +28,37 @@ extern "rust-intrinsic" {
     pub fn offset<T>(dst: *T, offset: int) -> *T;
 }
 
-#[inline]
+#[inline(always)]
 #[cfg(target_word_size = "32")]
 pub unsafe fn copy_memory<T>(dst: *mut T, src: *T, count: uint) {
     detail::memmove32(dst, src, count as u32)
 }
 
-#[inline]
+#[inline(always)]
 #[cfg(target_word_size = "64")]
 pub unsafe fn copy_memory<T>(dst: *mut T, src: *T, count: uint) {
     detail::memmove64(dst, src, count as u64)
 }
 
-#[inline]
+#[inline(always)]
 #[cfg(target_word_size = "32")]
 pub unsafe fn copy_nonoverlapping_memory<T>(dst: *mut T, src: *T, count: uint) {
     detail::memcpy32(dst, src, count as u32)
 }
 
-#[inline]
+#[inline(always)]
 #[cfg(target_word_size = "64")]
 pub unsafe fn copy_nonoverlapping_memory<T>(dst: *mut T, src: *T, count: uint) {
     detail::memcpy64(dst, src, count as u64)
 }
 
-#[inline]
+#[inline(always)]
 #[cfg(target_word_size = "32")]
 pub unsafe fn set_memory<T>(dst: *mut T, c: u8, count: uint) {
     detail::memset32(dst, c, count as u32)
 }
 
-#[inline]
+#[inline(always)]
 #[cfg(target_word_size = "64")]
 pub unsafe fn set_memory<T>(dst: *mut T, c: u8, count: uint) {
     detail::memset64(dst, c, count as u64)
@@ -83,45 +83,45 @@ pub unsafe fn swap_ptr<T>(x: *mut T, y: *mut T) {
 }
 
 impl<T> Eq for *T {
-    #[inline]
+    #[inline(always)]
     fn eq(&self, other: &*T) -> bool { *self == *other }
 
-    #[inline]
+    #[inline(always)]
     fn ne(&self, other: &*T) -> bool { *self != *other }
 }
 
 impl<T> Eq for *mut T {
-    #[inline]
+    #[inline(always)]
     fn eq(&self, other: &*mut T) -> bool { *self == *other }
 
-    #[inline]
+    #[inline(always)]
     fn ne(&self, other: &*mut T) -> bool { *self != *other }
 }
 
 impl<T> Ord for *T {
-    #[inline]
+    #[inline(always)]
     fn lt(&self, other: &*T) -> bool { *self < *other }
 
-    #[inline]
+    #[inline(always)]
     fn le(&self, other: &*T) -> bool { *self <= *other }
 
-    #[inline]
+    #[inline(always)]
     fn gt(&self, other: &*T) -> bool { *self > *other }
 
-    #[inline]
+    #[inline(always)]
     fn ge(&self, other: &*T) -> bool { *self >= *other }
 }
 
 impl<T> Ord for *mut T {
-    #[inline]
+    #[inline(always)]
     fn lt(&self, other: &*mut T) -> bool { *self < *other }
 
-    #[inline]
+    #[inline(always)]
     fn le(&self, other: &*mut T) -> bool { *self <= *other }
 
-    #[inline]
+    #[inline(always)]
     fn gt(&self, other: &*mut T) -> bool { *self > *other }
 
-    #[inline]
+    #[inline(always)]
     fn ge(&self, other: &*mut T) -> bool { *self >= *other }
 }

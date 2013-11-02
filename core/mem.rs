@@ -16,17 +16,17 @@ mod detail {
     }
 }
 
-#[inline]
+#[inline(always)]
 pub fn size_of<T>() -> uint {
     unsafe { detail::size_of::<T>() }
 }
 
-#[inline]
+#[inline(always)]
 pub fn min_align_of<T>() -> uint {
     unsafe { detail::min_align_of::<T>() }
 }
 
-#[inline]
+#[inline(always)]
 pub fn pref_align_of<T>() -> uint {
     unsafe { detail::pref_align_of::<T>() }
 }

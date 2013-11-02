@@ -53,6 +53,7 @@ mod detail {
     }
 }
 
+#[inline(always)]
 pub unsafe fn sqrt_unchecked(x: f64) -> f64 {
     detail::sqrtf64(x)
 }
@@ -65,146 +66,182 @@ pub fn sqrt(x: f64) -> f64 {
     }
 }
 
+#[inline(always)]
 pub fn cbrt(x: f64) -> f64 {
     unsafe { detail::cbrt(x) }
 }
 
+#[inline(always)]
 pub fn hypot(x: f64, y: f64) -> f64 {
     unsafe { detail::hypot(x, y) }
 }
 
+#[inline(always)]
 pub fn powi(x: f64, i: i32) -> f64 {
     unsafe { detail::powif64(x, i) }
 }
 
+#[inline(always)]
 pub fn pow(x: f64, y: f64) -> f64 {
     unsafe { detail::powf64(x, y) }
 }
 
+#[inline(always)]
 pub fn exp(x: f64) -> f64 {
     unsafe { detail::expf64(x) }
 }
 
+#[inline(always)]
 pub fn exp2(x: f64) -> f64 {
     unsafe { detail::exp2f64(x) }
 }
 
+#[inline(always)]
 pub fn expm1(x: f64) -> f64 {
     unsafe { detail::expm1(x) }
 }
 
+#[inline(always)]
 pub fn log(x: f64) -> f64 {
     unsafe { detail::logf64(x) }
 }
 
+#[inline(always)]
 pub fn log10(x: f64) -> f64 {
     unsafe { detail::log10f64(x) }
 }
 
+#[inline(always)]
 pub fn log1p(x: f64) -> f64 {
     unsafe { detail::log1p(x) }
 }
 
+#[inline(always)]
 pub fn log2(x: f64) -> f64 {
     unsafe { detail::log2f64(x) }
 }
 
+#[inline(always)]
 pub fn fma(a: f64, b: f64, c: f64) -> f64 {
     unsafe { detail::fmaf64(a, b, c) }
 }
 
+#[inline(always)]
 pub fn abs(x: f64) -> f64 {
     unsafe { detail::fabsf64(x) }
 }
 
+#[inline(always)]
 pub fn copysign(x: f64, y: f64) -> f64 {
     unsafe { detail::copysignf64(x, y) }
 }
 
+#[inline(always)]
 pub fn floor(x: f64) -> f64 {
     unsafe { detail::floorf64(x) }
 }
 
+#[inline(always)]
 pub fn ceil(x: f64) -> f64 {
     unsafe { detail::ceilf64(x) }
 }
 
+#[inline(always)]
 pub fn trunc(x: f64) -> f64 {
     unsafe { detail::truncf64(x) }
 }
 
+#[inline(always)]
 pub fn rint(x: f64) -> f64 {
     unsafe { detail::rintf64(x) }
 }
 
+#[inline(always)]
 pub fn nearbyint(x: f64) -> f64 {
     unsafe { detail::nearbyintf64(x) }
 }
 
+#[inline(always)]
 pub fn round(x: f64) -> f64 {
     unsafe { detail::roundf64(x) }
 }
 
+#[inline(always)]
 pub fn sin(x: f64) -> f64 {
     unsafe { detail::sinf64(x) }
 }
 
+#[inline(always)]
 pub fn cos(x: f64) -> f64 {
     unsafe { detail::cosf64(x) }
 }
 
+#[inline(always)]
 pub fn tan(x: f64) -> f64 {
     unsafe { detail::tan(x) }
 }
 
+#[inline(always)]
 pub fn asin(x: f64) -> f64 {
     unsafe { detail::asin(x) }
 }
 
+#[inline(always)]
 pub fn acos(x: f64) -> f64 {
     unsafe { detail::acos(x) }
 }
 
+#[inline(always)]
 pub fn atan(x: f64) -> f64 {
     unsafe { detail::atan(x) }
 }
 
+#[inline(always)]
 pub fn atan2(x: f64, y: f64) -> f64 {
     unsafe { detail::atan2(x, y) }
 }
 
+#[inline(always)]
 pub fn sinh(x: f64) -> f64 {
     unsafe { detail::sinh(x) }
 }
 
+#[inline(always)]
 pub fn cosh(x: f64) -> f64 {
     unsafe { detail::cosh(x) }
 }
 
+#[inline(always)]
 pub fn tanh(x: f64) -> f64 {
     unsafe { detail::tanh(x) }
 }
 
+#[inline(always)]
 pub fn asinh(x: f64) -> f64 {
     unsafe { detail::asinh(x) }
 }
 
+#[inline(always)]
 pub fn acosh(x: f64) -> f64 {
     unsafe { detail::acosh(x) }
 }
 
+#[inline(always)]
 pub fn atanh(x: f64) -> f64 {
     unsafe { detail::atanh(x) }
 }
 
+#[inline(always)]
 pub fn erf(x: f64) -> f64 {
     unsafe { detail::erf(x) }
 }
 
+#[inline(always)]
 pub fn erfc(x: f64) -> f64 {
     unsafe { detail::erfc(x) }
 }
 
+#[inline(always)]
 pub fn tgamma(x: f64) -> f64 {
     unsafe { detail::tgamma(x) }
 }
