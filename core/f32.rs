@@ -77,18 +77,6 @@ pub fn powi(x: f32, i: i32) -> f32 {
     unsafe { detail::powif32(x, i) }
 }
 
-pub fn sin(x: f32) -> f32 {
-    unsafe { detail::sinf32(x) }
-}
-
-pub fn cos(x: f32) -> f32 {
-    unsafe { detail::cosf32(x) }
-}
-
-pub fn tan(x: f32) -> f32 {
-    unsafe { detail::tanf(x) }
-}
-
 pub fn pow(x: f32, y: f32) -> f32 {
     unsafe { detail::powf32(x, y) }
 }
@@ -155,6 +143,18 @@ pub fn nearbyint(x: f32) -> f32 {
 
 pub fn round(x: f32) -> f32 {
     unsafe { detail::roundf32(x) }
+}
+
+pub fn sin(x: f32) -> f32 {
+    unsafe { detail::sinf32(x) }
+}
+
+pub fn cos(x: f32) -> f32 {
+    unsafe { detail::cosf32(x) }
+}
+
+pub fn tan(x: f32) -> f32 {
+    unsafe { detail::tanf(x) }
 }
 
 pub fn asin(x: f32) -> f32 {

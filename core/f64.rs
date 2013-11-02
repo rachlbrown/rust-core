@@ -77,18 +77,6 @@ pub fn powi(x: f64, i: i32) -> f64 {
     unsafe { detail::powif64(x, i) }
 }
 
-pub fn sin(x: f64) -> f64 {
-    unsafe { detail::sinf64(x) }
-}
-
-pub fn cos(x: f64) -> f64 {
-    unsafe { detail::cosf64(x) }
-}
-
-pub fn tan(x: f64) -> f64 {
-    unsafe { detail::tan(x) }
-}
-
 pub fn pow(x: f64, y: f64) -> f64 {
     unsafe { detail::powf64(x, y) }
 }
@@ -155,6 +143,18 @@ pub fn nearbyint(x: f64) -> f64 {
 
 pub fn round(x: f64) -> f64 {
     unsafe { detail::roundf64(x) }
+}
+
+pub fn sin(x: f64) -> f64 {
+    unsafe { detail::sinf64(x) }
+}
+
+pub fn cos(x: f64) -> f64 {
+    unsafe { detail::cosf64(x) }
+}
+
+pub fn tan(x: f64) -> f64 {
+    unsafe { detail::tan(x) }
 }
 
 pub fn asin(x: f64) -> f64 {
