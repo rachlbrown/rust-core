@@ -10,6 +10,7 @@
 
 #[allow(ctypes, cstack)];
 
+pub mod char;
 pub mod clone;
 pub mod fail;
 pub mod kinds;
