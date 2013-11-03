@@ -24,8 +24,3 @@ pub type c_ulonglong = u64;
 
 pub type ssize_t     = i32;
 pub type size_t      = u32;
-
-
-// FIXME: these should hold on all platforms
-pub type intptr_t  = int;
-pub type uintptr_t = uint;
