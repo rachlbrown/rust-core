@@ -10,6 +10,7 @@
 
 use super::mem::{Allocator, move_val_init, size_of, transmute};
 use super::fail::out_of_memory;
+#[cfg(libc)]
 use super::heap::{Heap, malloc_raw, free};
 use super::kinds::{Freeze, Send};
 use super::ops::Drop;
@@ -24,6 +25,7 @@ pub struct Vec<T, A> {
     priv alloc: A
 }
 
+#[cfg(libc)]
 impl<T: Send + Freeze> Vec<T, Heap> {
     #[inline(always)]
     pub fn new() -> Vec<T, Heap> {
@@ -121,6 +123,7 @@ impl<T: Send + Freeze, A: Allocator> Vec<T, A> {
 
 
 // FIXME: use the allocator, blocked on https://github.com/mozilla/rust/issues/4252
+#[cfg(libc)]
 #[unsafe_destructor]
 impl<T: Send + Freeze> Drop for Vec<T, Heap> {
     fn drop(&mut self) {

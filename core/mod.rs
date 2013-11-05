@@ -20,6 +20,7 @@ pub mod option;
 pub mod ptr;
 pub mod rc;
 pub mod slice;
+pub mod vec;
 
 pub mod uint;
 pub mod u8;
@@ -48,8 +49,6 @@ pub mod f64;
 
 #[cfg(libc)]
 pub mod heap;
-#[cfg(libc)]
-pub mod vec;
 
 #[cfg(libc)]
 pub mod os;
