@@ -11,7 +11,7 @@
 use super::mem::{Allocator, move_val_init, size_of, transmute};
 use super::fail::out_of_memory;
 #[cfg(libc)]
-use super::heap::{Heap, malloc_raw, free};
+use super::heap::{Heap, free};
 use super::kinds::{Freeze, Send};
 use super::ops::Drop;
 use super::slice::Slice;
@@ -29,40 +29,36 @@ pub struct Vec<T, A> {
 impl<T: Send + Freeze> Vec<T, Heap> {
     #[inline(always)]
     pub fn new() -> Vec<T, Heap> {
-        Vec { len: 0, cap: 0, ptr: 0 as *mut T, alloc: Heap }
+        Vec::with_alloc(Heap)
     }
 
+    #[inline(always)]
     pub fn with_capacity(capacity: uint) -> Vec<T, Heap> {
+        Vec::with_alloc_capacity(Heap, capacity)
+    }
+}
+
+// FIXME: making these public is blocked on the destructor being able to use
+// the allocator (see below)
+impl<T: Send + Freeze, A: Allocator> Vec<T, A> {
+    #[inline(always)]
+    fn with_alloc(alloc: A) -> Vec<T, A> {
+        Vec { len: 0, cap: 0, ptr: 0 as *mut T, alloc: alloc }
+    }
+
+    fn with_alloc_capacity(mut alloc: A, capacity: uint) -> Vec<T, A> {
         if capacity == 0 {
-            Vec::new()
+            Vec::with_alloc(alloc)
         } else {
             let (size, overflow) = mul_with_overflow(capacity, size_of::<T>());
             if overflow {
                 out_of_memory();
             }
-            let ptr = unsafe { malloc_raw(size) };
-            Vec { len: 0, cap: capacity, ptr: ptr as *mut T, alloc: Heap }
+            let (ptr, _) = unsafe { alloc.alloc(size) };
+            Vec { len: 0, cap: capacity, ptr: ptr as *mut T, alloc: alloc }
         }
     }
 }
-
-/* FIXME: blocked on the destructor being able to use the allocator (see below)
-impl<T: Send + Freeze, A: Allocator> Vec<T, A> {
-    #[inline(always)]
-    pub fn with_alloc(alloc: A) -> Vec<T, A> {
-        Vec { len: 0, cap: 0, ptr: 0 as *mut T, alloc: alloc }
-    }
-
-    pub fn with_alloc_capacity(mut alloc: A, capacity: uint) -> Vec<T, A> {
-        let (size, overflow) = mul_with_overflow(capacity, size_of::<T>());
-        if overflow {
-            out_of_memory();
-        }
-        let (ptr, _) = unsafe { alloc.alloc(size) };
-        Vec { len: 0, cap: capacity, ptr: ptr as *mut T, alloc: alloc }
-    }
-}
-*/
 
 impl<T: Send + Freeze, A: Allocator> Vec<T, A> {
     #[inline(always)]
