@@ -59,7 +59,7 @@ pub unsafe fn realloc_raw(ptr: *mut u8, size: uint) -> *mut u8 {
 }
 
 #[inline]
-pub unsafe fn out_of_memory() -> ! {
+pub fn out_of_memory() -> ! {
     abort()
 }
 

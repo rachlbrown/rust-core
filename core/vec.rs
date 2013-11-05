@@ -9,11 +9,12 @@
 // except according to those terms.
 
 use super::mem::{move_val_init, size_of, transmute};
-use super::heap::{out_of_memory, realloc_raw, free};
+use super::heap::{out_of_memory, malloc_raw, realloc_raw, free};
 use super::kinds::{Freeze, Send};
 use super::ops::Drop;
 use super::slice::Slice;
 use super::ptr::{offset, read_ptr};
+use super::uint::mul_with_overflow;
 
 pub struct Vec<T> {
     priv len: uint,
@@ -25,6 +26,15 @@ impl<T: Send + Freeze> Vec<T> {
     #[inline]
     pub fn new() -> Vec<T> {
         Vec { len: 0, cap: 0, ptr: 0 as *mut T }
+    }
+
+    pub fn with_capacity(capacity: uint) -> Vec<T> {
+        let (size, overflow) = mul_with_overflow(capacity, size_of::<T>());
+        if overflow {
+            out_of_memory();
+        }
+        let ptr = unsafe { malloc_raw(size) };
+        Vec { len: 0, cap: capacity, ptr: ptr as *mut T }
     }
 
     #[inline(always)]
