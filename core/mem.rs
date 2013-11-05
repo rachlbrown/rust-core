@@ -8,6 +8,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use super::ptr::copy_nonoverlapping_memory;
+
 mod detail {
     extern "rust-intrinsic" {
         pub fn size_of<T>() -> uint;
@@ -37,6 +39,18 @@ extern "rust-intrinsic" {
     pub fn init<T>() -> T;
     pub fn uninit<T>() -> T;
     pub fn move_val_init<T>(dst: &mut T, src: T);
+}
+
+pub fn swap<T>(x: &mut T, y: &mut T) {
+    unsafe {
+        let mut tmp: T = uninit();
+
+        copy_nonoverlapping_memory(&mut tmp, x as *mut T as *T, 1);
+        copy_nonoverlapping_memory(x, y as *mut T as *T, 1);
+        copy_nonoverlapping_memory(y, &tmp, 1);
+
+        forget(tmp);
+    }
 }
 
 pub trait Allocator {
