@@ -79,8 +79,9 @@ impl<T: Send + Freeze, A: Allocator> Vec<T, A> {
                 self.cap = 0;
                 self.ptr = 0 as *mut T;
             } else {
-                let (ptr, _) = self.alloc.realloc(self.ptr as *mut u8, self.cap * size_of::<T>());
+                let (ptr, _) = self.alloc.realloc(self.ptr as *mut u8, self.len * size_of::<T>());
                 self.ptr = ptr as *mut T;
+                self.cap = self.len;
             }
         }
     }
