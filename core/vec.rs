@@ -9,7 +9,8 @@
 // except according to those terms.
 
 use super::mem::{Allocator, move_val_init, size_of, transmute};
-use super::heap::{Heap, out_of_memory, malloc_raw, free};
+use super::fail::out_of_memory;
+use super::heap::{Heap, malloc_raw, free};
 use super::kinds::{Freeze, Send};
 use super::ops::Drop;
 use super::slice::Slice;

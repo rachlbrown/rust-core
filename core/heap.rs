@@ -8,7 +8,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::fail::abort;
+use super::fail::out_of_memory;
 use super::mem::Allocator;
 
 mod detail {
@@ -64,11 +64,6 @@ pub unsafe fn realloc_raw(ptr: *mut u8, size: uint) -> *mut u8 {
         out_of_memory()
     }
     ptr
-}
-
-#[inline]
-pub fn out_of_memory() -> ! {
-    abort()
 }
 
 pub struct Heap;

@@ -35,3 +35,8 @@ pub fn fail_(_: *u8, _: *u8, _: uint) -> ! {
 pub fn fail_borrowed() -> ! {
     abort()
 }
+
+#[inline]
+pub fn out_of_memory() -> ! {
+    abort()
+}
