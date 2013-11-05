@@ -9,6 +9,48 @@
 // except according to those terms.
 
 #[cfg(target_word_size = "32")]
+#[inline(always)]
+pub fn add_with_overflow(x: int, y: int) -> (int, bool) {
+    let (a, b) = super::i32::add_with_overflow(x as i32, y as i32);
+    (a as int, b)
+}
+
+#[cfg(target_word_size = "64")]
+#[inline(always)]
+pub fn add_with_overflow(x: int, y: int) -> (int, bool) {
+    let (a, b) = super::i64::add_with_overflow(x as i64, y as i64);
+    (a as int, b)
+}
+
+#[cfg(target_word_size = "32")]
+#[inline(always)]
+pub fn sub_with_overflow(x: int, y: int) -> (int, bool) {
+    let (a, b) = super::i32::sub_with_overflow(x as i32, y as i32);
+    (a as int, b)
+}
+
+#[cfg(target_word_size = "64")]
+#[inline(always)]
+pub fn sub_with_overflow(x: int, y: int) -> (int, bool) {
+    let (a, b) = super::i64::sub_with_overflow(x as i64, y as i64);
+    (a as int, b)
+}
+
+#[cfg(target_word_size = "32")]
+#[inline(always)]
+pub fn mul_with_overflow(x: int, y: int) -> (int, bool) {
+    let (a, b) = super::i32::mul_with_overflow(x as i32, y as i32);
+    (a as int, b)
+}
+
+#[cfg(target_word_size = "64")]
+#[inline(always)]
+pub fn mul_with_overflow(x: int, y: int) -> (int, bool) {
+    let (a, b) = super::i64::mul_with_overflow(x as i64, y as i64);
+    (a as int, b)
+}
+
+#[cfg(target_word_size = "32")]
 pub fn bswap(x: int) -> int {
     super::i32::bswap(x as i32) as int
 }

@@ -9,7 +9,22 @@
 // except according to those terms.
 
 extern "rust-intrinsic" {
-    pub fn u8_add_with_overflow(x: u8, y: u8) -> (u8, bool);
-    pub fn u8_sub_with_overflow(x: u8, y: u8) -> (u8, bool);
-    pub fn u8_mul_with_overflow(x: u8, y: u8) -> (u8, bool);
+    fn u8_add_with_overflow(x: u8, y: u8) -> (u8, bool);
+    fn u8_sub_with_overflow(x: u8, y: u8) -> (u8, bool);
+    fn u8_mul_with_overflow(x: u8, y: u8) -> (u8, bool);
+}
+
+#[inline(always)]
+pub fn add_with_overflow(x: u8, y: u8) -> (u8, bool) {
+    unsafe { u8_add_with_overflow(x, y) }
+}
+
+#[inline(always)]
+pub fn sub_with_overflow(x: u8, y: u8) -> (u8, bool) {
+    unsafe { u8_sub_with_overflow(x, y) }
+}
+
+#[inline(always)]
+pub fn mul_with_overflow(x: u8, y: u8) -> (u8, bool) {
+    unsafe { u8_mul_with_overflow(x, y) }
 }

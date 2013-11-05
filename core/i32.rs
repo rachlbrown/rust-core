@@ -13,9 +13,24 @@ extern "rust-intrinsic" {
     pub fn ctpop32(x: i32) -> i32;
     pub fn ctlz32(x: i32) -> i32;
     pub fn cttz32(x: i32) -> i32;
-    pub fn i32_add_with_overflow(x: i32, y: i32) -> (i32, bool);
-    pub fn i32_sub_with_overflow(x: i32, y: i32) -> (i32, bool);
-    pub fn i32_mul_with_overflow(x: i32, y: i32) -> (i32, bool);
+    fn i32_add_with_overflow(x: i32, y: i32) -> (i32, bool);
+    fn i32_sub_with_overflow(x: i32, y: i32) -> (i32, bool);
+    fn i32_mul_with_overflow(x: i32, y: i32) -> (i32, bool);
+}
+
+#[inline(always)]
+pub fn add_with_overflow(x: i32, y: i32) -> (i32, bool) {
+    unsafe { i32_add_with_overflow(x, y) }
+}
+
+#[inline(always)]
+pub fn sub_with_overflow(x: i32, y: i32) -> (i32, bool) {
+    unsafe { i32_sub_with_overflow(x, y) }
+}
+
+#[inline(always)]
+pub fn mul_with_overflow(x: i32, y: i32) -> (i32, bool) {
+    unsafe { i32_mul_with_overflow(x, y) }
 }
 
 pub fn bswap(x: i32) -> i32 {

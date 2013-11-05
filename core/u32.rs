@@ -9,9 +9,24 @@
 // except according to those terms.
 
 extern "rust-intrinsic" {
-    pub fn u32_add_with_overflow(x: u32, y: u32) -> (u32, bool);
-    pub fn u32_sub_with_overflow(x: u32, y: u32) -> (u32, bool);
-    pub fn u32_mul_with_overflow(x: u32, y: u32) -> (u32, bool);
+    fn u32_add_with_overflow(x: u32, y: u32) -> (u32, bool);
+    fn u32_sub_with_overflow(x: u32, y: u32) -> (u32, bool);
+    fn u32_mul_with_overflow(x: u32, y: u32) -> (u32, bool);
+}
+
+#[inline(always)]
+pub fn add_with_overflow(x: u32, y: u32) -> (u32, bool) {
+    unsafe { u32_add_with_overflow(x, y) }
+}
+
+#[inline(always)]
+pub fn sub_with_overflow(x: u32, y: u32) -> (u32, bool) {
+    unsafe { u32_sub_with_overflow(x, y) }
+}
+
+#[inline(always)]
+pub fn mul_with_overflow(x: u32, y: u32) -> (u32, bool) {
+    unsafe { u32_mul_with_overflow(x, y) }
 }
 
 pub fn bswap(x: u32) -> u32 {

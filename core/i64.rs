@@ -13,9 +13,24 @@ extern "rust-intrinsic" {
     pub fn ctpop64(x: i64) -> i64;
     pub fn ctlz64(x: i64) -> i64;
     pub fn cttz64(x: i64) -> i64;
-    pub fn i64_add_with_overflow(x: i64, y: i64) -> (i64, bool);
-    pub fn i64_sub_with_overflow(x: i64, y: i64) -> (i64, bool);
-    pub fn i64_mul_with_overflow(x: i64, y: i64) -> (i64, bool);
+    fn i64_add_with_overflow(x: i64, y: i64) -> (i64, bool);
+    fn i64_sub_with_overflow(x: i64, y: i64) -> (i64, bool);
+    fn i64_mul_with_overflow(x: i64, y: i64) -> (i64, bool);
+}
+
+#[inline(always)]
+pub fn add_with_overflow(x: i64, y: i64) -> (i64, bool) {
+    unsafe { i64_add_with_overflow(x, y) }
+}
+
+#[inline(always)]
+pub fn sub_with_overflow(x: i64, y: i64) -> (i64, bool) {
+    unsafe { i64_sub_with_overflow(x, y) }
+}
+
+#[inline(always)]
+pub fn mul_with_overflow(x: i64, y: i64) -> (i64, bool) {
+    unsafe { i64_mul_with_overflow(x, y) }
 }
 
 pub fn bswap(x: i64) -> i64 {
