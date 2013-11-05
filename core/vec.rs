@@ -30,12 +30,16 @@ impl<T: Send + Freeze> Vec<T, Heap> {
     }
 
     pub fn with_capacity(capacity: uint) -> Vec<T, Heap> {
-        let (size, overflow) = mul_with_overflow(capacity, size_of::<T>());
-        if overflow {
-            out_of_memory();
+        if capacity == 0 {
+            Vec::new()
+        } else {
+            let (size, overflow) = mul_with_overflow(capacity, size_of::<T>());
+            if overflow {
+                out_of_memory();
+            }
+            let ptr = unsafe { malloc_raw(size) };
+            Vec { len: 0, cap: capacity, ptr: ptr as *mut T, alloc: Heap }
         }
-        let ptr = unsafe { malloc_raw(size) };
-        Vec { len: 0, cap: capacity, ptr: ptr as *mut T, alloc: Heap }
     }
 }
 
