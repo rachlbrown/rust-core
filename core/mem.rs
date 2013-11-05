@@ -60,6 +60,12 @@ pub trait Allocator {
     /// allocation and the usable size.
     unsafe fn alloc(&mut self, size: uint) -> (*mut u8, uint);
 
+    /// Allocate at least `size` zeroed bytes of memory.
+    ///
+    /// The `size` parameter must be non-zero. Return a pointer to the memory
+    /// allocation and the usable size.
+    unsafe fn zero_alloc(&mut self, size: uint) -> (*mut u8, uint);
+
     /// Change the size of the memory allocation pointed to by `ptr` to `size`.
     ///
     /// The `size` parameter must be non-zero. Return a pointer to the memory
