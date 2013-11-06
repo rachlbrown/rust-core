@@ -20,6 +20,8 @@ pub mod option;
 pub mod ptr;
 pub mod rc;
 pub mod slice;
+#[cfg(libc)]
+pub mod thread;
 pub mod vec;
 
 pub mod uint;

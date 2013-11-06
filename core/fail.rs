@@ -40,3 +40,16 @@ pub fn fail_borrowed() -> ! {
 pub fn out_of_memory() -> ! {
     abort()
 }
+
+#[cfg(debug)]
+#[inline(always)]
+pub fn assert(b: bool) {
+    if !b {
+        abort()
+    }
+}
+
+#[cfg(not(debug))]
+#[inline(always)]
+pub fn assert(_: bool) {
+}
