@@ -17,7 +17,8 @@ a separate repository is easier.
 
 # Configuration
 
-If the C standard library is available, pass `--cfg libc` to `rustc`.
+* `--cfg libc` to enable features depending on a C standard library implementation
+* `--cfg debug` to enable debugging features (assertions)
 
 # Building
 
