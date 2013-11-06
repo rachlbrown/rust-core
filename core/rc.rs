@@ -26,8 +26,17 @@ pub struct Rc<T> {
 }
 
 impl<T: Freeze> Rc<T> {
-    #[inline]
+    #[inline(always)]
     pub fn new(value: T) -> Rc<T> {
+        unsafe {
+            Rc::new_unchecked(value)
+        }
+    }
+}
+
+impl<T: Send> Rc<T> {
+    #[inline(always)]
+    pub fn from_send(value: T) -> Rc<T> {
         unsafe {
             Rc::new_unchecked(value)
         }
@@ -42,7 +51,7 @@ impl<T> Rc<T> {
 }
 
 impl<T> Rc<T> {
-    #[inline]
+    #[inline(always)]
     pub fn borrow<'r>(&'r self) -> &'r T {
         unsafe { &(*self.ptr).value }
     }

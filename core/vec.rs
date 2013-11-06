@@ -12,7 +12,6 @@ use super::mem::{Allocator, move_val_init, size_of, transmute};
 use super::fail::out_of_memory;
 #[cfg(libc)]
 use super::heap::{Heap, free};
-use super::kinds::{Freeze, Send};
 use super::ops::Drop;
 use super::slice::Slice;
 use super::ptr::{offset, read_ptr};
@@ -26,7 +25,7 @@ pub struct Vec<T, A> {
 }
 
 #[cfg(libc)]
-impl<T: Send + Freeze> Vec<T, Heap> {
+impl<T> Vec<T, Heap> {
     #[inline(always)]
     pub fn new() -> Vec<T, Heap> {
         Vec::with_alloc(Heap)
@@ -40,7 +39,7 @@ impl<T: Send + Freeze> Vec<T, Heap> {
 
 // FIXME: making these public is blocked on the destructor being able to use
 // the allocator (see below)
-impl<T: Send + Freeze, A: Allocator> Vec<T, A> {
+impl<T, A: Allocator> Vec<T, A> {
     #[inline(always)]
     fn with_alloc(alloc: A) -> Vec<T, A> {
         Vec { len: 0, cap: 0, ptr: 0 as *mut T, alloc: alloc }
@@ -60,7 +59,7 @@ impl<T: Send + Freeze, A: Allocator> Vec<T, A> {
     }
 }
 
-impl<T: Send + Freeze, A: Allocator> Vec<T, A> {
+impl<T, A: Allocator> Vec<T, A> {
     #[inline(always)]
     pub fn len(&self) -> uint {
         self.len
@@ -122,7 +121,7 @@ impl<T: Send + Freeze, A: Allocator> Vec<T, A> {
 // FIXME: use the allocator, blocked on https://github.com/mozilla/rust/issues/4252
 #[cfg(libc)]
 #[unsafe_destructor]
-impl<T: Send + Freeze> Drop for Vec<T, Heap> {
+impl<T> Drop for Vec<T, Heap> {
     fn drop(&mut self) {
         unsafe {
             let mut i = 0;
