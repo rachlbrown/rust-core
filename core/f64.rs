@@ -8,7 +8,12 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use super::platform::c_types::c_int;
+use super::mem::uninit;
+
 mod detail {
+    use super::super::platform::c_types::c_int;
+
     extern "rust-intrinsic" {
         pub fn sqrtf64(x: f64) -> f64;
         pub fn powif64(a: f64, x: i32) -> f64;
@@ -50,6 +55,13 @@ mod detail {
         pub fn erf(x: f64) -> f64;
         pub fn erfc(x: f64) -> f64;
         pub fn tgamma(x: f64) -> f64;
+        pub fn frexp(x: f64, exp: *mut c_int) -> f64;
+        pub fn ldexp(x: f64, exp: c_int) -> f64;
+        pub fn modf(x: f64, iptr: *mut f64) -> f64;
+        pub fn ilogb(x: f64) -> c_int;
+        pub fn logb(x: f64) -> f64;
+        pub fn nextafter(from: f64, to: f64) -> f64;
+        pub fn nexttoward(from: f64, to: f64) -> f64;
     }
 }
 
@@ -244,4 +256,44 @@ pub fn erfc(x: f64) -> f64 {
 #[inline(always)]
 pub fn tgamma(x: f64) -> f64 {
     unsafe { detail::tgamma(x) }
+}
+
+pub fn frexp(x: f64) -> (f64, c_int) {
+    unsafe {
+        let mut exp = uninit();
+        (detail::frexp(x, &mut exp), exp)
+    }
+}
+
+#[inline(always)]
+pub fn ldexp(x: f64, exp: c_int) -> f64 {
+    unsafe { detail::ldexp(x, exp) }
+}
+
+pub fn modf(x: f64) -> (f64, f64) {
+    unsafe {
+        let mut i = uninit();
+        let frac = detail::modf(x, &mut i);
+        (i, frac)
+    }
+}
+
+#[inline(always)]
+pub fn ilogb(x: f64) -> c_int {
+    unsafe { detail::ilogb(x) }
+}
+
+#[inline(always)]
+pub fn logb(x: f64) -> f64 {
+    unsafe { detail::logb(x) }
+}
+
+#[inline(always)]
+pub fn nextafter(from: f64, to: f64) -> f64 {
+    unsafe { detail::nextafter(from, to) }
+}
+
+#[inline(always)]
+pub fn nexttoward(from: f64, to: f64) -> f64 {
+    unsafe { detail::nexttoward(from, to) }
 }

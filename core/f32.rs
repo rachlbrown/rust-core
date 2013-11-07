@@ -8,7 +8,12 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use super::platform::c_types::c_int;
+use super::mem::uninit;
+
 mod detail {
+    use super::super::platform::c_types::c_int;
+
     extern "rust-intrinsic" {
         pub fn sqrtf32(x: f32) -> f32;
         pub fn powif32(a: f32, x: i32) -> f32;
@@ -50,6 +55,13 @@ mod detail {
         pub fn erff(x: f32) -> f32;
         pub fn erfcf(x: f32) -> f32;
         pub fn tgammaf(x: f32) -> f32;
+        pub fn frexpf(x: f32, exp: *mut c_int) -> f32;
+        pub fn ldexpf(x: f32, exp: c_int) -> f32;
+        pub fn modff(x: f32, iptr: *mut f32) -> f32;
+        pub fn ilogbf(x: f32) -> c_int;
+        pub fn logbf(x: f32) -> f32;
+        pub fn nextafterf(from: f32, to: f32) -> f32;
+        pub fn nexttowardf(from: f32, to: f32) -> f32;
     }
 }
 
@@ -244,4 +256,44 @@ pub fn erfc(x: f32) -> f32 {
 #[inline(always)]
 pub fn tgamma(x: f32) -> f32 {
     unsafe { detail::tgammaf(x) }
+}
+
+pub fn frexp(x: f32) -> (f32, c_int) {
+    unsafe {
+        let mut exp = uninit();
+        (detail::frexpf(x, &mut exp), exp)
+    }
+}
+
+#[inline(always)]
+pub fn ldexp(x: f32, exp: c_int) -> f32 {
+    unsafe { detail::ldexpf(x, exp) }
+}
+
+pub fn modf(x: f32) -> (f32, f32) {
+    unsafe {
+        let mut i = uninit();
+        let frac = detail::modff(x, &mut i);
+        (i, frac)
+    }
+}
+
+#[inline(always)]
+pub fn ilogb(x: f32) -> c_int {
+    unsafe { detail::ilogbf(x) }
+}
+
+#[inline(always)]
+pub fn logb(x: f32) -> f32 {
+    unsafe { detail::logbf(x) }
+}
+
+#[inline(always)]
+pub fn nextafter(from: f32, to: f32) -> f32 {
+    unsafe { detail::nextafterf(from, to) }
+}
+
+#[inline(always)]
+pub fn nexttoward(from: f32, to: f32) -> f32 {
+    unsafe { detail::nexttowardf(from, to) }
 }
