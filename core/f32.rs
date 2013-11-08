@@ -37,6 +37,9 @@ mod detail {
     }
 
     extern {
+        pub fn fmaxf(x: f32, y: f32) -> f32;
+        pub fn fminf(x: f32, y: f32) -> f32;
+        pub fn fdimf(x: f32, y: f32) -> f32;
         pub fn expm1f(x: f32) -> f32;
         pub fn log1pf(x: f32) -> f32;
         pub fn cbrtf(x: f32) -> f32;
@@ -63,6 +66,21 @@ mod detail {
         pub fn nextafterf(from: f32, to: f32) -> f32;
         pub fn nexttowardf(from: f32, to: f32) -> f32;
     }
+}
+
+#[inline(always)]
+pub fn max(x: f32, y: f32) -> f32 {
+    unsafe { detail::fmaxf(x, y) }
+}
+
+#[inline(always)]
+pub fn min(x: f32, y: f32) -> f32 {
+    unsafe { detail::fminf(x, y) }
+}
+
+#[inline(always)]
+pub fn dim(x: f32, y: f32) -> f32 {
+    unsafe { detail::fdimf(x, y) }
 }
 
 #[inline(always)]
@@ -296,4 +314,9 @@ pub fn nextafter(from: f32, to: f32) -> f32 {
 #[inline(always)]
 pub fn nexttoward(from: f32, to: f32) -> f32 {
     unsafe { detail::nexttowardf(from, to) }
+}
+
+#[inline(always)]
+pub fn is_nan(x: f64) -> bool {
+    x != x
 }

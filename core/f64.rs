@@ -37,6 +37,9 @@ mod detail {
     }
 
     extern {
+        pub fn fmax(x: f64, y: f64) -> f64;
+        pub fn fmin(x: f64, y: f64) -> f64;
+        pub fn fdim(x: f64, y: f64) -> f64;
         pub fn expm1(x: f64) -> f64;
         pub fn log1p(x: f64) -> f64;
         pub fn cbrt(x: f64) -> f64;
@@ -63,6 +66,21 @@ mod detail {
         pub fn nextafter(from: f64, to: f64) -> f64;
         pub fn nexttoward(from: f64, to: f64) -> f64;
     }
+}
+
+#[inline(always)]
+pub fn max(x: f64, y: f64) -> f64 {
+    unsafe { detail::fmax(x, y) }
+}
+
+#[inline(always)]
+pub fn min(x: f64, y: f64) -> f64 {
+    unsafe { detail::fmin(x, y) }
+}
+
+#[inline(always)]
+pub fn dim(x: f64, y: f64) -> f64 {
+    unsafe { detail::fdim(x, y) }
 }
 
 #[inline(always)]
@@ -296,4 +314,9 @@ pub fn nextafter(from: f64, to: f64) -> f64 {
 #[inline(always)]
 pub fn nexttoward(from: f64, to: f64) -> f64 {
     unsafe { detail::nexttoward(from, to) }
+}
+
+#[inline(always)]
+pub fn is_nan(x: f64) -> bool {
+    x != x
 }
