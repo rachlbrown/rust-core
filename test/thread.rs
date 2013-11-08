@@ -16,27 +16,29 @@ use core::fail::abort;
 #[path = "../core/mod.rs"]
 mod core;
 
-static mut a: bool = false;
-static mut b: bool = false;
+// FIXME: these shouldn't have to return unique pointers, see comment on `thread::spawn`
 
-fn foo() {
-    unsafe { a = true };
+fn foo() -> ~int {
+    ~10
 }
 
-fn bar() {
-    unsafe { b = true };
+fn bar() -> ~int {
+    ~5
+}
+
+fn baz() -> ~() {
+    ~()
 }
 
 #[start]
 fn main(_: int, _: **u8) -> int {
-    {
-        let _a = spawn(foo);
-        let _b = spawn(bar);
+    let a = spawn(foo);
+    let b = spawn(bar);
+    let _c = spawn(baz);
+
+    if *a.join() != 10 || *b.join() != 5 {
+        abort()
     }
-    unsafe {
-        if !a || !b {
-            abort()
-        }
-    }
+
     0
 }

@@ -22,17 +22,18 @@ extern {
 }
 
 /// An owned thread type, joined in the destructor.
-pub struct Thread {
+pub struct Thread<A> {
     priv thread: pthread_t
 }
 
 extern "C" fn shim(box: *mut u8) -> *mut u8 {
-    let start_routine = unsafe { *transmute::<*mut u8, ~~fn()>(box) };
-    start_routine();
-    0 as *mut u8
+    let start_routine = unsafe { *transmute::<*mut u8, ~~fn() -> *mut u8>(box) };
+    start_routine()
 }
 
-pub fn spawn(start_routine: proc()) -> Thread {
+// FIXME: should take `proc() -> A`, but `shim` cannot currently be made generic
+// https://github.com/mozilla/rust/issues/10353
+pub fn spawn<A>(start_routine: proc() -> ~A) -> Thread<A> {
     unsafe {
         let box: *mut u8 = transmute(~start_routine);
         let mut thread = uninit();
@@ -43,14 +44,28 @@ pub fn spawn(start_routine: proc()) -> Thread {
     }
 }
 
-impl Drop for Thread {
-    fn drop(&mut self) {
+impl<A> Thread<A> {
+    pub fn join(self) -> ~A {
         unsafe {
-            assert(pthread_join(self.thread, 0 as *mut *mut u8) == 0);
+            let mut result = uninit();
+            assert(pthread_join(self.thread, &mut result) == 0);
+            transmute(result)
         }
     }
 }
 
+#[unsafe_destructor]
+impl<A> Drop for Thread<A> {
+    fn drop(&mut self) {
+        unsafe {
+            let mut result = uninit();
+            assert(pthread_join(self.thread, &mut result) == 0);
+            let _: ~A = transmute(result);
+        }
+    }
+}
+
+/// Yield control from the current thread
 pub fn deschedule() {
     unsafe {
         assert(sched_yield() == 0)
