@@ -19,14 +19,12 @@ mod core;
 static mut a: bool = false;
 static mut b: bool = false;
 
-extern "C" fn foo(_: *mut u8) -> *mut u8 {
+fn foo() {
     unsafe { a = true };
-    0 as *mut u8
 }
 
-extern "C" fn bar(_: *mut u8) -> *mut u8 {
+fn bar() {
     unsafe { b = true };
-    0 as *mut u8
 }
 
 #[start]

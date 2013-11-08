@@ -11,7 +11,7 @@
 use super::platform::c_types::{c_int, pthread_t, pthread_attr_t};
 use super::fail::{abort, assert};
 use super::ops::Drop;
-use super::mem::uninit;
+use super::mem::{uninit, transmute};
 
 extern {
     fn pthread_create(thread: *mut pthread_t, attr: *pthread_attr_t,
@@ -25,11 +25,18 @@ pub struct Thread {
     priv thread: pthread_t
 }
 
+extern "C" fn shim(box: *mut u8) -> *mut u8 {
+    let start_routine = unsafe { *transmute::<*mut u8, ~~fn()>(box) };
+    start_routine();
+    0 as *mut u8
+}
+
 impl Thread {
-    pub fn new(start_routine: extern "C" fn(arg: *mut u8) -> *mut u8) -> Thread {
+    pub fn new(start_routine: proc()) -> Thread {
         unsafe {
+            let box: *mut u8 = transmute(~start_routine);
             let mut thread = uninit();
-            if pthread_create(&mut thread, 0 as *pthread_attr_t, start_routine, 0 as *mut u8) != 0 {
+            if pthread_create(&mut thread, 0 as *pthread_attr_t, shim, box) != 0 {
                 abort()
             }
             Thread { thread: thread }
