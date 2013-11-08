@@ -9,7 +9,7 @@
 // except according to those terms.
 
 use super::platform::c_types::{c_int, pthread_t, pthread_attr_t};
-use super::fail::assert;
+use super::fail::{abort, assert};
 use super::ops::Drop;
 use super::mem::uninit;
 
@@ -29,7 +29,9 @@ impl Thread {
     pub fn new(start_routine: extern "C" fn(arg: *mut u8) -> *mut u8) -> Thread {
         unsafe {
             let mut thread = uninit();
-            pthread_create(&mut thread, 0 as *pthread_attr_t, start_routine, 0 as *mut u8);
+            if pthread_create(&mut thread, 0 as *pthread_attr_t, start_routine, 0 as *mut u8) != 0 {
+                abort()
+            }
             Thread { thread: thread }
         }
     }
