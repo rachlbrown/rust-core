@@ -10,7 +10,7 @@
 
 #[no_std];
 
-use core::thread::Thread;
+use core::thread::spawn;
 use core::fail::abort;
 
 #[path = "../core/mod.rs"]
@@ -30,8 +30,8 @@ fn bar() {
 #[start]
 fn main(_: int, _: **u8) -> int {
     {
-        let _a = Thread::new(foo);
-        let _b = Thread::new(bar);
+        let _a = spawn(foo);
+        let _b = spawn(bar);
     }
     unsafe {
         if !a || !b {

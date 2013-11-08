@@ -21,6 +21,7 @@ extern {
     fn sched_yield() -> c_int;
 }
 
+/// An owned thread type, joined in the destructor.
 pub struct Thread {
     priv thread: pthread_t
 }
@@ -31,16 +32,14 @@ extern "C" fn shim(box: *mut u8) -> *mut u8 {
     0 as *mut u8
 }
 
-impl Thread {
-    pub fn new(start_routine: proc()) -> Thread {
-        unsafe {
-            let box: *mut u8 = transmute(~start_routine);
-            let mut thread = uninit();
-            if pthread_create(&mut thread, 0 as *pthread_attr_t, shim, box) != 0 {
-                abort()
-            }
-            Thread { thread: thread }
+pub fn spawn(start_routine: proc()) -> Thread {
+    unsafe {
+        let box: *mut u8 = transmute(~start_routine);
+        let mut thread = uninit();
+        if pthread_create(&mut thread, 0 as *pthread_attr_t, shim, box) != 0 {
+            abort()
         }
+        Thread { thread: thread }
     }
 }
 
