@@ -60,22 +60,22 @@ pub fn bswap(x: uint) -> uint {
     super::i64::bswap(x as i64) as uint
 }
 
-#[cfg(target = "big")]
+#[cfg(target_endian = "big")]
 pub fn to_be(x: uint) -> uint {
     x
 }
 
-#[cfg(target = "little")]
+#[cfg(target_endian = "little")]
 pub fn to_be(x: uint) -> uint {
     bswap(x)
 }
 
-#[cfg(target = "big")]
+#[cfg(target_endian = "big")]
 pub fn to_le(x: uint) -> uint {
     bswap(x)
 }
 
-#[cfg(target = "little")]
+#[cfg(target_endian = "little")]
 pub fn to_le(x: uint) -> uint {
     x
 }

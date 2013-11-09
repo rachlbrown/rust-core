@@ -37,22 +37,22 @@ pub fn bswap(x: i64) -> i64 {
     unsafe { bswap64(x) }
 }
 
-#[cfg(target = "big")]
+#[cfg(target_endian = "big")]
 pub fn to_be(x: i64) -> i64 {
     x
 }
 
-#[cfg(target = "little")]
+#[cfg(target_endian = "little")]
 pub fn to_be(x: i64) -> i64 {
     bswap(x)
 }
 
-#[cfg(target = "big")]
+#[cfg(target_endian = "big")]
 pub fn to_le(x: i64) -> i64 {
     bswap(x)
 }
 
-#[cfg(target = "little")]
+#[cfg(target_endian = "little")]
 pub fn to_le(x: i64) -> i64 {
     x
 }

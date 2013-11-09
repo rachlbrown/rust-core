@@ -33,22 +33,22 @@ pub fn bswap(x: u32) -> u32 {
     super::i32::bswap(x as i32) as u32
 }
 
-#[cfg(target = "big")]
+#[cfg(target_endian = "big")]
 pub fn to_be(x: u32) -> u32 {
     x
 }
 
-#[cfg(target = "little")]
+#[cfg(target_endian = "little")]
 pub fn to_be(x: u32) -> u32 {
     bswap(x)
 }
 
-#[cfg(target = "big")]
+#[cfg(target_endian = "big")]
 pub fn to_le(x: u32) -> u32 {
     bswap(x)
 }
 
-#[cfg(target = "little")]
+#[cfg(target_endian = "little")]
 pub fn to_le(x: u32) -> u32 {
     x
 }

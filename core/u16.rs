@@ -33,22 +33,22 @@ pub fn bswap(x: u16) -> u16 {
     super::i16::bswap(x as i16) as u16
 }
 
-#[cfg(target = "big")]
+#[cfg(target_endian = "big")]
 pub fn to_be(x: u16) -> u16 {
     x
 }
 
-#[cfg(target = "little")]
+#[cfg(target_endian = "little")]
 pub fn to_be(x: u16) -> u16 {
     bswap(x)
 }
 
-#[cfg(target = "big")]
+#[cfg(target_endian = "big")]
 pub fn to_le(x: u16) -> u16 {
     bswap(x)
 }
 
-#[cfg(target = "little")]
+#[cfg(target_endian = "little")]
 pub fn to_le(x: u16) -> u16 {
     x
 }
