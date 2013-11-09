@@ -16,19 +16,15 @@ use core::fail::abort;
 #[path = "../core/mod.rs"]
 mod core;
 
-// FIXME: these shouldn't have to return unique pointers, see comment on `thread::spawn`
-
-fn foo() -> ~int {
-    ~10
+fn foo() -> int {
+    10
 }
 
-fn bar() -> ~int {
-    ~5
+fn bar() -> int {
+    5
 }
 
-fn baz() -> ~() {
-    ~()
-}
+fn baz() {}
 
 #[start]
 fn main(_: int, _: **u8) -> int {

@@ -53,4 +53,7 @@ pub mod f64;
 pub mod heap;
 
 #[cfg(libc)]
+pub mod heap_closure;
+
+#[cfg(libc)]
 pub mod os;

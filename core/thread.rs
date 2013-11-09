@@ -27,15 +27,16 @@ pub struct Thread<A> {
 }
 
 extern "C" fn shim(box: *mut u8) -> *mut u8 {
-    let start_routine = unsafe { *transmute::<*mut u8, ~~fn() -> *mut u8>(box) };
+    let start_routine = unsafe { *transmute::<*mut u8, ~proc() -> *mut u8>(box) };
     start_routine()
 }
 
-// FIXME: should take `proc() -> A`, but `shim` cannot currently be made generic
-// https://github.com/mozilla/rust/issues/10353
-pub fn spawn<A>(start_routine: proc() -> ~A) -> Thread<A> {
+pub fn spawn<A>(start_routine: proc() -> A) -> Thread<A> {
     unsafe {
-        let box: *mut u8 = transmute(~start_routine);
+        // FIXME: this wrapper should be unnecessary, shim should be a generic function instead
+        // https://github.com/mozilla/rust/issues/10353
+        let wrapper: proc() -> ~A = || ~start_routine();
+        let box: *mut u8 = transmute(~wrapper);
         let mut thread = uninit();
         if pthread_create(&mut thread, 0 as *pthread_attr_t, shim, box) != 0 {
             abort()
