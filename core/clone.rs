@@ -10,11 +10,19 @@
 
 pub trait Clone {
     fn clone(&self) -> Self;
+
+    #[inline(always)]
+    fn clone_from(&mut self, source: &Self) {
+        *self = source.clone()
+    }
 }
 
 impl<T: Clone> Clone for ~T {
-    #[inline]
     fn clone(&self) -> ~T { ~(**self).clone() }
+
+    fn clone_from(&mut self, source: &~T) {
+        **self = (**source).clone()
+    }
 }
 
 impl<'self, T> Clone for &'self T {
@@ -117,13 +125,21 @@ impl Clone for char {
     fn clone(&self) -> char { *self }
 }
 
-pub trait DeepClone {
+pub trait DeepClone: Clone {
     fn deep_clone(&self) -> Self;
+
+    #[inline(always)]
+    fn deep_clone_from(&mut self, source: &Self) {
+        *self = source.deep_clone()
+    }
 }
 
 impl<T: DeepClone> DeepClone for ~T {
-    #[inline]
     fn deep_clone(&self) -> ~T { ~(**self).deep_clone() }
+
+    fn deep_clone_from(&mut self, source: &~T) {
+        **self = (**source).deep_clone()
+    }
 }
 
 impl DeepClone for int {
