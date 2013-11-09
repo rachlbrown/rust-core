@@ -11,7 +11,7 @@
 use super::platform::c_types::{c_int, pthread_t, pthread_attr_t};
 use super::fail::{abort, assert};
 use super::ops::Drop;
-use super::mem::{uninit, transmute};
+use super::mem::{forget, uninit, transmute};
 
 extern {
     fn pthread_create(thread: *mut pthread_t, attr: *pthread_attr_t,
@@ -49,6 +49,7 @@ impl<A> Thread<A> {
         unsafe {
             let mut result = uninit();
             assert(pthread_join(self.thread, &mut result) == 0);
+            forget(self);
             transmute(result)
         }
     }
