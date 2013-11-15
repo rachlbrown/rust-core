@@ -29,7 +29,6 @@ extern {
     fn fflush(fp: *mut FILE) -> c_int;
 }
 
-#[unsafe_no_drop_flag]
 pub struct StdStream {
     priv file: *mut FILE
 }
