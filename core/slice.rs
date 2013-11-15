@@ -24,6 +24,13 @@ pub fn len<T>(xs: &[T]) -> uint {
     }
 }
 
+pub fn to_ptr<T>(xs: &[T]) -> *T {
+    unsafe {
+        let slice: Slice<T> = transmute(xs);
+        slice.data
+    }
+}
+
 pub fn slice<'a, T>(xs: &'a [T], start: uint, end: uint) -> &'a [T] {
     if start > end || end > len(xs) {
         abort()
@@ -48,6 +55,13 @@ pub fn slice_to<'a, T>(xs: &'a [T], end: uint) -> &'a [T] {
 
 pub fn split<'a, T>(xs: &'a [T], mid: uint) -> (&'a [T], &'a [T]) {
     (slice_to(xs, mid), slice_from(xs, mid))
+}
+
+pub fn to_mut_ptr<T>(xs: &mut [T]) -> *mut T {
+    unsafe {
+        let slice: Slice<T> = transmute(xs);
+        slice.data as *mut T
+    }
 }
 
 pub fn mut_slice<'a, T>(xs: &'a mut [T], start: uint, end: uint) -> &'a mut [T] {

@@ -13,6 +13,8 @@
 pub mod char;
 pub mod clone;
 pub mod fail;
+#[cfg(libc)]
+pub mod io;
 pub mod kinds;
 pub mod mem;
 pub mod ops;
