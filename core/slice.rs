@@ -17,6 +17,16 @@ pub struct Slice<T> {
     len: uint
 }
 
+pub unsafe fn unchecked_get<'a, T>(xs: &'a [T], index: uint) -> &'a T {
+    let slice: Slice<T> = transmute(xs);
+    transmute(offset(slice.data, index as int))
+}
+
+pub unsafe fn unchecked_mut_get<'a, T>(xs: &'a mut [T], index: uint) -> &'a mut T {
+    let slice: Slice<T> = transmute(xs);
+    transmute(offset(slice.data, index as int))
+}
+
 pub fn len<T>(xs: &[T]) -> uint {
     unsafe {
         let slice: Slice<T> = transmute(xs);
@@ -100,4 +110,10 @@ pub fn swap<T>(xs: &mut [T], a: uint, b: uint) {
         let y: *mut T = &mut xs[b];
         swap_ptr(x, y);
     }
+}
+
+pub unsafe fn unchecked_swap<T>(xs: &mut [T], a: uint, b: uint) {
+    let x: *mut T = unchecked_mut_get(xs, a);
+    let y: *mut T = unchecked_mut_get(xs, b);
+    swap_ptr(x, y);
 }

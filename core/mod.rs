@@ -10,6 +10,7 @@
 
 #[allow(ctypes)];
 
+pub mod deque;
 pub mod char;
 pub mod clone;
 pub mod fail;

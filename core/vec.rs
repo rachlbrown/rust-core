@@ -37,15 +37,15 @@ impl<T> Vec<T, Heap> {
     }
 }
 
-// FIXME: making these public is blocked on the destructor being able to use
-// the allocator (see below)
+// FIXME: broken with non-default allocators until generic destructors are fixed:
+// https://github.com/mozilla/rust/issues/4252
 impl<T, A: Allocator> Vec<T, A> {
     #[inline(always)]
-    fn with_alloc(alloc: A) -> Vec<T, A> {
+    pub fn with_alloc(alloc: A) -> Vec<T, A> {
         Vec { len: 0, cap: 0, ptr: 0 as *mut T, alloc: alloc }
     }
 
-    fn with_alloc_capacity(mut alloc: A, capacity: uint) -> Vec<T, A> {
+    pub fn with_alloc_capacity(mut alloc: A, capacity: uint) -> Vec<T, A> {
         if capacity == 0 {
             Vec::with_alloc(alloc)
         } else {
@@ -68,6 +68,20 @@ impl<T, A: Allocator> Vec<T, A> {
     #[inline(always)]
     pub fn capacity(&self) -> uint {
         self.cap
+    }
+
+    pub fn reserve(&mut self, capacity: uint) {
+        if capacity >= self.len {
+            let (size, overflow) = mul_with_overflow(capacity, size_of::<T>());
+            if overflow {
+                out_of_memory();
+            }
+            self.cap = capacity;
+            unsafe {
+                let (ptr, _) = self.alloc.realloc(self.ptr as *mut u8, size);
+                self.ptr = ptr as *mut T;
+            }
+        }
     }
 
     #[inline]
@@ -118,7 +132,8 @@ impl<T, A: Allocator> Vec<T, A> {
 }
 
 
-// FIXME: use the allocator, blocked on https://github.com/mozilla/rust/issues/4252
+// FIXME: broken with non-default allocators until generic destructors are fixed:
+// https://github.com/mozilla/rust/issues/4252
 #[cfg(libc)]
 #[unsafe_destructor]
 impl<T> Drop for Vec<T, Heap> {
