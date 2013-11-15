@@ -10,6 +10,7 @@
 
 #[allow(ctypes)];
 
+#[cfg(libc)]
 pub mod deque;
 pub mod char;
 pub mod clone;

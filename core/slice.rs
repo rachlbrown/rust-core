@@ -8,9 +8,9 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use core::mem::transmute;
-use core::ptr::{offset, read_ptr, swap_ptr};
-use core::fail::abort;
+use super::mem::transmute;
+use super::ptr::{offset, read_ptr, swap_ptr};
+use super::fail::abort;
 
 pub struct Slice<T> {
     data: *T,
