@@ -10,7 +10,6 @@
 
 use super::platform::c_types::c_int;
 use super::slice::{len, to_mut_ptr, to_ptr};
-use super::ops::Drop;
 
 enum FILE {}
 
@@ -28,37 +27,26 @@ extern {
     fn fread(ptr: *mut u8, size: uint, nmemb: uint, stream: *mut FILE) -> uint;
     fn fwrite(ptr: *u8, size: uint, nmemb: uint, stream: *mut FILE) -> uint;
     fn fflush(fp: *mut FILE) -> c_int;
-    fn fclose(fp: *mut FILE) -> c_int;
 }
 
 #[unsafe_no_drop_flag]
-pub struct File {
+pub struct StdStream {
     priv file: *mut FILE
 }
 
-pub fn stdin() -> File {
-    File { file: detail::stdin }
+pub fn stdin() -> StdStream {
+    StdStream { file: detail::stdin }
 }
 
-pub fn stdout() -> File {
-    File { file: detail::stdout }
+pub fn stdout() -> StdStream {
+    StdStream { file: detail::stdout }
 }
 
-pub fn stderr() -> File {
-    File { file: detail::stderr }
+pub fn stderr() -> StdStream {
+    StdStream { file: detail::stderr }
 }
 
-impl Drop for File {
-    fn drop(&mut self) {
-        if self.file as uint != 0 {
-            unsafe {
-                fclose(self.file);
-            }
-        }
-    }
-}
-
-impl File {
+impl StdStream {
     pub fn read(&mut self, xs: &mut [u8]) -> uint {
         unsafe {
             fread(to_mut_ptr(xs), 1, len(xs), self.file)
