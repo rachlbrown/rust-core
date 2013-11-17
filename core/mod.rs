@@ -10,6 +10,8 @@
 
 #[allow(ctypes)];
 
+pub mod arc;
+pub mod atomic;
 #[cfg(libc)]
 pub mod deque;
 pub mod char;

@@ -44,7 +44,6 @@ impl<T: Send> Rc<T> {
 }
 
 impl<T> Rc<T> {
-    #[inline]
     pub unsafe fn new_unchecked(value: T) -> Rc<T> {
         Rc{ptr: transmute(~RcBox{value: value, count: 1})}
     }
