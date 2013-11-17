@@ -117,7 +117,7 @@ impl<T> Deque<T> {
         }
     }
 
-    pub fn push_front(&mut self, element: T) {
+    pub fn push_front(&mut self, item: T) {
         if self.nelts == self.elts.capacity() {
             grow(self.nelts, &mut self.lo, &mut self.elts);
         }
@@ -127,18 +127,18 @@ impl<T> Deque<T> {
             self.lo -= 1;
         }
         unsafe {
-            move_val_init(unchecked_mut_get(self.elts.as_mut_slice(), self.lo), element);
+            move_val_init(unchecked_mut_get(self.elts.as_mut_slice(), self.lo), item);
         }
         self.nelts += 1;
     }
 
-    pub fn push_back(&mut self, element: T) {
+    pub fn push_back(&mut self, item: T) {
         if self.nelts == self.elts.capacity() {
             grow(self.nelts, &mut self.lo, &mut self.elts);
         }
         let hi = self.raw_index(self.nelts);
         unsafe {
-            move_val_init(unchecked_mut_get(self.elts.as_mut_slice(), hi), element);
+            move_val_init(unchecked_mut_get(self.elts.as_mut_slice(), hi), item);
         }
         self.nelts += 1;
     }

@@ -25,8 +25,26 @@ pub type c_ulonglong = u64;
 pub type ssize_t     = i32;
 pub type size_t      = u32;
 
-pub type pthread_t = c_ulonglong;
+pub struct pthread_t {
+    priv size: c_ulong
+}
 
 pub struct pthread_attr_t {
     priv size: [u32, ..9]
+}
+
+pub struct pthread_mutex_t {
+    priv size: [u32, ..6]
+}
+
+pub struct pthread_mutex_attr_t {
+    priv size: u32
+}
+
+pub struct pthread_cond_t {
+    priv size: [u64, ..6]
+}
+
+pub struct pthread_cond_attr_t {
+    priv size: u32
 }

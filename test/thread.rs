@@ -10,8 +10,11 @@
 
 #[no_std];
 
+use core::clone::Clone;
 use core::thread::spawn;
 use core::fail::abort;
+use core::concurrent::Queue;
+use core::vec::Vec;
 
 #[path = "../core/mod.rs"]
 mod core;
@@ -33,6 +36,47 @@ fn main(_: int, _: **u8) -> int {
     let _c = spawn(baz);
 
     if *a.join() != 10 || *b.join() != 5 {
+        abort()
+    }
+
+    let queue = Queue::<int>::new();
+
+    let active = 10;
+
+    let send_queue = queue.clone();
+    let consumer = do spawn {
+        let mut received = 0;
+        let mut active = active;
+        loop {
+            if send_queue.pop() == -1 {
+                active -= 1;
+            } else {
+                received += 1;
+            }
+            if active == 0 {
+                break;
+            }
+        }
+        received
+    };
+
+    let mut producers = Vec::new();
+    let mut i = 0;
+    while i < active {
+        let send_queue = queue.clone();
+        let producer = do spawn {
+            let mut i = 0;
+            while i < 1000 {
+                send_queue.push(i);
+                i += 1;
+            }
+            send_queue.push(-1);
+        };
+        producers.push(producer);
+        i += 1;
+    }
+
+    if *consumer.join() != 10000 {
         abort()
     }
 
