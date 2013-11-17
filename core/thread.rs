@@ -8,7 +8,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::c_types::{c_int, pthread_t, pthread_attr_t};
+use super::c_types::{c_int, pthread_t, pthread_attr_t, pthread_mutex_t, pthread_mutex_attr_t};
+use super::c_types::{pthread_cond_t, pthread_cond_attr_t};
 use super::fail::{abort, assert};
 use super::ops::Drop;
 use super::mem::{forget, uninit, transmute};
@@ -18,7 +19,19 @@ extern {
                       start_routine: extern "C" fn(*mut u8) -> *mut u8,
                       arg: *mut u8) -> c_int;
     fn pthread_join(thread: pthread_t, retval: *mut *mut u8) -> c_int;
+
     fn sched_yield() -> c_int;
+
+    fn pthread_mutex_init(mutex: *mut pthread_mutex_t, attr: *pthread_mutex_attr_t) -> c_int;
+    fn pthread_mutex_destroy(mutex: *mut pthread_mutex_t) -> c_int;
+    fn pthread_mutex_lock(mutex: *mut pthread_mutex_t) -> c_int;
+    fn pthread_mutex_unlock(mutex: *mut pthread_mutex_t) -> c_int;
+
+    fn pthread_cond_init(cond: *mut pthread_cond_t, attr: *pthread_cond_attr_t) -> c_int;
+    fn pthread_cond_destroy(cond: *mut pthread_cond_t) -> c_int;
+    fn pthread_cond_signal(cond: *mut pthread_cond_t) -> c_int;
+    fn pthread_cond_broadcast(cond: *mut pthread_cond_t) -> c_int;
+    fn pthread_cond_wait(cond: *mut pthread_cond_t, mutex: *mut pthread_mutex_t) -> c_int;
 }
 
 /// An owned thread type, joined in the destructor.
@@ -71,5 +84,73 @@ impl<A> Drop for Thread<A> {
 pub fn deschedule() {
     unsafe {
         assert(sched_yield() == 0)
+    }
+}
+
+pub struct Mutex {
+    priv mutex: pthread_mutex_t
+}
+
+impl Mutex {
+    pub fn new() -> Mutex {
+        unsafe {
+            let mut mutex = uninit();
+            if pthread_mutex_init(&mut mutex, 0 as *pthread_mutex_attr_t) != 0 {
+                abort()
+            }
+            Mutex { mutex: mutex }
+        }
+    }
+
+    pub unsafe fn lock(&mut self) {
+        assert(pthread_mutex_lock(&mut self.mutex) == 0)
+    }
+
+    pub unsafe fn unlock(&mut self) {
+        assert(pthread_mutex_unlock(&mut self.mutex) == 0)
+    }
+}
+
+impl Drop for Mutex {
+    fn drop(&mut self) {
+        unsafe {
+            assert(pthread_mutex_destroy(&mut self.mutex) == 0)
+        }
+    }
+}
+
+pub struct Cond {
+    priv cond: pthread_cond_t
+}
+
+impl Cond {
+    pub fn new() -> Cond {
+        unsafe {
+            let mut cond = uninit();
+            if pthread_cond_init(&mut cond, 0 as *pthread_cond_attr_t) != 0 {
+                abort()
+            }
+            Cond { cond: cond }
+        }
+    }
+
+    pub unsafe fn signal(&mut self) {
+        assert(pthread_cond_signal(&mut self.cond) == 0)
+    }
+
+    pub unsafe fn broadcast(&mut self) {
+        assert(pthread_cond_broadcast(&mut self.cond) == 0)
+    }
+
+    pub unsafe fn wait(&mut self, mutex: &mut Mutex) {
+        assert(pthread_cond_wait(&mut self.cond, &mut mutex.mutex) == 0)
+    }
+}
+
+impl Drop for Cond {
+    fn drop(&mut self) {
+        unsafe {
+            assert(pthread_cond_destroy(&mut self.cond) == 0);
+        }
     }
 }
