@@ -8,7 +8,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::platform::c_types::c_int;
+use super::c_types::c_int;
 use super::slice::{len, to_mut_ptr, to_ptr};
 
 enum FILE {}

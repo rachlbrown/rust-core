@@ -8,11 +8,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::platform::c_types::c_int;
+use super::c_types::c_int;
 use super::mem::uninit;
 
 mod detail {
-    use super::super::platform::c_types::c_int;
+    use super::super::c_types::c_int;
 
     extern "rust-intrinsic" {
         pub fn sqrtf32(x: f32) -> f32;

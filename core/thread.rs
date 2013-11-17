@@ -8,7 +8,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::platform::c_types::{c_int, pthread_t, pthread_attr_t};
+use super::c_types::{c_int, pthread_t, pthread_attr_t};
 use super::fail::{abort, assert};
 use super::ops::Drop;
 use super::mem::{forget, uninit, transmute};

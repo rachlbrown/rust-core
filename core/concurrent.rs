@@ -14,8 +14,8 @@ use super::fail::{abort, assert};
 use super::ops::Drop;
 use super::deque::Deque;
 use super::mem::{transmute, uninit};
-use super::platform::c_types::{c_int, pthread_mutex_t, pthread_mutex_attr_t};
-use super::platform::c_types::{pthread_cond_t, pthread_cond_attr_t};
+use super::c_types::{c_int, pthread_mutex_t, pthread_mutex_attr_t};
+use super::c_types::{pthread_cond_t, pthread_cond_attr_t};
 
 extern {
     fn pthread_mutex_init(mutex: *mut pthread_mutex_t, attr: *pthread_mutex_attr_t) -> c_int;
@@ -31,9 +31,9 @@ extern {
 
 #[no_freeze]
 struct QueueBox<T> {
-    priv deque: Deque<T>,
-    priv mutex: pthread_mutex_t,
-    priv cond: pthread_cond_t
+    deque: Deque<T>,
+    mutex: pthread_mutex_t,
+    cond: pthread_cond_t
 }
 
 pub struct Queue<T> {

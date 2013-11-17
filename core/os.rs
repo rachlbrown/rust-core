@@ -8,10 +8,10 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::platform::c_types::c_int;
+use super::c_types::c_int;
 
 mod detail {
-    use super::super::platform::c_types::c_int;
+    use super::super::c_types::c_int;
     extern {
         pub fn exit(status: c_int) -> !;
     }
