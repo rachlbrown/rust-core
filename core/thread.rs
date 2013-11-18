@@ -25,6 +25,7 @@ extern {
     fn pthread_mutex_init(mutex: *mut pthread_mutex_t, attr: *pthread_mutex_attr_t) -> c_int;
     fn pthread_mutex_destroy(mutex: *mut pthread_mutex_t) -> c_int;
     fn pthread_mutex_lock(mutex: *mut pthread_mutex_t) -> c_int;
+    fn pthread_mutex_trylock(mutex: *mut pthread_mutex_t) -> c_int;
     fn pthread_mutex_unlock(mutex: *mut pthread_mutex_t) -> c_int;
 
     fn pthread_cond_init(cond: *mut pthread_cond_t, attr: *pthread_cond_attr_t) -> c_int;
@@ -33,6 +34,8 @@ extern {
     fn pthread_cond_broadcast(cond: *mut pthread_cond_t) -> c_int;
     fn pthread_cond_wait(cond: *mut pthread_cond_t, mutex: *mut pthread_mutex_t) -> c_int;
 }
+
+static EBUSY: c_int = 16;
 
 /// An owned thread type, joined in the destructor.
 pub struct Thread<A> {
@@ -104,6 +107,17 @@ impl Mutex {
 
     pub unsafe fn lock(&mut self) {
         assert(pthread_mutex_lock(&mut self.mutex) == 0)
+    }
+
+    /// Try to grab ownership of a lock, and return `true` if successful
+    pub unsafe fn trylock(&mut self) -> bool {
+        let rc = pthread_mutex_trylock(&mut self.mutex);
+        if rc == EBUSY {
+            false
+        } else {
+            assert(rc == 0);
+            true
+        }
     }
 
     pub unsafe fn unlock(&mut self) {
