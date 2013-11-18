@@ -8,6 +8,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+//! Concurrent data structures
+
 use super::clone::Clone;
 use super::arc::Arc;
 use super::deque::Deque;
@@ -21,11 +23,13 @@ struct QueueBox<T> {
     not_empty: Cond
 }
 
+/// An unbounded, blocking concurrent queue
 pub struct Queue<T> {
     priv ptr: Arc<QueueBox<T>>
 }
 
 impl<T> Queue<T> {
+    /// Return a new `Queue` instance
     pub fn new() -> Queue<T> {
         unsafe {
             let box = QueueBox { deque: Deque::new(), mutex: Mutex::new(), not_empty: Cond::new() };
@@ -33,6 +37,7 @@ impl<T> Queue<T> {
         }
     }
 
+    /// Pop a value from the front of the queue, blocking until the queue is not empty
     pub fn pop(&self) -> T {
         unsafe {
             let box: &mut QueueBox<T> = transmute(self.ptr.borrow());
@@ -46,6 +51,7 @@ impl<T> Queue<T> {
         }
     }
 
+    /// Push a value to the back of the queue
     pub fn push(&self, item: T) {
         unsafe {
             let box: &mut QueueBox<T> = transmute(self.ptr.borrow());
@@ -58,6 +64,7 @@ impl<T> Queue<T> {
 }
 
 impl<T> Clone for Queue<T> {
+    /// Return a shallow copy of the `Queue`
     fn clone(&self) -> Queue<T> {
         Queue { ptr: self.ptr.clone() }
     }
@@ -72,11 +79,13 @@ struct BoundedQueueBox<T> {
     maximum: uint
 }
 
+/// A bounded, blocking concurrent queue
 pub struct BoundedQueue<T> {
     priv ptr: Arc<BoundedQueueBox<T>>
 }
 
 impl<T> BoundedQueue<T> {
+    /// Return a new `BoundedQueue` instance
     pub fn new(maximum: uint) -> BoundedQueue<T> {
         unsafe {
             let box = BoundedQueueBox { deque: Deque::new(), mutex: Mutex::new(), not_empty: Cond::new(),
@@ -85,6 +94,7 @@ impl<T> BoundedQueue<T> {
         }
     }
 
+    /// Pop a value from the front of the queue, blocking until the queue is not empty
     pub fn pop(&self) -> T {
         unsafe {
             let box: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
@@ -99,6 +109,7 @@ impl<T> BoundedQueue<T> {
         }
     }
 
+    /// Push a value to the back of the queue, blocking until the queue is not full
     pub fn push(&self, item: T) {
         unsafe {
             let box: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
@@ -114,6 +125,7 @@ impl<T> BoundedQueue<T> {
 }
 
 impl<T> Clone for BoundedQueue<T> {
+    /// Return a shallow copy of the `BlockingQueue`
     fn clone(&self) -> BoundedQueue<T> {
         BoundedQueue { ptr: self.ptr.clone() }
     }
