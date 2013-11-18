@@ -18,7 +18,7 @@ use super::thread::{Mutex, Cond};
 struct QueueBox<T> {
     deque: Deque<T>,
     mutex: Mutex,
-    cond: Cond
+    not_empty: Cond
 }
 
 pub struct Queue<T> {
@@ -28,7 +28,7 @@ pub struct Queue<T> {
 impl<T> Queue<T> {
     pub fn new() -> Queue<T> {
         unsafe {
-            let box = QueueBox { deque: Deque::new(), mutex: Mutex::new(), cond: Cond::new() };
+            let box = QueueBox { deque: Deque::new(), mutex: Mutex::new(), not_empty: Cond::new() };
             Queue { ptr: Arc::new_unchecked(box) }
         }
     }
@@ -38,7 +38,7 @@ impl<T> Queue<T> {
             let box: &mut QueueBox<T> = transmute(self.ptr.borrow());
             box.mutex.lock();
             while box.deque.len() == 0 {
-                box.cond.wait(&mut box.mutex)
+                box.not_empty.wait(&mut box.mutex)
             }
             let item = box.deque.pop_front().get();
             box.mutex.unlock();
@@ -52,7 +52,7 @@ impl<T> Queue<T> {
             box.mutex.lock();
             box.deque.push_back(item);
             box.mutex.unlock();
-            box.cond.signal()
+            box.not_empty.signal()
         }
     }
 }
@@ -60,5 +60,61 @@ impl<T> Queue<T> {
 impl<T> Clone for Queue<T> {
     fn clone(&self) -> Queue<T> {
         Queue { ptr: self.ptr.clone() }
+    }
+}
+
+#[no_freeze]
+struct BoundedQueueBox<T> {
+    deque: Deque<T>,
+    mutex: Mutex,
+    not_empty: Cond,
+    not_full: Cond,
+    maximum: uint
+}
+
+pub struct BoundedQueue<T> {
+    priv ptr: Arc<BoundedQueueBox<T>>
+}
+
+impl<T> BoundedQueue<T> {
+    pub fn new(maximum: uint) -> BoundedQueue<T> {
+        unsafe {
+            let box = BoundedQueueBox { deque: Deque::new(), mutex: Mutex::new(), not_empty: Cond::new(),
+                                        not_full: Cond::new(), maximum: maximum };
+            BoundedQueue { ptr: Arc::new_unchecked(box) }
+        }
+    }
+
+    pub fn pop(&self) -> T {
+        unsafe {
+            let box: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
+            box.mutex.lock();
+            while box.deque.len() == 0 {
+                box.not_empty.wait(&mut box.mutex)
+            }
+            let item = box.deque.pop_front().get();
+            box.mutex.unlock();
+            box.not_full.signal();
+            item
+        }
+    }
+
+    pub fn push(&self, item: T) {
+        unsafe {
+            let box: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
+            box.mutex.lock();
+            while box.deque.len() == box.maximum {
+                box.not_full.wait(&mut box.mutex)
+            }
+            box.deque.push_back(item);
+            box.mutex.unlock();
+            box.not_empty.signal()
+        }
+    }
+}
+
+impl<T> Clone for BoundedQueue<T> {
+    fn clone(&self) -> BoundedQueue<T> {
+        BoundedQueue { ptr: self.ptr.clone() }
     }
 }
