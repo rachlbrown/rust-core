@@ -85,7 +85,7 @@ pub struct BoundedQueue<T> {
 }
 
 impl<T> BoundedQueue<T> {
-    /// Return a new `BoundedQueue` instance
+    /// Return a new `BoundedQueue` instance, holding at most `maximum` elements
     pub fn new(maximum: uint) -> BoundedQueue<T> {
         unsafe {
             let box = BoundedQueueBox { deque: Deque::new(), mutex: Mutex::new(), not_empty: Cond::new(),
