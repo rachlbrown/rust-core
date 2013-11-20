@@ -13,9 +13,10 @@ use super::fail::out_of_memory;
 #[cfg(libc)]
 use super::heap::{Heap, free};
 use super::ops::Drop;
-use super::slice::Slice;
+use super::slice::{Slice, unchecked_get};
 use super::ptr::{offset, read_ptr};
 use super::uint::mul_with_overflow;
+use super::option::{Option, Some, None};
 
 pub struct Vec<T, A> {
     priv len: uint,
@@ -95,6 +96,17 @@ impl<T, A: Allocator> Vec<T, A> {
                 let (ptr, _) = self.alloc.realloc(self.ptr as *mut u8, self.len * size_of::<T>());
                 self.ptr = ptr as *mut T;
                 self.cap = self.len;
+            }
+        }
+    }
+
+    pub fn pop(&mut self) -> Option<T> {
+        if self.len == 0 {
+            None
+        } else {
+            unsafe {
+                self.len -= 1;
+                Some(read_ptr(unchecked_get(self.as_slice(), self.len())))
             }
         }
     }

@@ -101,3 +101,31 @@ pub trait Ord {
     #[inline(always)]
     fn ge(&self, other: &Self) -> bool { !self.lt(other) }
 }
+
+impl Ord for int {
+    #[inline(always)]
+    fn lt(&self, other: &int) -> bool { *self < *other }
+
+    #[inline(always)]
+    fn le(&self, other: &int) -> bool { *self <= *other }
+
+    #[inline(always)]
+    fn gt(&self, other: &int) -> bool { *self > *other }
+
+    #[inline(always)]
+    fn ge(&self, other: &int) -> bool { *self >= *other }
+}
+
+impl<T: Ord> Ord for ~T {
+    #[inline(always)]
+    fn lt(&self, other: &~T) -> bool { **self < **other }
+
+    #[inline(always)]
+    fn le(&self, other: &~T) -> bool { **self <= **other }
+
+    #[inline(always)]
+    fn gt(&self, other: &~T) -> bool { **self > **other }
+
+    #[inline(always)]
+    fn ge(&self, other: &~T) -> bool { **self >= **other }
+}
