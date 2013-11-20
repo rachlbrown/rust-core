@@ -41,13 +41,11 @@ impl<T> Queue<T> {
     pub fn pop(&self) -> T {
         unsafe {
             let box: &mut QueueBox<T> = transmute(self.ptr.borrow());
-            box.mutex.lock();
+            let mut guard = box.mutex.lock_guard();
             while box.deque.len() == 0 {
-                box.not_empty.wait(&mut box.mutex)
+                box.not_empty.wait_guard(&mut guard)
             }
-            let item = box.deque.pop_front().get();
-            box.mutex.unlock();
-            item
+            box.deque.pop_front().get()
         }
     }
 

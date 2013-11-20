@@ -109,6 +109,11 @@ impl Mutex {
         assert(pthread_mutex_lock(&mut self.mutex) == 0)
     }
 
+    pub unsafe fn lock_guard<'a>(&'a mut self) -> LockGuard<'a> {
+        self.lock();
+        LockGuard { mutex: self }
+    }
+
     /// Try to grab ownership of a lock, and return `true` if successful
     pub unsafe fn trylock(&mut self) -> bool {
         let rc = pthread_mutex_trylock(&mut self.mutex);
@@ -159,12 +164,29 @@ impl Cond {
     pub unsafe fn wait(&mut self, mutex: &mut Mutex) {
         assert(pthread_cond_wait(&mut self.cond, &mut mutex.mutex) == 0)
     }
+
+    pub unsafe fn wait_guard(&mut self, guard: &mut LockGuard) {
+        self.wait(guard.mutex)
+    }
 }
 
 impl Drop for Cond {
     fn drop(&mut self) {
         unsafe {
             assert(pthread_cond_destroy(&mut self.cond) == 0);
+        }
+    }
+}
+
+pub struct LockGuard<'a> {
+    priv mutex: &'a mut Mutex
+}
+
+#[unsafe_destructor]
+impl<'a> Drop for LockGuard<'a> {
+    fn drop(&mut self) {
+        unsafe {
+            self.mutex.unlock()
         }
     }
 }
