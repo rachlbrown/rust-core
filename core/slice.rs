@@ -11,6 +11,7 @@
 use super::mem::transmute;
 use super::ptr::{offset, read_ptr, swap_ptr};
 use super::fail::abort;
+use super::traits::Container;
 
 pub struct Slice<T> {
     data: *T,
@@ -116,4 +117,11 @@ pub unsafe fn unchecked_swap<T>(xs: &mut [T], a: uint, b: uint) {
     let x: *mut T = unchecked_mut_get(xs, a);
     let y: *mut T = unchecked_mut_get(xs, b);
     swap_ptr(x, y);
+}
+
+
+impl<'self, T> Container for &'self [T] {
+    fn len(&self) -> uint {
+        len(*self)
+    }
 }

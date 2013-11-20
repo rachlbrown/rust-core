@@ -30,8 +30,10 @@ pub mod priority_queue;
 pub mod ptr;
 pub mod rc;
 pub mod slice;
+pub mod str;
 #[cfg(libc)]
 pub mod thread;
+pub mod traits;
 pub mod vec;
 
 pub mod uint;
