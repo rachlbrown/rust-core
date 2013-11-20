@@ -25,19 +25,19 @@ impl<T: Clone> Clone for ~T {
     }
 }
 
-impl<'self, T> Clone for &'self T {
+impl<'a, T> Clone for &'a T {
     #[inline(always)]
-    fn clone(&self) -> &'self T { *self }
+    fn clone(&self) -> &'a T { *self }
 }
 
-impl<'self, T> Clone for &'self [T] {
+impl<'a, T> Clone for &'a [T] {
     #[inline(always)]
-    fn clone(&self) -> &'self [T] { *self }
+    fn clone(&self) -> &'a [T] { *self }
 }
 
-impl<'self> Clone for &'self str {
+impl<'a> Clone for &'a str {
     #[inline(always)]
-    fn clone(&self) -> &'self str { *self }
+    fn clone(&self) -> &'a str { *self }
 }
 
 impl<T> Clone for *T {

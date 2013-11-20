@@ -41,7 +41,7 @@ impl<T> Arc<T> {
 
 impl<T> Arc<T> {
     #[inline(always)]
-    pub fn borrow<'r>(&'r self) -> &'r T {
+    pub fn borrow<'a>(&'a self) -> &'a T {
         unsafe { &(*self.ptr).value }
     }
 }

@@ -119,13 +119,13 @@ impl<T, A: Allocator> Vec<T, A> {
     }
 
     #[inline]
-    pub fn as_slice<'r>(&'r self) -> &'r [T] {
+    pub fn as_slice<'a>(&'a self) -> &'a [T] {
         let slice = Slice { data: self.ptr as *T, len: self.len };
         unsafe { transmute(slice) }
     }
 
     #[inline]
-    pub fn as_mut_slice<'r>(&'r mut self) -> &'r mut [T] {
+    pub fn as_mut_slice<'a>(&'a mut self) -> &'a mut [T] {
         let slice = Slice { data: self.ptr as *T, len: self.len };
         unsafe { transmute(slice) }
     }

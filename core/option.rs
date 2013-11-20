@@ -17,12 +17,12 @@ pub enum Option<T> {
 
 impl<T> Option<T> {
     /// Convert from `Option<T>` to `Option<&T>`
-    pub fn as_ref<'r>(&'r self) -> Option<&'r T> {
+    pub fn as_ref<'a>(&'a self) -> Option<&'a T> {
         match *self { Some(ref x) => Some(x), None => None }
     }
 
     /// Convert from `Option<T>` to `Option<&mut T>`
-    pub fn as_mut<'r>(&'r mut self) -> Option<&'r mut T> {
+    pub fn as_mut<'a>(&'a mut self) -> Option<&'a mut T> {
         match *self { Some(ref mut x) => Some(x), None => None }
     }
 
