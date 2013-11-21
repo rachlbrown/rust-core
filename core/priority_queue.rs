@@ -10,6 +10,7 @@
 
 //! A priority queue implemented with a binary heap
 
+use super::container::Container;
 use super::heap::Heap;
 use super::vec::Vec;
 use super::ops::Ord;
@@ -22,12 +23,14 @@ pub struct PriorityQueue<T> {
     priv data: Vec<T, Heap>
 }
 
-impl<T: Ord> PriorityQueue<T> {
+impl<T> Container for PriorityQueue<T> {
     #[inline(always)]
-    pub fn len(&self) -> uint {
+    fn len(&self) -> uint {
         self.data.len()
     }
+}
 
+impl<T: Ord> PriorityQueue<T> {
     #[inline(always)]
     pub fn capacity(&self) -> uint {
         self.data.capacity()

@@ -8,13 +8,9 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::container::Container;
-use super::mem::transmute;
-
-impl<'self> Container for &'self str {
-    #[no_split_stack]
-    fn len(&self) -> uint {
-        let (_, l) : (*u8, uint) = unsafe { transmute(*self) };
-        l
+pub trait Container {
+    fn len(&self) -> uint;
+    fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 }

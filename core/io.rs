@@ -8,8 +8,9 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use super::container::Container;
 use super::c_types::c_int;
-use super::slice::{len, to_mut_ptr, to_ptr};
+use super::slice::{to_mut_ptr, to_ptr};
 
 enum FILE {}
 
@@ -48,13 +49,13 @@ pub fn stderr() -> StdStream {
 impl StdStream {
     pub fn read(&mut self, xs: &mut [u8]) -> uint {
         unsafe {
-            fread(to_mut_ptr(xs), 1, len(xs), self.file)
+            fread(to_mut_ptr(xs), 1, xs.len(), self.file)
         }
     }
 
     pub fn write(&mut self, xs: &[u8]) -> uint {
         unsafe {
-            fwrite(to_ptr(xs), 1, len(xs), self.file)
+            fwrite(to_ptr(xs), 1, xs.len(), self.file)
         }
     }
 

@@ -15,6 +15,7 @@
 // reduces the size of the queue by 2x for types without a compact `Option<T>` representation like
 // non-nullable pointers.
 
+use super::container::Container;
 use super::mem::move_val_init;
 use super::ptr::read_ptr;
 use super::ops::Drop;
@@ -38,6 +39,13 @@ fn raw_index(lo: uint, len: uint, index: uint) -> uint {
     }
 }
 
+impl<T> Container for Deque<T> {
+    #[inline(always)]
+    fn len(&self) -> uint {
+        self.nelts
+    }
+}
+
 impl<T> Deque<T> {
     pub fn new() -> Deque<T> {
         Deque{ nelts: 0, lo: 0, elts: Vec::new() }
@@ -45,11 +53,6 @@ impl<T> Deque<T> {
 
     pub fn with_capacity(capacity: uint) -> Deque<T> {
         Deque{ nelts: 0, lo: 0, elts: Vec::with_capacity(capacity) }
-    }
-
-    #[inline(always)]
-    pub fn len(&self) -> uint {
-        self.nelts
     }
 
     #[inline(always)]

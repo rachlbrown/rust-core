@@ -11,7 +11,7 @@
 use super::mem::transmute;
 use super::ptr::{offset, read_ptr, swap_ptr};
 use super::fail::abort;
-use super::traits::Container;
+use super::container::Container;
 
 pub struct Slice<T> {
     data: *T,
@@ -28,13 +28,6 @@ pub unsafe fn unchecked_mut_get<'a, T>(xs: &'a mut [T], index: uint) -> &'a mut 
     transmute(offset(slice.data, index as int))
 }
 
-pub fn len<T>(xs: &[T]) -> uint {
-    unsafe {
-        let slice: Slice<T> = transmute(xs);
-        slice.len
-    }
-}
-
 pub fn to_ptr<T>(xs: &[T]) -> *T {
     unsafe {
         let slice: Slice<T> = transmute(xs);
@@ -43,7 +36,7 @@ pub fn to_ptr<T>(xs: &[T]) -> *T {
 }
 
 pub fn slice<'a, T>(xs: &'a [T], start: uint, end: uint) -> &'a [T] {
-    if start > end || end > len(xs) {
+    if start > end || end > xs.len() {
         abort()
     }
     unsafe {
@@ -57,7 +50,7 @@ pub fn slice<'a, T>(xs: &'a [T], start: uint, end: uint) -> &'a [T] {
 }
 
 pub fn slice_from<'a, T>(xs: &'a [T], start: uint) -> &'a [T] {
-    slice(xs, start, len(xs))
+    slice(xs, start, xs.len())
 }
 
 pub fn slice_to<'a, T>(xs: &'a [T], end: uint) -> &'a [T] {
@@ -76,7 +69,7 @@ pub fn to_mut_ptr<T>(xs: &mut [T]) -> *mut T {
 }
 
 pub fn mut_slice<'a, T>(xs: &'a mut [T], start: uint, end: uint) -> &'a mut [T] {
-    if start > end || end > len(xs) {
+    if start > end || end > xs.len() {
         abort()
     }
     unsafe {
@@ -90,7 +83,7 @@ pub fn mut_slice<'a, T>(xs: &'a mut [T], start: uint, end: uint) -> &'a mut [T] 
 }
 
 pub fn mut_slice_from<'a, T>(xs: &'a mut [T], start: uint) -> &'a mut [T] {
-    let length = len(xs);
+    let length = xs.len();
     mut_slice(xs, start, length)
 }
 
@@ -122,6 +115,9 @@ pub unsafe fn unchecked_swap<T>(xs: &mut [T], a: uint, b: uint) {
 
 impl<'self, T> Container for &'self [T] {
     fn len(&self) -> uint {
-        len(*self)
+        unsafe {
+            let slice: Slice<T> = transmute(*self);
+            slice.len
+        }
     }
 }

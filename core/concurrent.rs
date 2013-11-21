@@ -10,6 +10,7 @@
 
 //! Concurrent data structures
 
+use super::container::Container;
 use super::clone::Clone;
 use super::arc::Arc;
 use super::deque::Deque;
@@ -19,22 +20,19 @@ use super::thread::{Mutex, Cond};
 use super::ops::Ord;
 use super::option::Option;
 
-trait GenericQueue<T> {
+trait GenericQueue<T>: Container {
     fn generic_push(&mut self, item: T);
     fn generic_pop(&mut self) -> Option<T>;
-    fn generic_len(&self) -> uint;
 }
 
 impl<T> GenericQueue<T> for Deque<T> {
     fn generic_push(&mut self, item: T) { self.push_back(item) }
     fn generic_pop(&mut self) -> Option<T> { self.pop_front() }
-    fn generic_len(&self) -> uint { self.len() }
 }
 
 impl<T: Ord> GenericQueue<T> for PriorityQueue<T> {
     fn generic_push(&mut self, item: T) { self.push(item) }
     fn generic_pop(&mut self) -> Option<T> { self.pop() }
-    fn generic_len(&self) -> uint { self.len() }
 }
 
 #[no_freeze]
@@ -60,7 +58,7 @@ impl<A, T: GenericQueue<A>> QueuePtr<T> {
         unsafe {
             let box: &mut QueueBox<T> = transmute(self.ptr.borrow());
             let mut guard = box.mutex.lock_guard();
-            while box.queue.generic_len() == 0 {
+            while box.queue.is_empty() {
                 box.not_empty.wait_guard(&mut guard)
             }
             box.queue.generic_pop().get()
@@ -168,7 +166,7 @@ impl<A, T: GenericQueue<A>> BoundedQueuePtr<T> {
         unsafe {
             let box: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
             box.mutex.lock();
-            while box.deque.generic_len() == 0 {
+            while box.deque.is_empty() {
                 box.not_empty.wait(&mut box.mutex)
             }
             let item = box.deque.generic_pop().get();
@@ -182,7 +180,7 @@ impl<A, T: GenericQueue<A>> BoundedQueuePtr<T> {
         unsafe {
             let box: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
             box.mutex.lock();
-            while box.deque.generic_len() == box.maximum {
+            while box.deque.len() == box.maximum {
                 box.not_full.wait(&mut box.mutex)
             }
             box.deque.generic_push(item);

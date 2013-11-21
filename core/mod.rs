@@ -18,6 +18,7 @@ pub mod char;
 pub mod clone;
 #[cfg(libc)]
 pub mod concurrent;
+pub mod container;
 pub mod fail;
 #[cfg(libc)]
 pub mod io;
@@ -33,7 +34,6 @@ pub mod slice;
 pub mod str;
 #[cfg(libc)]
 pub mod thread;
-pub mod traits;
 pub mod vec;
 
 pub mod uint;
