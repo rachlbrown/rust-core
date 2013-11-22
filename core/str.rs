@@ -11,7 +11,7 @@
 use super::container::Container;
 use super::mem::transmute;
 
-impl<'self> Container for &'self str {
+impl<'a> Container for &'a str {
     #[no_split_stack]
     fn len(&self) -> uint {
         let (_, l) : (*u8, uint) = unsafe { transmute(*self) };

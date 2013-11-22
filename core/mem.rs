@@ -23,6 +23,11 @@ pub fn size_of<T>() -> uint {
     unsafe { detail::size_of::<T>() }
 }
 
+pub fn nonzero_size_of<T>() -> uint {
+    let s = size_of::<T>();
+    if s == 0 { 1 } else { s }
+}
+
 #[inline(always)]
 pub fn min_align_of<T>() -> uint {
     unsafe { detail::min_align_of::<T>() }

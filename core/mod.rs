@@ -22,6 +22,7 @@ pub mod container;
 pub mod fail;
 #[cfg(libc)]
 pub mod io;
+pub mod iter;
 pub mod kinds;
 pub mod mem;
 pub mod ops;

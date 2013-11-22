@@ -13,10 +13,11 @@ use super::fail::out_of_memory;
 #[cfg(libc)]
 use super::heap::{Heap, free};
 use super::ops::Drop;
-use super::slice::{Slice, unchecked_get};
+use super::slice::{Slice, iter, unchecked_get};
 use super::ptr::{offset, read_ptr};
 use super::uint::mul_with_overflow;
 use super::option::{Option, Some, None};
+use super::iter::Iterator;
 
 pub struct Vec<T, A> {
     priv len: uint,
@@ -151,12 +152,8 @@ impl<T, A: Allocator> Vec<T, A> {
 impl<T> Drop for Vec<T, Heap> {
     fn drop(&mut self) {
         unsafe {
-            let mut i = 0;
-            let len = self.len();
-            let xs = self.as_mut_slice();
-            while i < len {
-                read_ptr(&xs[i]);
-                i += 1;
+            for x in iter(self.as_mut_slice()) {
+                read_ptr(x);
             }
             free(self.ptr as *mut u8)
         }

@@ -8,10 +8,13 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::mem::transmute;
+use super::mem::{nonzero_size_of, size_of, transmute};
 use super::ptr::{offset, read_ptr, swap_ptr};
 use super::fail::abort;
 use super::container::Container;
+use super::option::{Option, Some, None};
+use super::clone::Clone;
+use super::iter::Iterator;
 
 pub struct Slice<T> {
     data: *T,
@@ -113,11 +116,68 @@ pub unsafe fn unchecked_swap<T>(xs: &mut [T], a: uint, b: uint) {
 }
 
 
-impl<'self, T> Container for &'self [T] {
+impl<'a, T> Container for &'a [T] {
     fn len(&self) -> uint {
         unsafe {
             let slice: Slice<T> = transmute(*self);
             slice.len
         }
+    }
+}
+
+pub fn iter<'a, T>(xs: &'a [T]) -> VecIterator<'a, T> {
+    unsafe {
+        let p = to_ptr(xs);
+        if size_of::<T>() == 0 {
+            VecIterator{ptr: p,
+            end: (p as uint + xs.len()) as *T,
+            lifetime: None}
+        } else {
+            VecIterator{ptr: p,
+            end: offset(p, xs.len() as int),
+            lifetime: None}
+        }
+    }
+}
+
+/// An iterator for iterating over a slice.
+pub struct VecIterator<'a, T> {
+    priv ptr: *T,
+    priv end: *T,
+    priv lifetime: Option<&'a ()> // FIXME: https://github.com/mozilla/rust/issues/5922
+}
+
+impl<'a, T> Clone for VecIterator<'a, T> {
+    fn clone(&self) -> VecIterator<'a, T> {
+        *self
+    }
+}
+
+impl<'a, T> Iterator<&'a T> for VecIterator<'a, T> {
+    #[inline]
+    fn next(&mut self) -> Option<&'a T> {
+        // could be implemented with slices, but this avoids bounds checks
+        unsafe {
+            if self.ptr == self.end {
+                None
+            } else {
+                let old = self.ptr;
+                self.ptr = if size_of::<T>() == 0 {
+                    // `offset` will return the same pointer for 0-size types
+                    transmute(self.ptr as uint + 1)
+                } else {
+                    offset(self.ptr, 1)
+                };
+
+                Some(transmute(old))
+            }
+        }
+    }
+
+    #[inline]
+    fn size_hint(&self) -> (uint, Option<uint>) {
+        let diff = (self.end as uint) - (self.ptr as uint);
+        let exact = diff / nonzero_size_of::<T>();
+        (exact, Some(exact))
     }
 }
