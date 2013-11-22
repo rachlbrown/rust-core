@@ -8,7 +8,9 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+#[no_std];
 #[allow(ctypes)];
+#[link(name = "core")];
 
 pub mod arc;
 pub mod atomic;
