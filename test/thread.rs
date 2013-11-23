@@ -11,10 +11,9 @@
 #[no_std];
 
 use core::clone::Clone;
-use core::thread::spawn;
+use core::thread::{spawn, spawn_detached};
 use core::fail::abort;
 use core::concurrent::Queue;
-use core::vec::Vec;
 
 #[path = "../core/mod.rs"]
 mod core;
@@ -44,7 +43,7 @@ fn main(_: int, _: **u8) -> int {
     let active = 10;
 
     let send_queue = queue.clone();
-    let consumer = do spawn {
+    let consumer = spawn(proc() {
         let mut received = 0;
         let mut active = active;
         loop {
@@ -58,27 +57,28 @@ fn main(_: int, _: **u8) -> int {
             }
         }
         received
-    };
+    });
 
-    let mut producers = Vec::new();
     let mut i = 0;
     while i < active {
         let send_queue = queue.clone();
-        let producer = do spawn {
+        spawn_detached(proc() {
             let mut i = 0;
             while i < 1000 {
                 send_queue.push(i);
                 i += 1;
             }
             send_queue.push(-1);
-        };
-        producers.push(producer);
+        });
         i += 1;
     }
 
     if *consumer.join() != 10000 {
         abort()
     }
+
+    // A harmless leak of the procs and queue used in the detached producers may occur, since
+    // there's no call to `pthread_exit` here.
 
     0
 }

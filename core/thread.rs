@@ -22,6 +22,10 @@ extern {
 
     fn sched_yield() -> c_int;
 
+    fn pthread_attr_init(attr: *mut pthread_attr_t) -> c_int;
+    fn pthread_attr_destroy(attr: *mut pthread_attr_t) -> c_int;
+    fn pthread_attr_setdetachstate(attr: *mut pthread_attr_t, detachstate: c_int) -> c_int;
+
     fn pthread_mutex_init(mutex: *mut pthread_mutex_t, attr: *pthread_mutex_attr_t) -> c_int;
     fn pthread_mutex_destroy(mutex: *mut pthread_mutex_t) -> c_int;
     fn pthread_mutex_lock(mutex: *mut pthread_mutex_t) -> c_int;
@@ -35,6 +39,7 @@ extern {
     fn pthread_cond_wait(cond: *mut pthread_cond_t, mutex: *mut pthread_mutex_t) -> c_int;
 }
 
+static PTHREAD_CREATE_DETACHED: c_int = 1;
 static EBUSY: c_int = 16;
 
 /// An owned thread type, joined in the destructor.
@@ -58,6 +63,22 @@ pub fn spawn<A>(start_routine: proc() -> A) -> Thread<A> {
             abort()
         }
         Thread { thread: thread }
+    }
+}
+
+pub fn spawn_detached(start_routine: proc()) {
+    unsafe {
+        let box: *mut u8 = transmute(~start_routine);
+        let mut attr = uninit();
+        if pthread_attr_init(&mut attr) != 0 {
+            abort()
+        }
+        pthread_attr_setdetachstate(&mut attr, PTHREAD_CREATE_DETACHED);
+        let mut thread = uninit();
+        if pthread_create(&mut thread, &attr, shim, box) != 0 {
+            abort()
+        }
+        assert(pthread_attr_destroy(&mut attr) == 0);
     }
 }
 
