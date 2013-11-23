@@ -66,6 +66,12 @@ pub fn spawn<A>(start_routine: proc() -> A) -> Thread<A> {
     }
 }
 
+extern "C" fn detached_shim(box: *mut u8) -> *mut u8 {
+    let start_routine = unsafe { *transmute::<*mut u8, ~proc()>(box) };
+    start_routine();
+    0 as *mut u8
+}
+
 pub fn spawn_detached(start_routine: proc()) {
     unsafe {
         let box: *mut u8 = transmute(~start_routine);
@@ -75,7 +81,7 @@ pub fn spawn_detached(start_routine: proc()) {
         }
         pthread_attr_setdetachstate(&mut attr, PTHREAD_CREATE_DETACHED);
         let mut thread = uninit();
-        if pthread_create(&mut thread, &attr, shim, box) != 0 {
+        if pthread_create(&mut thread, &attr, detached_shim, box) != 0 {
             abort()
         }
         assert(pthread_attr_destroy(&mut attr) == 0);
