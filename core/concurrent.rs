@@ -65,7 +65,7 @@ impl<A, T: GenericQueue<A>> QueuePtr<T> {
         }
     }
 
-    pub fn push(&self, item: A) {
+    fn push(&self, item: A) {
         unsafe {
             let box: &mut QueueBox<T> = transmute(self.ptr.borrow());
             box.mutex.lock();
@@ -154,7 +154,7 @@ struct BoundedQueuePtr<T> {
 }
 
 impl<A, T: GenericQueue<A>> BoundedQueuePtr<T> {
-    pub fn new(maximum: uint, queue: T) -> BoundedQueuePtr<T> {
+    fn new(maximum: uint, queue: T) -> BoundedQueuePtr<T> {
         unsafe {
             let box = BoundedQueueBox { deque: queue, mutex: Mutex::new(), not_empty: Cond::new(),
                                         not_full: Cond::new(), maximum: maximum };
@@ -162,7 +162,7 @@ impl<A, T: GenericQueue<A>> BoundedQueuePtr<T> {
         }
     }
 
-    pub fn pop(&self) -> A {
+    fn pop(&self) -> A {
         unsafe {
             let box: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
             box.mutex.lock();
@@ -176,7 +176,7 @@ impl<A, T: GenericQueue<A>> BoundedQueuePtr<T> {
         }
     }
 
-    pub fn push(&self, item: A) {
+    fn push(&self, item: A) {
         unsafe {
             let box: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
             box.mutex.lock();
