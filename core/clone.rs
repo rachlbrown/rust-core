@@ -182,7 +182,6 @@ impl DeepClone for u16 {
     fn deep_clone(&self) -> u16 { *self }
 }
 
-
 impl DeepClone for u32 {
     #[inline(always)]
     fn deep_clone(&self) -> u32 { *self }

@@ -9,7 +9,7 @@
 // except according to those terms.
 
 use super::mem::transmute;
-use super::ops::Drop;
+use super::ops::{Drop, Eq, Ord};
 use super::kinds::{Freeze, Send};
 use super::clone::{Clone, DeepClone};
 
@@ -48,6 +48,20 @@ impl<T> Rc<T> {
     }
 }
 
+#[unsafe_destructor]
+impl<T> Drop for Rc<T> {
+    fn drop(&mut self) {
+        unsafe {
+            if self.ptr != 0 as *mut RcBox<T> {
+                (*self.ptr).count -= 1;
+                if (*self.ptr).count == 0 {
+                    let _: ~RcBox<T> = transmute(self.ptr);
+                }
+            }
+        }
+    }
+}
+
 impl<T> Rc<T> {
     #[inline(always)]
     pub fn borrow<'a>(&'a self) -> &'a T {
@@ -72,16 +86,24 @@ impl<T: DeepClone> DeepClone for Rc<T> {
     }
 }
 
-#[unsafe_destructor]
-impl<T> Drop for Rc<T> {
-    fn drop(&mut self) {
-        unsafe {
-            if self.ptr != 0 as *mut RcBox<T> {
-                (*self.ptr).count -= 1;
-                if (*self.ptr).count == 0 {
-                    let _: ~RcBox<T> = transmute(self.ptr);
-                }
-            }
-        }
-    }
+impl<T: Eq> Eq for Rc<T> {
+    #[inline(always)]
+    fn eq(&self, other: &Rc<T>) -> bool { *self.borrow() == *other.borrow() }
+
+    #[inline(always)]
+    fn ne(&self, other: &Rc<T>) -> bool { *self.borrow() != *other.borrow() }
+}
+
+impl<T: Ord> Ord for Rc<T> {
+    #[inline(always)]
+    fn lt(&self, other: &Rc<T>) -> bool { *self.borrow() < *other.borrow() }
+
+    #[inline(always)]
+    fn le(&self, other: &Rc<T>) -> bool { *self.borrow() <= *other.borrow() }
+
+    #[inline(always)]
+    fn gt(&self, other: &Rc<T>) -> bool { *self.borrow() > *other.borrow() }
+
+    #[inline(always)]
+    fn ge(&self, other: &Rc<T>) -> bool { *self.borrow() >= *other.borrow() }
 }
