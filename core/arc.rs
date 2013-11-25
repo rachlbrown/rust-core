@@ -11,7 +11,7 @@
 use super::mem::transmute;
 use super::kinds::{Freeze, Send};
 use super::clone::{Clone, DeepClone};
-use super::ops::Drop;
+use super::ops::{Drop, Eq, Ord};
 use super::atomic::{atomic_fence_acq, atomic_xadd_relaxed, atomic_xsub_rel};
 
 struct ArcBox<T> {
@@ -76,4 +76,26 @@ impl<T: DeepClone> DeepClone for Arc<T> {
     fn deep_clone(&self) -> Arc<T> {
         unsafe { Arc::new_unchecked(self.borrow().deep_clone()) }
     }
+}
+
+impl<T: Eq> Eq for Arc<T> {
+    #[inline(always)]
+    fn eq(&self, other: &Arc<T>) -> bool { *self.borrow() == *other.borrow() }
+
+    #[inline(always)]
+    fn ne(&self, other: &Arc<T>) -> bool { *self.borrow() != *other.borrow() }
+}
+
+impl<T: Ord> Ord for Arc<T> {
+    #[inline(always)]
+    fn lt(&self, other: &Arc<T>) -> bool { *self.borrow() < *other.borrow() }
+
+    #[inline(always)]
+    fn le(&self, other: &Arc<T>) -> bool { *self.borrow() <= *other.borrow() }
+
+    #[inline(always)]
+    fn gt(&self, other: &Arc<T>) -> bool { *self.borrow() > *other.borrow() }
+
+    #[inline(always)]
+    fn ge(&self, other: &Arc<T>) -> bool { *self.borrow() >= *other.borrow() }
 }
