@@ -22,6 +22,7 @@ pub mod clone;
 pub mod concurrent;
 pub mod container;
 pub mod fail;
+pub mod hash;
 #[cfg(libc)]
 pub mod io;
 pub mod iter;

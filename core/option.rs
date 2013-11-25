@@ -9,6 +9,7 @@
 // except according to those terms.
 
 use super::fail::abort;
+use super::mem::replace;
 
 pub enum Option<T> {
     Some(T),
@@ -16,6 +17,14 @@ pub enum Option<T> {
 }
 
 impl<T> Option<T> {
+    /// Returns true if the option contains a `Some` value
+    pub fn is_some(&self) -> bool {
+        match *self {
+            Some(_) => true,
+            None => false
+        }
+    }
+
     /// Convert from `Option<T>` to `Option<&T>`
     pub fn as_ref<'a>(&'a self) -> Option<&'a T> {
         match *self { Some(ref x) => Some(x), None => None }
@@ -39,5 +48,11 @@ impl<T> Option<T> {
     /// Applies a function to the contained value or returns a default.
     pub fn map_or<U>(self, def: U, f: &fn(T) -> U) -> U {
         match self { None => def, Some(t) => f(t) }
+    }
+
+    /// Take the value out of the option, leaving a `None` in its place.
+    #[inline(always)]
+    pub fn take(&mut self) -> Option<T> {
+        replace(self, None)
     }
 }

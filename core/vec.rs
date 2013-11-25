@@ -8,6 +8,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use super::container::Container;
 use super::mem::{Allocator, move_val_init, size_of, transmute};
 use super::fail::out_of_memory;
 #[cfg(libc)]
@@ -61,12 +62,14 @@ impl<T, A: Allocator> Vec<T, A> {
     }
 }
 
-impl<T, A: Allocator> Vec<T, A> {
+impl<T, A: Allocator> Container for Vec<T, A> {
     #[inline(always)]
-    pub fn len(&self) -> uint {
+    fn len(&self) -> uint {
         self.len
     }
+}
 
+impl<T, A: Allocator> Vec<T, A> {
     #[inline(always)]
     pub fn capacity(&self) -> uint {
         self.cap

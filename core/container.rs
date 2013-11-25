@@ -10,6 +10,8 @@
 
 pub trait Container {
     fn len(&self) -> uint;
+
+    #[inline(always)]
     fn is_empty(&self) -> bool {
         self.len() == 0
     }
