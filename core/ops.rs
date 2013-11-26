@@ -191,6 +191,22 @@ impl Eq for char {
     fn ne(&self, other: &char) -> bool { *self != *other }
 }
 
+impl<'a, T: Eq> Eq for &'a T {
+    #[inline(always)]
+    fn eq(&self, other: & &T) -> bool { **self == **other }
+
+    #[inline(always)]
+    fn ne(&self, other: & &T) -> bool { **self != **other }
+}
+
+impl<T: Eq> Eq for ~T {
+    #[inline(always)]
+    fn eq(&self, other: &~T) -> bool { **self == **other }
+
+    #[inline(always)]
+    fn ne(&self, other: &~T) -> bool { **self != **other }
+}
+
 #[lang="ord"]
 pub trait Ord {
     #[inline(always)]
@@ -386,6 +402,20 @@ impl Ord for char {
 
     #[inline(always)]
     fn ge(&self, other: &char) -> bool { *self >= *other }
+}
+
+impl<'a, T: Ord> Ord for &'a T {
+    #[inline(always)]
+    fn lt(&self, other: & &T) -> bool { **self < **other }
+
+    #[inline(always)]
+    fn le(&self, other: & &T) -> bool { **self <= **other }
+
+    #[inline(always)]
+    fn gt(&self, other: & &T) -> bool { **self > **other }
+
+    #[inline(always)]
+    fn ge(&self, other: & &T) -> bool { **self >= **other }
 }
 
 impl<T: Ord> Ord for ~T {
