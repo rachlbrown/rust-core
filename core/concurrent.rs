@@ -298,7 +298,6 @@ impl<K: Hash + Eq, V: Clone> ConcurrentHashMap<K, V> {
 
 pub struct ShardMap<K, V> {
     priv maps: Vec<ConcurrentHashMap<K, V>, Heap>,
-    priv shards: uint,
     priv k0: u64,
     priv k1: u64
 }
@@ -311,7 +310,7 @@ impl<K: Hash + Eq, V> ShardMap<K, V> {
             xs.push(ConcurrentHashMap::with_capacity_and_keys(k0, k1, capacity));
             i += 1;
         }
-        ShardMap { maps: xs, shards: shards, k0: k0, k1: k1 }
+        ShardMap { maps: xs, k0: k0, k1: k1 }
     }
 
     pub fn swap(&mut self, k: K, v: V) -> Option<V> {
@@ -325,7 +324,7 @@ impl<K: Hash + Eq, V> ShardMap<K, V> {
     }
 
     fn get_shard(&self, k: &K) -> uint {
-        k.hash(self.k0, self.k1) as uint % self.shards
+        k.hash(self.k0, self.k1) as uint % self.maps.len()
     }
 }
 
