@@ -155,7 +155,7 @@ impl<'a, A: HashBytes> HashBytes for &'a [A] {
     }
 }
 
-struct State {
+pub struct State {
     k0: u64,
     k1: u64,
     length: uint, // how many bytes we've processed
@@ -198,7 +198,7 @@ macro_rules! compress (
 
 impl State {
     #[inline]
-    fn new(key0: u64, key1: u64) -> State {
+    pub fn new(key0: u64, key1: u64) -> State {
         let mut state = State {
             k0: key0,
             k1: key1,
@@ -215,7 +215,7 @@ impl State {
     }
 
     #[inline]
-    fn result(&mut self) -> u64 {
+    pub fn result(&mut self) -> u64 {
         let mut v0 = self.v0;
         let mut v1 = self.v1;
         let mut v2 = self.v2;
@@ -246,7 +246,7 @@ impl State {
     }
 
     #[inline]
-    fn write(&mut self, msg: &[u8]) {
+    pub fn write(&mut self, msg: &[u8]) {
         let length = msg.len();
         self.length += length;
 
@@ -308,7 +308,7 @@ impl State {
 
 
     #[inline]
-    fn reset(&mut self) {
+    pub fn reset(&mut self) {
         self.length = 0;
         self.v0 = self.k0 ^ 0x736f6d6570736575;
         self.v1 = self.k1 ^ 0x646f72616e646f6d;
