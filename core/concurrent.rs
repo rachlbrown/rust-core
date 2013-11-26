@@ -261,8 +261,8 @@ impl<T> Clone for BoundedPriorityQueue<T> {
 
 #[no_freeze]
 struct LockedHashMap<K, V> {
-    priv map: HashMap<K, V>,
-    priv mutex: Mutex
+    map: HashMap<K, V>,
+    mutex: Mutex
 }
 
 impl<K: Hash + Eq, V> LockedHashMap<K, V> {
@@ -297,11 +297,14 @@ impl<K: Hash + Eq, V: Clone> LockedHashMap<K, V> {
     }
 }
 
+/// A concurrent hash table based a single lock per instance
 pub struct ConcurrentHashMap<K, V> {
     priv ptr: Arc<LockedHashMap<K, V>>
 }
 
 impl<K: Hash + Eq, V> ConcurrentHashMap<K, V> {
+    /// Create a new `ConcurrentHashMap` with the specified 128-bit hash key (`k0` and `k1`) and
+    /// initial `capacity`.
     pub fn with_capacity_and_keys(k0: u64, k1: u64, capacity: uint) -> ConcurrentHashMap<K, V> {
         let box = LockedHashMap::with_capacity_and_keys(k0, k1, capacity);
         unsafe {
@@ -309,6 +312,7 @@ impl<K: Hash + Eq, V> ConcurrentHashMap<K, V> {
         }
     }
 
+    /// Insert a key-value pair into the hash table. Return the old value corresponding to the key.
     pub fn swap(&self, k: K, v: V) -> Option<V> {
         unsafe {
             let box: &mut LockedHashMap<K, V> = transmute(self.ptr.borrow());
@@ -316,6 +320,7 @@ impl<K: Hash + Eq, V> ConcurrentHashMap<K, V> {
         }
     }
 
+    /// Remove a key-value pair from the map. Return the value corresponding to the key.
     pub fn pop(&self, k: &K) -> Option<V> {
         unsafe {
             let box: &mut LockedHashMap<K, V> = transmute(self.ptr.borrow());
@@ -325,11 +330,22 @@ impl<K: Hash + Eq, V> ConcurrentHashMap<K, V> {
 }
 
 impl<K: Hash + Eq, V: Clone> ConcurrentHashMap<K, V> {
+    /// Return the value corresponding to the key via `clone`.
+    ///
+    /// A reference cannot be returned directly, because a lock has to be obtained and released by
+    /// the function.
     pub fn find(&self, k: &K) -> Option<V> {
         unsafe {
             let box: &mut LockedHashMap<K, V> = transmute(self.ptr.borrow());
             box.find(k)
         }
+    }
+}
+
+impl<K, V> Clone for ConcurrentHashMap<K, V> {
+    /// Return a shallow copy of the map
+    fn clone(&self) -> ConcurrentHashMap<K, V> {
+        ConcurrentHashMap { ptr: self.ptr.clone() }
     }
 }
 
@@ -346,11 +362,14 @@ impl<K: Hash + Eq, V> ShardMapBox<K, V> {
     }
 }
 
+/// A concurrent hash table distributing keys across shards, with locking on a per-shard basis
 pub struct ShardMap<K, V> {
     priv ptr: Arc<ShardMapBox<K, V>>
 }
 
 impl<K: Hash + Eq, V> ShardMap<K, V> {
+    /// Create a new `ShardMap` with `shards` internal hash tables, the specified 128-bit hash key
+    /// (`k0` and `k1`) and an initial `capacity`.
     pub fn with_capacity_and_keys(shards: uint, k0: u64, k1: u64, capacity: uint) -> ShardMap<K, V> {
         let mut xs = Vec::with_capacity(shards);
         let mut i = 0;
@@ -364,6 +383,7 @@ impl<K: Hash + Eq, V> ShardMap<K, V> {
         }
     }
 
+    /// Insert a key-value pair into the hash table. Return the old value corresponding to the key.
     pub fn swap(&self, k: K, v: V) -> Option<V> {
         unsafe {
             let box: &mut ShardMapBox<K, V> = transmute(self.ptr.borrow());
@@ -372,6 +392,7 @@ impl<K: Hash + Eq, V> ShardMap<K, V> {
         }
     }
 
+    /// Remove a key-value pair from the map. Return the value corresponding to the key.
     pub fn pop(&self, k: &K) -> Option<V> {
         unsafe {
             let box: &mut ShardMapBox<K, V> = transmute(self.ptr.borrow());
@@ -382,6 +403,10 @@ impl<K: Hash + Eq, V> ShardMap<K, V> {
 }
 
 impl<K: Hash + Eq, V: Clone> ShardMap<K, V> {
+    /// Return the value corresponding to the key via `clone`.
+    ///
+    /// A reference cannot be returned directly, because a lock has to be obtained and released by
+    /// the function.
     pub fn find(&self, k: &K) -> Option<V> {
         unsafe {
             let box: &mut ShardMapBox<K, V> = transmute(self.ptr.borrow());
@@ -392,6 +417,7 @@ impl<K: Hash + Eq, V: Clone> ShardMap<K, V> {
 }
 
 impl<K, V> Clone for ShardMap<K, V> {
+    /// Return a shallow copy of the map
     fn clone(&self) -> ShardMap<K, V> {
         ShardMap { ptr: self.ptr.clone() }
     }
