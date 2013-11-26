@@ -58,6 +58,12 @@ pub fn swap<T>(x: &mut T, y: &mut T) {
     }
 }
 
+#[inline(always)]
+pub fn replace<T>(dest: &mut T, mut src: T) -> T {
+    swap(dest, &mut src);
+    src
+}
+
 pub trait Allocator {
     /// Allocate at least `size` bytes of memory.
     ///
