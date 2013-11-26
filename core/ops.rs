@@ -401,3 +401,13 @@ impl<T: Ord> Ord for ~T {
     #[inline(always)]
     fn ge(&self, other: &~T) -> bool { **self >= **other }
 }
+
+#[inline(always)]
+pub fn max<T: Ord>(x: T, y: T) -> T {
+    if x < y { y } else { x }
+}
+
+#[inline(always)]
+pub fn min<T: Ord>(x: T, y: T) -> T {
+    if x < y { x } else { y }
+}
