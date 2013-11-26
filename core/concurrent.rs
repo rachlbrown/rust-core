@@ -22,6 +22,8 @@ use super::option::Option;
 use super::hash::HashMap;
 use super::ops::Eq;
 use super::hash::Hash;
+use super::heap::Heap;
+use super::vec::Vec;
 
 trait GenericQueue<T>: Container {
     fn generic_push(&mut self, item: T);
@@ -291,5 +293,45 @@ impl<K: Hash + Eq, V: Clone> ConcurrentHashMap<K, V> {
             let _guard = self.mutex.lock_guard();
             self.map.find(k).map(|v| v.clone())
         }
+    }
+}
+
+pub struct ShardMap<K, V> {
+    priv maps: Vec<ConcurrentHashMap<K, V>, Heap>,
+    priv shards: uint,
+    priv k0: u64,
+    priv k1: u64
+}
+
+impl<K: Hash + Eq, V> ShardMap<K, V> {
+    pub fn with_capacity_and_keys(shards: uint, k0: u64, k1: u64, capacity: uint) -> ShardMap<K, V> {
+        let mut xs = Vec::with_capacity(shards);
+        let mut i = 0;
+        while i < shards {
+            xs.push(ConcurrentHashMap::with_capacity_and_keys(k0, k1, capacity));
+            i += 1;
+        }
+        ShardMap { maps: xs, shards: shards, k0: k0, k1: k1 }
+    }
+
+    pub fn swap(&mut self, k: K, v: V) -> Option<V> {
+        let shard = self.get_shard(&k);
+        self.maps.as_mut_slice()[shard].swap(k, v)
+    }
+
+    pub fn pop(&mut self, k: &K) -> Option<V> {
+        let shard = self.get_shard(k);
+        self.maps.as_mut_slice()[shard].pop(k)
+    }
+
+    fn get_shard(&self, k: &K) -> uint {
+        k.hash(self.k0, self.k1) as uint % self.shards
+    }
+}
+
+impl<K: Hash + Eq, V: Clone> ShardMap<K, V> {
+    pub fn find(&mut self, k: &K) -> Option<V> {
+        let shard = self.get_shard(k);
+        self.maps.as_mut_slice()[shard].find(k)
     }
 }
