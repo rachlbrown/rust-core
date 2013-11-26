@@ -259,27 +259,28 @@ impl<T> Clone for BoundedPriorityQueue<T> {
     }
 }
 
-pub struct ConcurrentHashMap<K, V> {
+#[no_freeze]
+struct LockedHashMap<K, V> {
     priv map: HashMap<K, V>,
     priv mutex: Mutex
 }
 
-impl<K: Hash + Eq, V> ConcurrentHashMap<K, V> {
-    pub fn with_capacity_and_keys(k0: u64, k1: u64, capacity: uint) -> ConcurrentHashMap<K, V> {
-        ConcurrentHashMap {
+impl<K: Hash + Eq, V> LockedHashMap<K, V> {
+    fn with_capacity_and_keys(k0: u64, k1: u64, capacity: uint) -> LockedHashMap<K, V> {
+        LockedHashMap {
             map: HashMap::with_capacity_and_keys(k0, k1, capacity),
             mutex: Mutex::new()
         }
     }
 
-    pub fn swap(&mut self, k: K, v: V) -> Option<V> {
+    fn swap(&mut self, k: K, v: V) -> Option<V> {
         unsafe {
             let _guard = self.mutex.lock_guard();
             self.map.swap(k, v)
         }
     }
 
-    pub fn pop(&mut self, k: &K) -> Option<V> {
+    fn pop(&mut self, k: &K) -> Option<V> {
         unsafe {
             let _guard = self.mutex.lock_guard();
             self.map.pop(k)
@@ -287,8 +288,8 @@ impl<K: Hash + Eq, V> ConcurrentHashMap<K, V> {
     }
 }
 
-impl<K: Hash + Eq, V: Clone> ConcurrentHashMap<K, V> {
-    pub fn find(&mut self, k: &K) -> Option<V> {
+impl<K: Hash + Eq, V: Clone> LockedHashMap<K, V> {
+    fn find(&mut self, k: &K) -> Option<V> {
         unsafe {
             let _guard = self.mutex.lock_guard();
             self.map.find(k).map(|v| v.clone())
@@ -296,10 +297,57 @@ impl<K: Hash + Eq, V: Clone> ConcurrentHashMap<K, V> {
     }
 }
 
-pub struct ShardMap<K, V> {
-    priv maps: Vec<ConcurrentHashMap<K, V>, Heap>,
+pub struct ConcurrentHashMap<K, V> {
+    priv ptr: Arc<LockedHashMap<K, V>>
+}
+
+impl<K: Hash + Eq, V> ConcurrentHashMap<K, V> {
+    pub fn with_capacity_and_keys(k0: u64, k1: u64, capacity: uint) -> ConcurrentHashMap<K, V> {
+        let box = LockedHashMap::with_capacity_and_keys(k0, k1, capacity);
+        unsafe {
+            ConcurrentHashMap { ptr: Arc::new_unchecked(box) }
+        }
+    }
+
+    pub fn swap(&self, k: K, v: V) -> Option<V> {
+        unsafe {
+            let box: &mut LockedHashMap<K, V> = transmute(self.ptr.borrow());
+            box.swap(k, v)
+        }
+    }
+
+    pub fn pop(&self, k: &K) -> Option<V> {
+        unsafe {
+            let box: &mut LockedHashMap<K, V> = transmute(self.ptr.borrow());
+            box.pop(k)
+        }
+    }
+}
+
+impl<K: Hash + Eq, V: Clone> ConcurrentHashMap<K, V> {
+    pub fn find(&self, k: &K) -> Option<V> {
+        unsafe {
+            let box: &mut LockedHashMap<K, V> = transmute(self.ptr.borrow());
+            box.find(k)
+        }
+    }
+}
+
+#[no_freeze]
+struct ShardMapBox<K, V> {
+    priv maps: Vec<LockedHashMap<K, V>, Heap>,
     priv k0: u64,
     priv k1: u64
+}
+
+impl<K: Hash + Eq, V> ShardMapBox<K, V> {
+    fn get_shard(&self, k: &K) -> uint {
+        k.hash(self.k0, self.k1) as uint % self.maps.len()
+    }
+}
+
+pub struct ShardMap<K, V> {
+    priv ptr: Arc<ShardMapBox<K, V>>
 }
 
 impl<K: Hash + Eq, V> ShardMap<K, V> {
@@ -307,30 +355,44 @@ impl<K: Hash + Eq, V> ShardMap<K, V> {
         let mut xs = Vec::with_capacity(shards);
         let mut i = 0;
         while i < shards {
-            xs.push(ConcurrentHashMap::with_capacity_and_keys(k0, k1, capacity));
+            xs.push(LockedHashMap::with_capacity_and_keys(k0, k1, capacity));
             i += 1;
         }
-        ShardMap { maps: xs, k0: k0, k1: k1 }
+        let box = ShardMapBox { maps: xs, k0: k0, k1: k1 };
+        unsafe {
+            ShardMap { ptr: Arc::new_unchecked(box) }
+        }
     }
 
-    pub fn swap(&mut self, k: K, v: V) -> Option<V> {
-        let shard = self.get_shard(&k);
-        self.maps.as_mut_slice()[shard].swap(k, v)
+    pub fn swap(&self, k: K, v: V) -> Option<V> {
+        unsafe {
+            let box: &mut ShardMapBox<K, V> = transmute(self.ptr.borrow());
+            let shard = box.get_shard(&k);
+            box.maps.as_mut_slice()[shard].swap(k, v)
+        }
     }
 
-    pub fn pop(&mut self, k: &K) -> Option<V> {
-        let shard = self.get_shard(k);
-        self.maps.as_mut_slice()[shard].pop(k)
-    }
-
-    fn get_shard(&self, k: &K) -> uint {
-        k.hash(self.k0, self.k1) as uint % self.maps.len()
+    pub fn pop(&self, k: &K) -> Option<V> {
+        unsafe {
+            let box: &mut ShardMapBox<K, V> = transmute(self.ptr.borrow());
+            let shard = box.get_shard(k);
+            box.maps.as_mut_slice()[shard].pop(k)
+        }
     }
 }
 
 impl<K: Hash + Eq, V: Clone> ShardMap<K, V> {
-    pub fn find(&mut self, k: &K) -> Option<V> {
-        let shard = self.get_shard(k);
-        self.maps.as_mut_slice()[shard].find(k)
+    pub fn find(&self, k: &K) -> Option<V> {
+        unsafe {
+            let box: &mut ShardMapBox<K, V> = transmute(self.ptr.borrow());
+            let shard = box.get_shard(k);
+            box.maps.as_mut_slice()[shard].find(k)
+        }
+    }
+}
+
+impl<K, V> Clone for ShardMap<K, V> {
+    fn clone(&self) -> ShardMap<K, V> {
+        ShardMap { ptr: self.ptr.clone() }
     }
 }
