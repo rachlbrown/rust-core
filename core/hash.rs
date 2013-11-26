@@ -37,6 +37,11 @@ impl<A: HashBytes> Hash for A {
     }
 }
 
+impl HashBytes for () {
+    #[inline(always)]
+    fn hash_bytes(&self, _: |&[u8]|) {}
+}
+
 impl HashBytes for bool {
     #[inline(always)]
     fn hash_bytes(&self, f: |&[u8]|) {
