@@ -19,6 +19,9 @@ use super::mem::transmute;
 use super::thread::{Mutex, Cond};
 use super::ops::Ord;
 use super::option::Option;
+use super::hash::HashMap;
+use super::ops::Eq;
+use super::hash::Hash;
 
 trait GenericQueue<T>: Container {
     fn generic_push(&mut self, item: T);
@@ -251,5 +254,42 @@ impl<T> Clone for BoundedPriorityQueue<T> {
     /// Return a shallow copy of the queue
     fn clone(&self) -> BoundedPriorityQueue<T> {
         BoundedPriorityQueue { ptr: self.ptr.clone() }
+    }
+}
+
+pub struct ConcurrentHashMap<K, V> {
+    priv map: HashMap<K, V>,
+    priv mutex: Mutex
+}
+
+impl<K: Hash + Eq, V> ConcurrentHashMap<K, V> {
+    pub fn with_capacity_and_keys(k0: u64, k1: u64, capacity: uint) -> ConcurrentHashMap<K, V> {
+        ConcurrentHashMap {
+            map: HashMap::with_capacity_and_keys(k0, k1, capacity),
+            mutex: Mutex::new()
+        }
+    }
+
+    pub fn swap(&mut self, k: K, v: V) -> Option<V> {
+        unsafe {
+            let _guard = self.mutex.lock_guard();
+            self.map.swap(k, v)
+        }
+    }
+
+    pub fn pop(&mut self, k: &K) -> Option<V> {
+        unsafe {
+            let _guard = self.mutex.lock_guard();
+            self.map.pop(k)
+        }
+    }
+}
+
+impl<K: Hash + Eq, V: Clone> ConcurrentHashMap<K, V> {
+    pub fn find(&mut self, k: &K) -> Option<V> {
+        unsafe {
+            let _guard = self.mutex.lock_guard();
+            self.map.find(k).map(|v| v.clone())
+        }
     }
 }
