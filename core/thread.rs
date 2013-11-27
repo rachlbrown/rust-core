@@ -57,6 +57,8 @@ extern "C" fn shim(box: *mut u8) -> *mut u8 {
     start_routine()
 }
 
+/// Spawn an owned, joined thread. Joining the thread will block until it completes execution, and
+/// this is done automatically by the destructor if the thread isn't manually joined.
 pub fn spawn<A>(start_routine: proc() -> A) -> Thread<A> {
     unsafe {
         // FIXME: this wrapper should be unnecessary, shim should be a generic function instead
@@ -77,6 +79,8 @@ extern "C" fn detached_shim(box: *mut u8) -> *mut u8 {
     0 as *mut u8
 }
 
+/// Spawn an unowned, detached thread. If the `main` function returns, the program will exit
+/// immediately even if there are unfinished detached threads.
 pub fn spawn_detached(start_routine: proc()) {
     unsafe {
         let box: *mut u8 = transmute(~start_routine);
@@ -94,6 +98,7 @@ pub fn spawn_detached(start_routine: proc()) {
 }
 
 impl<A> Thread<A> {
+    /// Manually join the thread, retrieving the result of the `proc`.
     pub fn join(self) -> ~A {
         unsafe {
             let mut result = uninit();
@@ -137,10 +142,13 @@ impl Mutex {
         }
     }
 
+    /// Grab ownership of the mutex.
     pub unsafe fn lock(&mut self) {
         assert(pthread_mutex_lock(&mut self.mutex) == 0)
     }
 
+    /// Grab ownership of the mutex, returning a `LockGuard` value releasing ownership of the mutex
+    /// in the destructor.
     pub unsafe fn lock_guard<'a>(&'a mut self) -> LockGuard<'a> {
         self.lock();
         LockGuard { mutex: self }
@@ -157,6 +165,7 @@ impl Mutex {
         }
     }
 
+    /// Release ownership of the mutex.
     pub unsafe fn unlock(&mut self) {
         assert(pthread_mutex_unlock(&mut self.mutex) == 0)
     }
@@ -185,18 +194,25 @@ impl Cond {
         }
     }
 
+    /// Unblock at least one thread blocked on the condition variable.
     pub unsafe fn signal(&mut self) {
         assert(pthread_cond_signal(&mut self.cond) == 0)
     }
 
+    /// Unblock all the threads blocked on the condition variable.
     pub unsafe fn broadcast(&mut self) {
         assert(pthread_cond_broadcast(&mut self.cond) == 0)
     }
 
+    /// Block on the condition variable, releasing ownership of the mutex until notified. Upon
+    /// returning, the mutex will be owned again. Note that spurious wakeups may occur.
     pub unsafe fn wait(&mut self, mutex: &mut Mutex) {
         assert(pthread_cond_wait(&mut self.cond, &mut mutex.mutex) == 0)
     }
 
+    /// Block on the condition variable, releasing ownership of the mutex until notified. Upon
+    /// returning, the mutex will be owned by the `LockGuard` again. Note that spurious wakeups may
+    /// occur.
     pub unsafe fn wait_guard(&mut self, guard: &mut LockGuard) {
         self.wait(guard.mutex)
     }
@@ -210,6 +226,7 @@ impl Drop for Cond {
     }
 }
 
+/// A scoped lock taking ownership of a mutex
 pub struct LockGuard<'a> {
     priv mutex: &'a mut Mutex
 }
@@ -223,6 +240,7 @@ impl<'a> Drop for LockGuard<'a> {
     }
 }
 
+/// A pool of worker threads
 pub struct Pool {
     priv queue: Queue<Option<proc()>>,
     priv pool: Vec<Thread<()>, Heap>
