@@ -12,6 +12,7 @@
 #[allow(ctypes)];
 #[link(name = "core")];
 #[allow(attribute_usage)];
+#[feature(macro_rules)];
 
 pub mod arc;
 pub mod atomic;

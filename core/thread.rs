@@ -18,6 +18,7 @@ use super::concurrent::Queue;
 use super::vec::Vec;
 use super::heap::Heap;
 use super::option::{Option, Some, None};
+use super::clone::Clone;
 
 extern {
     fn pthread_create(thread: *mut pthread_t, attr: *pthread_attr_t,
