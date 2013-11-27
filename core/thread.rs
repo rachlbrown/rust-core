@@ -8,11 +8,16 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use super::container::Container;
 use super::c_types::{c_int, pthread_t, pthread_attr_t, pthread_mutex_t, pthread_mutex_attr_t};
 use super::c_types::{pthread_cond_t, pthread_cond_attr_t};
 use super::fail::{abort, assert};
 use super::ops::Drop;
 use super::mem::{forget, uninit, transmute};
+use super::concurrent::Queue;
+use super::vec::Vec;
+use super::heap::Heap;
+use super::option::{Option, Some, None};
 
 extern {
     fn pthread_create(thread: *mut pthread_t, attr: *pthread_attr_t,
@@ -214,6 +219,49 @@ impl<'a> Drop for LockGuard<'a> {
     fn drop(&mut self) {
         unsafe {
             self.mutex.unlock()
+        }
+    }
+}
+
+pub struct Pool {
+    priv queue: Queue<Option<proc()>>,
+    priv pool: Vec<Thread<()>, Heap>
+}
+
+impl Pool {
+    /// Create a thread pool with `n_threads` threads.
+    pub fn new(n_threads: uint) -> Pool {
+        let queue = Queue::<Option<proc()>>::new();
+        let mut pool = Vec::with_capacity(n_threads);
+        let mut i = 0;
+        while i < n_threads {
+            let send_queue = queue.clone();
+            pool.push(spawn(proc() {
+                let queue = send_queue;
+                loop {
+                    match queue.pop() {
+                        Some(function) => function(),
+                        None => break
+                    }
+                }
+            }));
+            i += 1;
+        }
+        Pool { queue: queue, pool: pool }
+    }
+
+    /// Submit a task to the thread pool. They are run in FIFO order to completion.
+    pub fn submit(&self, task: proc()) {
+        self.queue.push(Some(task))
+    }
+}
+
+impl Drop for Pool {
+    fn drop(&mut self) {
+        let mut i = 0;
+        while i < self.pool.len() {
+            self.queue.push(None);
+            i += 1;
         }
     }
 }

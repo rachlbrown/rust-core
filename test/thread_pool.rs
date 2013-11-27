@@ -8,20 +8,28 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::c_types::{c_int, c_uint};
+#[no_std];
+#[feature(macro_rules)];
 
-mod detail {
-    use super::super::c_types::{c_int, c_uint};
-    extern {
-        pub fn exit(status: c_int) -> !;
-        pub fn sleep(seconds: c_uint) -> c_int;
+use core::clone::Clone;
+use core::thread::{Pool};
+use core::io::stderr;
+use core::os::sleep;
+
+#[path = "../core/mod.rs"]
+mod core;
+
+#[start]
+fn main(_: int, _: **u8) -> int {
+    let pool = Pool::new(4);
+    let mut i = 0;
+    while i < 16 {
+        pool.submit(proc() {
+            stderr().write(bytes!("sleeping\n"));
+            sleep(2);
+            stderr().write(bytes!("waking\n"));
+        });
+        i += 1
     }
-}
-
-pub fn exit(status: c_int) -> ! {
-    unsafe { detail::exit(status) }
-}
-
-pub fn sleep(seconds: c_uint) {
-    unsafe { detail::sleep(seconds); }
+    0
 }
