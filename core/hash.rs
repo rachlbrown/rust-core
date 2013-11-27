@@ -30,9 +30,7 @@ impl<A: HashBytes> Hash for A {
     #[inline]
     fn hash(&self, k0: u64, k1: u64) -> u64 {
         let mut s = State::new(k0, k1);
-        do self.hash_bytes |bytes| {
-            s.write(bytes);
-        }
+        self.hash_bytes(|bytes| s.write(bytes));
         s.result()
     }
 }
@@ -380,7 +378,7 @@ impl<K:Hash + Eq,V> HashMap<K, V> {
                                 k: &K)
                              -> SearchResult {
         let mut ret = TableFull;
-        do self.bucket_sequence(hash) |i| {
+        self.bucket_sequence(hash, |i| {
             match self.buckets.as_slice()[i] {
                 Some(ref bkt) if bkt.hash == hash && *k == bkt.key => {
                     ret = FoundEntry(i); false
@@ -388,7 +386,7 @@ impl<K:Hash + Eq,V> HashMap<K, V> {
                 None => { ret = FoundHole(i); false }
                 _ => true,
             }
-        };
+        });
         ret
     }
 
@@ -492,10 +490,7 @@ impl<K:Hash + Eq,V> HashMap<K, V> {
 
         let len_buckets = self.buckets.len();
         let bucket = self.buckets.as_mut_slice()[idx].take();
-
-        let value = do bucket.map |bucket| {
-            bucket.value
-        };
+        let value = bucket.map(|bucket| bucket.value);
 
         /* re-inserting buckets may cause changes in size, so remember
         what our new size is ahead of time before we start insertions */

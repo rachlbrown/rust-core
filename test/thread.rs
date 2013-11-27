@@ -9,6 +9,7 @@
 // except according to those terms.
 
 #[no_std];
+#[feature(macro_rules)];
 
 use core::clone::Clone;
 use core::thread::{spawn, spawn_detached};

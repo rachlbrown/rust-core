@@ -56,7 +56,7 @@ pub fn spawn<A>(start_routine: proc() -> A) -> Thread<A> {
     unsafe {
         // FIXME: this wrapper should be unnecessary, shim should be a generic function instead
         // https://github.com/mozilla/rust/issues/10353
-        let wrapper: proc() -> ~A = || ~start_routine();
+        let wrapper: proc() -> ~A = proc() ~start_routine();
         let box: *mut u8 = transmute(~wrapper);
         let mut thread = uninit();
         if pthread_create(&mut thread, 0 as *pthread_attr_t, shim, box) != 0 {

@@ -11,6 +11,7 @@
 #[no_std];
 #[allow(ctypes)];
 #[link(name = "core")];
+#[allow(attribute_usage)];
 
 pub mod arc;
 pub mod atomic;

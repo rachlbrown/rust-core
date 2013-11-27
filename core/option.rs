@@ -41,12 +41,12 @@ impl<T> Option<T> {
     }
 
     /// Maps an `Option<T>` to `Option<U>` by applying a function to a contained value.
-    pub fn map<U>(self, f: &fn(T) -> U) -> Option<U> {
+    pub fn map<U>(self, f: |T| -> U) -> Option<U> {
         match self { Some(x) => Some(f(x)), None => None }
     }
 
     /// Applies a function to the contained value or returns a default.
-    pub fn map_or<U>(self, def: U, f: &fn(T) -> U) -> U {
+    pub fn map_or<U>(self, def: U, f: |T| -> U) -> U {
         match self { None => def, Some(t) => f(t) }
     }
 
