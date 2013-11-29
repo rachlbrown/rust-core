@@ -131,6 +131,12 @@ impl<T: Eq> Eq for ~T {
     fn ne(&self, other: &~T) -> bool { **self != **other }
 }
 
+enum Ordering {
+    Less,
+    Equal,
+    Greater
+}
+
 #[lang="ord"]
 pub trait Ord {
     #[inline(always)]
@@ -144,6 +150,12 @@ pub trait Ord {
 
     #[inline(always)]
     fn ge(&self, other: &Self) -> bool { !self.lt(other) }
+
+    fn cmp(&self, other: &Self) -> Ordering {
+        if *self < *other { Less }
+        else if *self > *other { Greater }
+        else { Equal }
+    }
 }
 
 macro_rules! ord_impl(
