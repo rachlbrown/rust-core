@@ -1,5 +1,7 @@
 #[no_std];
+#[feature(macro_rules)];
 
+use core::container::Container;
 use core::fail::abort;
 use core::priority_queue::PriorityQueue;
 

@@ -1,4 +1,5 @@
 #[no_std];
+#[feature(macro_rules)];
 
 use core::vec::Vec;
 

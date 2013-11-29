@@ -9,6 +9,7 @@
 // except according to those terms.
 
 #[no_std];
+#[feature(macro_rules)];
 
 use core::io::{stdout, stderr};
 

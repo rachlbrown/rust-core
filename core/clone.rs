@@ -50,80 +50,33 @@ impl<T> Clone for *mut T {
     fn clone(&self) -> *mut T { *self }
 }
 
-impl Clone for int {
-    #[inline(always)]
-    fn clone(&self) -> int { *self }
-}
+macro_rules! clone_impl(
+    ($t:ty) => {
+        impl Clone for $t {
+            #[inline(always)]
+            fn clone(&self) -> $t { *self }
+        }
+    }
+)
 
-impl Clone for i8 {
-    #[inline(always)]
-    fn clone(&self) -> i8 { *self }
-}
+clone_impl!(int)
+clone_impl!(i8)
+clone_impl!(i16)
+clone_impl!(i32)
+clone_impl!(i64)
 
-impl Clone for i16 {
-    #[inline(always)]
-    fn clone(&self) -> i16 { *self }
-}
+clone_impl!(uint)
+clone_impl!(u8)
+clone_impl!(u16)
+clone_impl!(u32)
+clone_impl!(u64)
 
-impl Clone for i32 {
-    #[inline(always)]
-    fn clone(&self) -> i32 { *self }
-}
+clone_impl!(f32)
+clone_impl!(f64)
 
-impl Clone for i64 {
-    #[inline(always)]
-    fn clone(&self) -> i64 { *self }
-}
-
-impl Clone for uint {
-    #[inline(always)]
-    fn clone(&self) -> uint { *self }
-}
-
-impl Clone for u8 {
-    #[inline(always)]
-    fn clone(&self) -> u8 { *self }
-}
-
-impl Clone for u16 {
-    #[inline(always)]
-    fn clone(&self) -> u16 { *self }
-}
-
-impl Clone for u32 {
-    #[inline(always)]
-    fn clone(&self) -> u32 { *self }
-}
-
-impl Clone for u64 {
-    #[inline(always)]
-    fn clone(&self) -> u64 { *self }
-}
-
-impl Clone for f32 {
-    #[inline(always)]
-    fn clone(&self) -> f32 { *self }
-}
-
-impl Clone for f64 {
-    #[inline(always)]
-    fn clone(&self) -> f64 { *self }
-}
-
-impl Clone for () {
-    #[inline(always)]
-    fn clone(&self) -> () { *self }
-}
-
-impl Clone for bool {
-    #[inline(always)]
-    fn clone(&self) -> bool { *self }
-}
-
-impl Clone for char {
-    #[inline(always)]
-    fn clone(&self) -> char { *self }
-}
+clone_impl!(())
+clone_impl!(bool)
+clone_impl!(char)
 
 pub trait DeepClone: Clone {
     fn deep_clone(&self) -> Self;
@@ -142,77 +95,30 @@ impl<T: DeepClone> DeepClone for ~T {
     }
 }
 
-impl DeepClone for int {
-    #[inline(always)]
-    fn deep_clone(&self) -> int { *self }
-}
+macro_rules! deep_clone_impl(
+    ($t:ty) => {
+        impl DeepClone for $t {
+            #[inline(always)]
+            fn deep_clone(&self) -> $t { *self }
+        }
+    }
+)
 
-impl DeepClone for i8 {
-    #[inline(always)]
-    fn deep_clone(&self) -> i8 { *self }
-}
+deep_clone_impl!(int)
+deep_clone_impl!(i8)
+deep_clone_impl!(i16)
+deep_clone_impl!(i32)
+deep_clone_impl!(i64)
 
-impl DeepClone for i16 {
-    #[inline(always)]
-    fn deep_clone(&self) -> i16 { *self }
-}
+deep_clone_impl!(uint)
+deep_clone_impl!(u8)
+deep_clone_impl!(u16)
+deep_clone_impl!(u32)
+deep_clone_impl!(u64)
 
-impl DeepClone for i32 {
-    #[inline(always)]
-    fn deep_clone(&self) -> i32 { *self }
-}
+deep_clone_impl!(f32)
+deep_clone_impl!(f64)
 
-impl DeepClone for i64 {
-    #[inline(always)]
-    fn deep_clone(&self) -> i64 { *self }
-}
-
-impl DeepClone for uint {
-    #[inline(always)]
-    fn deep_clone(&self) -> uint { *self }
-}
-
-impl DeepClone for u8 {
-    #[inline(always)]
-    fn deep_clone(&self) -> u8 { *self }
-}
-
-impl DeepClone for u16 {
-    #[inline(always)]
-    fn deep_clone(&self) -> u16 { *self }
-}
-
-impl DeepClone for u32 {
-    #[inline(always)]
-    fn deep_clone(&self) -> u32 { *self }
-}
-
-impl DeepClone for u64 {
-    #[inline(always)]
-    fn deep_clone(&self) -> u64 { *self }
-}
-
-impl DeepClone for f32 {
-    #[inline(always)]
-    fn deep_clone(&self) -> f32 { *self }
-}
-
-impl DeepClone for f64 {
-    #[inline(always)]
-    fn deep_clone(&self) -> f64 { *self }
-}
-
-impl DeepClone for () {
-    #[inline(always)]
-    fn deep_clone(&self) -> () { *self }
-}
-
-impl DeepClone for bool {
-    #[inline(always)]
-    fn deep_clone(&self) -> bool { *self }
-}
-
-impl DeepClone for char {
-    #[inline(always)]
-    fn deep_clone(&self) -> char { *self }
-}
+deep_clone_impl!(())
+deep_clone_impl!(bool)
+deep_clone_impl!(char)

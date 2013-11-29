@@ -1,7 +1,9 @@
 #[no_std];
+#[feature(macro_rules)];
 
-use core::fail::abort;
+use core::container::Container;
 use core::deque::Deque;
+use core::fail::abort;
 
 #[path = "../core/mod.rs"]
 mod core;
