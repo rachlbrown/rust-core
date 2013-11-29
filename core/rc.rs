@@ -9,7 +9,8 @@
 // except according to those terms.
 
 use super::mem::transmute;
-use super::ops::{Drop, Eq, Ord};
+use super::ops::Drop;
+use super::cmp::{Eq, Ord};
 use super::kinds::{Freeze, Send};
 use super::clone::{Clone, DeepClone};
 

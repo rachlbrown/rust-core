@@ -13,7 +13,7 @@ use super::iter::Iterator;
 use super::slice::iter;
 use super::option::{None, Option, Some};
 use super::fail::abort;
-use super::ops::{Eq, max};
+use super::cmp::{Eq, max};
 use super::vec::Vec;
 use super::mem::replace;
 use super::heap::Heap;

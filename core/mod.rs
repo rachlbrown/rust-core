@@ -21,6 +21,7 @@ pub mod atomic;
 pub mod deque;
 pub mod char;
 pub mod clone;
+pub mod cmp;
 #[cfg(libc)]
 pub mod concurrent;
 pub mod container;

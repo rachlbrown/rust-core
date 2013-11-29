@@ -11,7 +11,8 @@
 use super::mem::transmute;
 use super::kinds::{Freeze, Send};
 use super::clone::{Clone, DeepClone};
-use super::ops::{Drop, Eq, Ord};
+use super::ops::Drop;
+use super::cmp::{Eq, Ord};
 use super::atomic::{atomic_fence_acq, atomic_xadd_relaxed, atomic_xsub_rel};
 
 struct ArcBox<T> {

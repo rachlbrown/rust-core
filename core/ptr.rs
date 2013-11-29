@@ -9,7 +9,7 @@
 // except according to those terms.
 
 use super::mem::{forget, uninit};
-use super::ops::{Eq, Ord};
+use super::cmp::{Eq, Ord};
 
 extern "rust-intrinsic" {
     pub fn offset<T>(dst: *T, offset: int) -> *T;

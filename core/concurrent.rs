@@ -17,11 +17,9 @@ use super::deque::Deque;
 use super::priority_queue::PriorityQueue;
 use super::mem::transmute;
 use super::thread::{Mutex, Cond};
-use super::ops::Ord;
+use super::cmp::{Eq, Ord};
 use super::option::Option;
-use super::hash::HashMap;
-use super::ops::Eq;
-use super::hash::Hash;
+use super::hash::{Hash, HashMap};
 use super::heap::Heap;
 use super::vec::Vec;
 

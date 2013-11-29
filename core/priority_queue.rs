@@ -13,7 +13,7 @@
 use super::container::Container;
 use super::heap::Heap;
 use super::vec::Vec;
-use super::ops::Ord;
+use super::cmp::Ord;
 use super::option::{Option, Some, None};
 use super::mem::swap;
 use super::slice;
