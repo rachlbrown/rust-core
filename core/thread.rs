@@ -8,6 +8,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+#[macro_escape];
+
 use super::container::Container;
 use super::c_types::{c_int, pthread_t, pthread_attr_t, pthread_mutex_t, pthread_mutex_attr_t};
 use super::c_types::{pthread_cond_t, pthread_cond_attr_t};
@@ -19,6 +21,29 @@ use super::vec::Vec;
 use super::heap::Heap;
 use super::option::{Option, Some, None};
 use super::clone::Clone;
+
+macro_rules! thread_local(
+    ($name:ident, $t:ty, $init:expr) => {
+        mod $name {
+            #[thread_local]
+            pub static mut VALUE: $t = $init;
+
+            #[inline(always)]
+            pub fn set(value: $t) {
+                unsafe {
+                    VALUE = value;
+                }
+            }
+
+            #[inline(always)]
+            pub fn get() -> $t {
+                unsafe {
+                    VALUE.clone()
+                }
+            }
+        }
+    }
+)
 
 extern {
     fn pthread_create(thread: *mut pthread_t, attr: *pthread_attr_t,
