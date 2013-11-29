@@ -19,6 +19,9 @@ use super::ptr::{offset, read_ptr};
 use super::uint::mul_with_overflow;
 use super::option::{Option, Some, None};
 use super::iter::Iterator;
+use super::cmp::expect;
+
+mod macros;
 
 pub struct Vec<T, A> {
     priv len: uint,
@@ -117,17 +120,19 @@ impl<T, A: Allocator> Vec<T, A> {
 
     #[inline]
     pub fn push(&mut self, value: T) {
-        unsafe {
-            if self.len == self.cap {
-                if self.cap == 0 { self.cap += 2 }
-                let old_size = self.cap * size_of::<T>();
-                self.cap = self.cap * 2;
-                let size = old_size * 2;
-                if old_size > size { out_of_memory() }
+        if unlikely!(self.len == self.cap) {
+            if self.cap == 0 { self.cap += 2 }
+            let old_size = self.cap * size_of::<T>();
+            self.cap = self.cap * 2;
+            let size = old_size * 2;
+            if old_size > size { out_of_memory() }
+            unsafe {
                 let (ptr, _) = self.alloc.realloc(self.ptr as *mut u8, size);
                 self.ptr = ptr as *mut T;
             }
+        }
 
+        unsafe {
             let end = offset(self.ptr as *T, self.len as int) as *mut T;
             move_val_init(&mut *end, value);
             self.len += 1;

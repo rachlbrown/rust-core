@@ -32,6 +32,7 @@ pub mod hash;
 pub mod io;
 pub mod iter;
 pub mod kinds;
+pub mod macros;
 pub mod mem;
 pub mod ops;
 pub mod option;
@@ -78,21 +79,3 @@ pub mod heap_closure;
 
 #[cfg(libc)]
 pub mod os;
-
-macro_rules! likely(
-    ($val:expr) => {
-        {
-            let x: bool = $val;
-            unsafe { expect(x as u8, 1) != 0 }
-        }
-    }
-)
-
-macro_rules! unlikely(
-    ($val:expr) => {
-        {
-            let x: bool = $val;
-            unsafe { expect(x as u8, 0) != 0 }
-        }
-    }
-)
