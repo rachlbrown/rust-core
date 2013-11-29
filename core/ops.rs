@@ -78,6 +78,12 @@ pub trait Index<Index, Result> {
     fn index(&self, index: &Index) -> Result;
 }
 
+/// Equivalence relation
+///
+/// * `a != b` returns the same value as `!(a == b)`
+/// * `a == a` is true
+/// * `a == b` implies `b == a`
+/// * `a == b && b == c` implies `a == c`
 #[lang="eq"]
 pub trait Eq {
     #[inline(always)]
@@ -131,14 +137,15 @@ impl<T: Eq> Eq for ~T {
     fn ne(&self, other: &~T) -> bool { **self != **other }
 }
 
-enum Ordering {
+pub enum Ordering {
     Less,
     Equal,
     Greater
 }
 
+/// Total ordering
 #[lang="ord"]
-pub trait Ord {
+pub trait Ord: Eq {
     #[inline(always)]
     fn lt(&self, other: &Self) -> bool { other.gt(self) }
 
