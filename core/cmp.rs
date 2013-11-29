@@ -8,6 +8,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+extern {
+    #[link_name = "llvm.expect.i8"]
+    pub fn expect(val: u8, expected_val: u8) -> u8;
+}
+
 /// Equivalence relation
 ///
 /// * `a != b` returns the same value as `!(a == b)`

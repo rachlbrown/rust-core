@@ -26,6 +26,7 @@ pub mod cmp;
 pub mod concurrent;
 pub mod container;
 pub mod fail;
+#[cfg(libc)]
 pub mod hash;
 #[cfg(libc)]
 pub mod io;
@@ -77,3 +78,21 @@ pub mod heap_closure;
 
 #[cfg(libc)]
 pub mod os;
+
+macro_rules! likely(
+    ($val:expr) => {
+        {
+            let x: bool = $val;
+            unsafe { expect(x as u8, 1) != 0 }
+        }
+    }
+)
+
+macro_rules! unlikely(
+    ($val:expr) => {
+        {
+            let x: bool = $val;
+            unsafe { expect(x as u8, 0) != 0 }
+        }
+    }
+)
