@@ -14,29 +14,46 @@ use super::mem::uninit;
 mod detail {
     use super::super::c_types::c_int;
 
-    extern "rust-intrinsic" {
-        pub fn sqrtf32(x: f32) -> f32;
-        pub fn powif32(a: f32, x: i32) -> f32;
-        pub fn sinf32(x: f32) -> f32;
-        pub fn cosf32(x: f32) -> f32;
-        pub fn powf32(a: f32, x: f32) -> f32;
-        pub fn expf32(x: f32) -> f32;
-        pub fn exp2f32(x: f32) -> f32;
-        pub fn logf32(x: f32) -> f32;
-        pub fn log10f32(x: f32) -> f32;
-        pub fn log2f32(x: f32) -> f32;
-        pub fn fmaf32(a: f32, b: f32, c: f32) -> f32;
-        pub fn fabsf32(x: f32) -> f32;
-        pub fn copysignf32(x: f32, y: f32) -> f32;
-        pub fn floorf32(x: f32) -> f32;
-        pub fn ceilf32(x: f32) -> f32;
-        pub fn truncf32(x: f32) -> f32;
-        pub fn rintf32(x: f32) -> f32;
-        pub fn nearbyintf32(x: f32) -> f32;
-        pub fn roundf32(x: f32) -> f32;
-    }
-
     extern {
+        #[link_name = "llvm.sqrt.f32"]
+        pub fn sqrtf32(x: f32) -> f32;
+        #[link_name = "llvm.powi.f32"]
+        pub fn powif32(a: f32, x: i32) -> f32;
+        #[link_name = "llvm.sin.f32"]
+        pub fn sinf32(x: f32) -> f32;
+        #[link_name = "llvm.cos.f32"]
+        pub fn cosf32(x: f32) -> f32;
+        #[link_name = "llvm.pow.f32"]
+        pub fn powf32(a: f32, x: f32) -> f32;
+        #[link_name = "llvm.exp.f32"]
+        pub fn expf32(x: f32) -> f32;
+        #[link_name = "llvm.exp2.f32"]
+        pub fn exp2f32(x: f32) -> f32;
+        #[link_name = "llvm.log.f32"]
+        pub fn logf32(x: f32) -> f32;
+        #[link_name = "llvm.log10.f32"]
+        pub fn log10f32(x: f32) -> f32;
+        #[link_name = "llvm.log2.f32"]
+        pub fn log2f32(x: f32) -> f32;
+        #[link_name = "llvm.fma.f32"]
+        pub fn fmaf32(a: f32, b: f32, c: f32) -> f32;
+        #[link_name = "llvm.fabs.f32"]
+        pub fn fabsf32(x: f32) -> f32;
+        #[link_name = "llvm.copysign.f32"]
+        pub fn copysignf32(x: f32, y: f32) -> f32;
+        #[link_name = "llvm.floor.f32"]
+        pub fn floorf32(x: f32) -> f32;
+        #[link_name = "llvm.ceil.f32"]
+        pub fn ceilf32(x: f32) -> f32;
+        #[link_name = "llvm.trunc.f32"]
+        pub fn truncf32(x: f32) -> f32;
+        #[link_name = "llvm.rint.f32"]
+        pub fn rintf32(x: f32) -> f32;
+        #[link_name = "llvm.nearbyint.f32"]
+        pub fn nearbyintf32(x: f32) -> f32;
+        #[link_name = "llvm.round.f32"]
+        pub fn roundf32(x: f32) -> f32;
+
         pub fn fmaxf(x: f32, y: f32) -> f32;
         pub fn fminf(x: f32, y: f32) -> f32;
         pub fn fdimf(x: f32, y: f32) -> f32;

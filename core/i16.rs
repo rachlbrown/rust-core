@@ -9,7 +9,9 @@
 // except according to those terms.
 
 extern "rust-intrinsic" {
+    #[link_name = "llvm.bswap.i16"]
     fn bswap16(x: i16) -> i16;
+    #[link_name = "llvm.ctpop.i16"]
     pub fn ctpop16(x: i16) -> i16;
     pub fn ctlz16(x: i16) -> i16;
     pub fn cttz16(x: i16) -> i16;

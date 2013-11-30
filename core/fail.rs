@@ -9,14 +9,22 @@
 // except according to those terms.
 
 mod detail {
-    extern "rust-intrinsic" {
+    extern {
+        #[link_name = "llvm.trap"]
         pub fn abort() -> !;
+
+        #[link_name = "llvm.debugtrap"]
+        pub fn breakpoint();
     }
 }
 
-#[inline]
+#[inline(always)]
 pub fn abort() -> ! {
     unsafe { detail::abort() }
+}
+
+pub fn breakpoint() {
+    unsafe { detail::breakpoint() }
 }
 
 #[inline]

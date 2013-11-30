@@ -14,29 +14,46 @@ use super::mem::uninit;
 mod detail {
     use super::super::c_types::c_int;
 
-    extern "rust-intrinsic" {
-        pub fn sqrtf64(x: f64) -> f64;
-        pub fn powif64(a: f64, x: i32) -> f64;
-        pub fn sinf64(x: f64) -> f64;
-        pub fn cosf64(x: f64) -> f64;
-        pub fn powf64(a: f64, x: f64) -> f64;
-        pub fn expf64(x: f64) -> f64;
-        pub fn exp2f64(x: f64) -> f64;
-        pub fn logf64(x: f64) -> f64;
-        pub fn log10f64(x: f64) -> f64;
-        pub fn log2f64(x: f64) -> f64;
-        pub fn fmaf64(a: f64, b: f64, c: f64) -> f64;
-        pub fn fabsf64(x: f64) -> f64;
-        pub fn copysignf64(x: f64, y: f64) -> f64;
-        pub fn floorf64(x: f64) -> f64;
-        pub fn ceilf64(x: f64) -> f64;
-        pub fn truncf64(x: f64) -> f64;
-        pub fn rintf64(x: f64) -> f64;
-        pub fn nearbyintf64(x: f64) -> f64;
-        pub fn roundf64(x: f64) -> f64;
-    }
-
     extern {
+        #[link_name = "llvm.sqrt.f64"]
+        pub fn sqrtf64(x: f64) -> f64;
+        #[link_name = "llvm.powi.f64"]
+        pub fn powif64(a: f64, x: i32) -> f64;
+        #[link_name = "llvm.sin.f64"]
+        pub fn sinf64(x: f64) -> f64;
+        #[link_name = "llvm.cos.f64"]
+        pub fn cosf64(x: f64) -> f64;
+        #[link_name = "llvm.pow.f64"]
+        pub fn powf64(a: f64, x: f64) -> f64;
+        #[link_name = "llvm.exp.f64"]
+        pub fn expf64(x: f64) -> f64;
+        #[link_name = "llvm.exp2.f64"]
+        pub fn exp2f64(x: f64) -> f64;
+        #[link_name = "llvm.log.f64"]
+        pub fn logf64(x: f64) -> f64;
+        #[link_name = "llvm.log10.f64"]
+        pub fn log10f64(x: f64) -> f64;
+        #[link_name = "llvm.log2.f64"]
+        pub fn log2f64(x: f64) -> f64;
+        #[link_name = "llvm.fma.f64"]
+        pub fn fmaf64(a: f64, b: f64, c: f64) -> f64;
+        #[link_name = "llvm.fabs.f64"]
+        pub fn fabsf64(x: f64) -> f64;
+        #[link_name = "llvm.copysign.f64"]
+        pub fn copysignf64(x: f64, y: f64) -> f64;
+        #[link_name = "llvm.floor.f64"]
+        pub fn floorf64(x: f64) -> f64;
+        #[link_name = "llvm.ceil.f64"]
+        pub fn ceilf64(x: f64) -> f64;
+        #[link_name = "llvm.trunc.f64"]
+        pub fn truncf64(x: f64) -> f64;
+        #[link_name = "llvm.rint.f64"]
+        pub fn rintf64(x: f64) -> f64;
+        #[link_name = "llvm.nearbyint.f64"]
+        pub fn nearbyintf64(x: f64) -> f64;
+        #[link_name = "llvm.round.f64"]
+        pub fn roundf64(x: f64) -> f64;
+
         pub fn fmax(x: f64, y: f64) -> f64;
         pub fn fmin(x: f64, y: f64) -> f64;
         pub fn fdim(x: f64, y: f64) -> f64;
