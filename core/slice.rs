@@ -129,55 +129,69 @@ pub fn iter<'a, T>(xs: &'a [T]) -> VecIterator<'a, T> {
     unsafe {
         let p = to_ptr(xs);
         if size_of::<T>() == 0 {
-            VecIterator{ptr: p,
-            end: (p as uint + xs.len()) as *T,
-            lifetime: None}
+            VecIterator { ptr: p, end: (p as uint + xs.len()) as *T, lifetime: None }
         } else {
-            VecIterator{ptr: p,
-            end: offset(p, xs.len() as int),
-            lifetime: None}
+            VecIterator { ptr: p, end: offset(p, xs.len() as int), lifetime: None}
         }
     }
 }
 
-/// An iterator for iterating over a slice.
-pub struct VecIterator<'a, T> {
-    priv ptr: *T,
-    priv end: *T,
-    priv lifetime: Option<&'a ()> // FIXME: https://github.com/mozilla/rust/issues/5922
+pub fn mut_iter<'a, T>(xs: &'a mut [T]) -> VecMutIterator<'a, T> {
+    unsafe {
+        let p = to_mut_ptr(xs);
+        if size_of::<T>() == 0 {
+            VecMutIterator{ptr: p, end: (p as uint + xs.len()) as *mut T, lifetime: None}
+        } else {
+            VecMutIterator{ptr: p, end: offset(p as *T, xs.len() as int) as *mut T, lifetime: None}
+        }
+    }
 }
+
+macro_rules! iterator {
+    (struct $name:ident -> $ptr:ty, $elem:ty) => {
+        /// An iterator for iterating over a slice.
+        pub struct $name<'self, T> {
+            priv ptr: $ptr,
+            priv end: $ptr,
+            priv lifetime: Option<$elem> // https://github.com/mozilla/rust/issues/5922
+        }
+
+        impl<'self, T> Iterator<$elem> for $name<'self, T> {
+            #[inline]
+            fn next(&mut self) -> Option<$elem> {
+                // could be implemented with slices, but this avoids bounds checks
+                unsafe {
+                    if self.ptr == self.end {
+                        None
+                    } else {
+                        let old = self.ptr;
+                        self.ptr = if size_of::<T>() == 0 {
+                            // `offset` will return the same pointer for 0-size types
+                            transmute(self.ptr as uint + 1)
+                        } else {
+                            offset(self.ptr as *T, 1) as $ptr
+                        };
+
+                        Some(transmute(old))
+                    }
+                }
+            }
+
+            #[inline]
+            fn size_hint(&self) -> (uint, Option<uint>) {
+                let diff = (self.end as uint) - (self.ptr as uint);
+                let exact = diff / nonzero_size_of::<T>();
+                (exact, Some(exact))
+            }
+        }
+    }
+}
+
+iterator!{struct VecIterator -> *T, &'self T}
+iterator!{struct VecMutIterator -> *mut T, &'self mut T}
 
 impl<'a, T> Clone for VecIterator<'a, T> {
     fn clone(&self) -> VecIterator<'a, T> {
         *self
-    }
-}
-
-impl<'a, T> Iterator<&'a T> for VecIterator<'a, T> {
-    #[inline]
-    fn next(&mut self) -> Option<&'a T> {
-        // could be implemented with slices, but this avoids bounds checks
-        unsafe {
-            if self.ptr == self.end {
-                None
-            } else {
-                let old = self.ptr;
-                self.ptr = if size_of::<T>() == 0 {
-                    // `offset` will return the same pointer for 0-size types
-                    transmute(self.ptr as uint + 1)
-                } else {
-                    offset(self.ptr, 1)
-                };
-
-                Some(transmute(old))
-            }
-        }
-    }
-
-    #[inline]
-    fn size_hint(&self) -> (uint, Option<uint>) {
-        let diff = (self.end as uint) - (self.ptr as uint);
-        let exact = diff / nonzero_size_of::<T>();
-        (exact, Some(exact))
     }
 }
