@@ -62,13 +62,13 @@ is done.
 
 # Stack safety
 
-A stack safety strategy is currently not implemented. For systems with an MMU,
-the likely solution will be a combination of guard pages and leveraging LLVM to
-handle functions with large stack frames.
+The operating system is currently relied upon to provide some level of stack
+safety. On systems with an MMU, a guard page at the end of each thread's stack
+is a viable solution (glibc adds this by default). LLVM support would need to
+be implemented to insert checks in functions with large stack frames.
 
-The prelude check system used for segmented stacks would work fine on a system
-with no MMU. Segmented stacks are unlikely, because lack of a userland
-scheduler is the main differentiation from the standard library.
+The function prelude stack space check used to provide support for segmented
+stacks would work fine on a system with no MMU.
 
 # Allocators
 
