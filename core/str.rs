@@ -18,3 +18,8 @@ impl<'a> Container for &'a str {
         l
     }
 }
+
+#[inline(always)]
+pub fn as_bytes<'a>(string: &'a str) -> &'a [u8] {
+    unsafe { transmute(string) }
+}
