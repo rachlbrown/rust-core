@@ -79,3 +79,5 @@ pub mod heap_closure;
 
 #[cfg(libc)]
 pub mod os;
+
+pub fn ignore<T>(_: T) {}
