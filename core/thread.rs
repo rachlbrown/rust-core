@@ -13,6 +13,7 @@ use super::c_types::{c_int, pthread_t, pthread_attr_t, pthread_mutex_t, pthread_
 use super::c_types::{pthread_cond_t, pthread_cond_attr_t};
 use super::fail::{abort, assert};
 use super::ops::Drop;
+use super::kinds::Send;
 use super::mem::{forget, uninit, transmute};
 use super::concurrent::Queue;
 use super::vec::Vec;
@@ -60,7 +61,7 @@ extern "C" fn shim(box: *mut u8) -> *mut u8 {
 
 /// Spawn an owned, joined thread. Joining the thread will block until it completes execution, and
 /// this is done automatically by the destructor if the thread isn't manually joined.
-pub fn spawn<A>(start_routine: proc() -> A) -> Thread<A> {
+pub fn spawn<A: Send>(start_routine: proc() -> A) -> Thread<A> {
     unsafe {
         // FIXME: this wrapper should be unnecessary, shim should be a generic function instead
         // https://github.com/mozilla/rust/issues/10353
@@ -98,7 +99,7 @@ pub fn spawn_detached(start_routine: proc()) {
     }
 }
 
-impl<A> Thread<A> {
+impl<A: Send> Thread<A> {
     /// Manually join the thread, retrieving the result of the `proc`.
     pub fn join(self) -> ~A {
         unsafe {
@@ -111,7 +112,7 @@ impl<A> Thread<A> {
 }
 
 #[unsafe_destructor]
-impl<A> Drop for Thread<A> {
+impl<A: Send> Drop for Thread<A> {
     fn drop(&mut self) {
         unsafe {
             let mut result = uninit();
