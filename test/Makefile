@@ -6,7 +6,7 @@ all: $(BINARIES)
 
 %: %.rs
 	rustc $< --emit-llvm --cfg libc -O
-	clang $@.bc -o $@ -O2 -lpthread -lrustrt
+	clang $@.bc -o $@ -O2 -lpthread
 	./$@
 
 clean:
