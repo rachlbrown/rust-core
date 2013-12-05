@@ -32,6 +32,8 @@ pub mod hash;
 pub mod io;
 pub mod iter;
 pub mod kinds;
+#[cfg(libc)]
+pub mod lru;
 pub mod macros;
 pub mod mem;
 pub mod ops;
