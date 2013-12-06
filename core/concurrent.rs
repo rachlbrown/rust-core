@@ -22,6 +22,7 @@ use super::option::Option;
 use super::hash::{Hash, HashMap};
 use super::heap::Heap;
 use super::vec::Vec;
+use super::kinds::Send;
 
 trait GenericQueue<T>: Container {
     fn generic_push(&mut self, item: T);
@@ -49,7 +50,7 @@ struct QueuePtr<T> {
     ptr: Arc<QueueBox<T>>
 }
 
-impl<A, T: GenericQueue<A>> QueuePtr<T> {
+impl<A: Send, T: GenericQueue<A>> QueuePtr<T> {
     fn new(queue: T) -> QueuePtr<T> {
         unsafe {
             let box = QueueBox { queue: queue, mutex: Mutex::new(), not_empty: Cond::new() };
@@ -90,7 +91,7 @@ pub struct Queue<T> {
     priv ptr: QueuePtr<Deque<T>>
 }
 
-impl<T> Queue<T> {
+impl<T: Send> Queue<T> {
     /// Return a new `Queue` instance
     pub fn new() -> Queue<T> {
         Queue { ptr: QueuePtr::new(Deque::new()) }
@@ -119,7 +120,7 @@ pub struct BlockingPriorityQueue<T> {
     priv ptr: QueuePtr<PriorityQueue<T>>
 }
 
-impl<T: Ord> BlockingPriorityQueue<T> {
+impl<T: Ord + Send> BlockingPriorityQueue<T> {
     /// Return a new `BlockingPriorityQueue` instance
     pub fn new() -> BlockingPriorityQueue<T> {
         BlockingPriorityQueue { ptr: QueuePtr::new(PriorityQueue::new()) }
@@ -156,7 +157,7 @@ struct BoundedQueuePtr<T> {
     ptr: Arc<BoundedQueueBox<T>>
 }
 
-impl<A, T: GenericQueue<A>> BoundedQueuePtr<T> {
+impl<A: Send, T: GenericQueue<A>> BoundedQueuePtr<T> {
     fn new(maximum: uint, queue: T) -> BoundedQueuePtr<T> {
         unsafe {
             let box = BoundedQueueBox { deque: queue, mutex: Mutex::new(), not_empty: Cond::new(),
@@ -204,7 +205,7 @@ pub struct BoundedQueue<T> {
     priv ptr: BoundedQueuePtr<Deque<T>>
 }
 
-impl<T> BoundedQueue<T> {
+impl<T: Send> BoundedQueue<T> {
     /// Return a new `BoundedQueue` instance, holding at most `maximum` elements
     pub fn new(maximum: uint) -> BoundedQueue<T> {
         BoundedQueue { ptr: BoundedQueuePtr::new(maximum, Deque::new()) }
@@ -233,7 +234,7 @@ pub struct BoundedPriorityQueue<T> {
     priv ptr: BoundedQueuePtr<PriorityQueue<T>>
 }
 
-impl<T: Ord> BoundedPriorityQueue<T> {
+impl<T: Ord + Send> BoundedPriorityQueue<T> {
     /// Return a new `BoundedPriorityQueue` instance, holding at most `maximum` elements
     pub fn new(maximum: uint) -> BoundedPriorityQueue<T> {
         BoundedPriorityQueue { ptr: BoundedQueuePtr::new(maximum, PriorityQueue::new()) }
@@ -300,7 +301,7 @@ pub struct ConcurrentHashMap<K, V> {
     priv ptr: Arc<LockedHashMap<K, V>>
 }
 
-impl<K: Hash + Eq, V> ConcurrentHashMap<K, V> {
+impl<K: Hash + Eq + Send, V: Send> ConcurrentHashMap<K, V> {
     /// Create a new `ConcurrentHashMap` with the specified 128-bit hash key (`k0` and `k1`) and
     /// initial `capacity`.
     pub fn with_capacity_and_keys(k0: u64, k1: u64, capacity: uint) -> ConcurrentHashMap<K, V> {
@@ -365,7 +366,7 @@ pub struct ShardMap<K, V> {
     priv ptr: Arc<ShardMapBox<K, V>>
 }
 
-impl<K: Hash + Eq, V> ShardMap<K, V> {
+impl<K: Hash + Eq + Send, V: Send> ShardMap<K, V> {
     /// Create a new `ShardMap` with `shards` internal hash tables, the specified 128-bit hash key
     /// (`k0` and `k1`) and an initial `capacity`.
     pub fn with_capacity_and_keys(shards: uint, k0: u64, k1: u64, capacity: uint) -> ShardMap<K, V> {
