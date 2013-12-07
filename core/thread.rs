@@ -33,6 +33,10 @@ extern {
     fn pthread_attr_destroy(attr: *mut pthread_attr_t) -> c_int;
     fn pthread_attr_setdetachstate(attr: *mut pthread_attr_t, detachstate: c_int) -> c_int;
 
+    fn pthread_mutexattr_init(attr: *mut pthread_mutex_attr_t) -> c_int;
+    fn pthread_mutexattr_destroy(attr: *mut pthread_mutex_attr_t) -> c_int;
+    fn pthread_mutexattr_settype(attr: *mut pthread_mutex_attr_t, ty: c_int) -> c_int;
+
     fn pthread_mutex_init(mutex: *mut pthread_mutex_t, attr: *pthread_mutex_attr_t) -> c_int;
     fn pthread_mutex_destroy(mutex: *mut pthread_mutex_t) -> c_int;
     fn pthread_mutex_lock(mutex: *mut pthread_mutex_t) -> c_int;
@@ -47,6 +51,7 @@ extern {
 }
 
 static PTHREAD_CREATE_DETACHED: c_int = 1;
+static PTHREAD_MUTEX_ERRORCHECK: c_int = 2;
 static EBUSY: c_int = 16;
 
 /// An owned thread type, joined in the destructor.
@@ -134,12 +139,30 @@ pub struct Mutex {
 }
 
 impl Mutex {
+    #[cfg(not(debug))]
     pub fn new() -> Mutex {
         unsafe {
             let mut mutex = uninit();
             if pthread_mutex_init(&mut mutex, 0 as *pthread_mutex_attr_t) != 0 {
                 abort()
             }
+            Mutex { mutex: mutex }
+        }
+    }
+
+    #[cfg(debug)]
+    pub fn new() -> Mutex {
+        unsafe {
+            let mut attr = uninit();
+            if pthread_mutexattr_init(&mut attr) != 0 {
+                abort()
+            }
+            assert(pthread_mutexattr_settype(&mut attr, PTHREAD_MUTEX_ERRORCHECK) == 0);
+            let mut mutex = uninit();
+            if pthread_mutex_init(&mut mutex, &attr) != 0 {
+                abort()
+            }
+            assert(pthread_mutexattr_destroy(&mut attr) == 0);
             Mutex { mutex: mutex }
         }
     }
