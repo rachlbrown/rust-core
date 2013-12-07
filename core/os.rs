@@ -25,3 +25,35 @@ pub fn exit(status: c_int) -> ! {
 pub fn sleep(seconds: c_uint) {
     unsafe { detail::sleep(seconds); }
 }
+
+#[cfg(unix)]
+/// Returns the platform-specific value of errno
+pub fn errno() -> int {
+    extern {
+        #[cfg(target_os = "linux")]
+        #[cfg(target_os = "android")]
+        fn __errno_location() -> *c_int;
+
+        #[link_name = "__error"]
+        #[cfg(target_os = "macos")]
+        #[cfg(target_os = "freebsd")]
+        fn __errno_location() -> *c_int;
+    }
+
+    unsafe {
+        (*__errno_location()) as int
+    }
+}
+
+#[cfg(windows)]
+/// Returns the platform-specific value of errno
+pub fn errno() -> uint {
+    #[link_name = "kernel32"]
+    extern "system" {
+        fn GetLastError() -> u32;
+    }
+
+    unsafe {
+        GetLastError() as uint
+    }
+}
