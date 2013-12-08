@@ -9,6 +9,9 @@
 // except according to those terms.
 
 //! Concurrent data structures
+//!
+//! This module defines mutable concurrent data structures built on top of
+//! atomic reference counting (`core::arc`).
 
 use super::container::Container;
 use super::clone::Clone;
