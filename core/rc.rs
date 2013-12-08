@@ -11,7 +11,6 @@
 use super::mem::transmute;
 use super::ops::Drop;
 use super::cmp::{Eq, Ord};
-use super::kinds::{Freeze, Send};
 use super::clone::{Clone, DeepClone};
 
 struct RcBox<T> {
@@ -25,27 +24,16 @@ pub struct Rc<T> {
     priv ptr: *mut RcBox<T>
 }
 
-impl<T: Freeze> Rc<T> {
-    #[inline(always)]
+impl<T> Rc<T> {
     pub fn new(value: T) -> Rc<T> {
         unsafe {
-            Rc::new_unchecked(value)
+            Rc { ptr: transmute(~RcBox { value: value, count: 1 }) }
         }
     }
-}
 
-impl<T: Send> Rc<T> {
     #[inline(always)]
-    pub fn from_send(value: T) -> Rc<T> {
-        unsafe {
-            Rc::new_unchecked(value)
-        }
-    }
-}
-
-impl<T> Rc<T> {
-    pub unsafe fn new_unchecked(value: T) -> Rc<T> {
-        Rc{ptr: transmute(~RcBox{value: value, count: 1})}
+    pub fn borrow<'a>(&'a self) -> &'a T {
+        unsafe { &(*self.ptr).value }
     }
 }
 
@@ -63,19 +51,12 @@ impl<T> Drop for Rc<T> {
     }
 }
 
-impl<T> Rc<T> {
-    #[inline(always)]
-    pub fn borrow<'a>(&'a self) -> &'a T {
-        unsafe { &(*self.ptr).value }
-    }
-}
-
 impl<T> Clone for Rc<T> {
     #[inline]
     fn clone(&self) -> Rc<T> {
         unsafe {
             (*self.ptr).count += 1;
-            Rc{ptr: self.ptr}
+            Rc { ptr: self.ptr }
         }
     }
 }
@@ -83,7 +64,7 @@ impl<T> Clone for Rc<T> {
 impl<T: DeepClone> DeepClone for Rc<T> {
     #[inline]
     fn deep_clone(&self) -> Rc<T> {
-        unsafe { Rc::new_unchecked(self.borrow().deep_clone()) }
+        Rc::new(self.borrow().deep_clone())
     }
 }
 
