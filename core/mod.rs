@@ -16,6 +16,10 @@
 #[macro_escape];
 
 pub mod arc;
+pub mod rc;
+#[cfg(libc)]
+pub mod weak;
+
 pub mod atomic;
 #[cfg(libc)]
 pub mod deque;
@@ -41,7 +45,6 @@ pub mod option;
 #[cfg(libc)]
 pub mod priority_queue;
 pub mod ptr;
-pub mod rc;
 pub mod slice;
 pub mod str;
 #[cfg(libc)]

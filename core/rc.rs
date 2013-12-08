@@ -8,6 +8,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+//! Task-local reference counted smart pointers
+
 use super::mem::transmute;
 use super::ops::Drop;
 use super::cmp::{Eq, Ord};
