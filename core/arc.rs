@@ -8,7 +8,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::mem::transmute;
+use super::thread::Mutex;
+use super::mem::{replace, transmute};
 use super::kinds::{Freeze, Send};
 use super::clone::{Clone, DeepClone};
 use super::ops::Drop;
@@ -99,4 +100,38 @@ impl<T: Ord> Ord for Arc<T> {
 
     #[inline(always)]
     fn ge(&self, other: &Arc<T>) -> bool { *self.borrow() >= *other.borrow() }
+}
+
+#[no_freeze]
+struct MutexArcBox<T> {
+    mutex: Mutex,
+    value: T
+}
+
+pub struct MutexArc<T> {
+    priv ptr: Arc<MutexArcBox<T>>
+}
+
+impl<T: Send> MutexArc<T> {
+    pub fn new(value: T) -> MutexArc<T> {
+        let box = MutexArcBox { mutex: Mutex::new(), value: value };
+        unsafe {
+            MutexArc { ptr: Arc::new_unchecked(box) }
+        }
+    }
+
+    pub fn swap(&self, value: T) -> T {
+        unsafe {
+            let box: &mut MutexArcBox<T> = transmute(self.ptr.borrow());
+            let _guard = box.mutex.lock_guard();
+            replace(&mut box.value, value)
+        }
+    }
+}
+
+impl<T> Clone for MutexArc<T> {
+    #[inline(always)]
+    fn clone(&self) -> MutexArc<T> {
+        MutexArc { ptr: self.ptr.clone() }
+    }
 }
