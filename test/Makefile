@@ -10,6 +10,7 @@ all: $(BINARIES)
 	./$@
 
 core:
+	rustc ../core/lib.rs --out-dir . # test that the freestanding subset builds
 	rustc --cfg libc ../core/lib.rs --out-dir . -O -Z no-landing-pads
 	touch core
 
