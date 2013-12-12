@@ -8,8 +8,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::fail::abort;
-use super::mem::replace;
+use fail::abort;
+use mem::replace;
 
 pub enum Option<T> {
     Some(T),

@@ -2,10 +2,6 @@ A lightweight standard library for Rust with freestanding support. It provides
 a baseline level of functionality without any external dependencies, and an
 extended set of features in a traditional hosted environment.
 
-The `core` library is currently designed to be used as a module, but as Rust's
-support for static linking and link-time optimization matures it will move
-towards the standard crate model.
-
 # Configuration
 
 * `--cfg libc` to enable features depending on a C standard library implementation
@@ -20,19 +16,15 @@ way to avoid position independent code and linking against the runtime without
 making use of `clang`.
 
 ```
-rustc -O --emit-llvm foo.rs
-clang -O2 -flto -lm -lpthread -o foo foo.bc
+rustc --cfg libc core/lib.rs --out-dir . -O -Z no-landing-pads
+rustc --emit-llvm example.rs -O -Z no-landing-pads -L .
+clang -O2 -flto -o example example.bc
 ```
 
-As an additional problem, the Rust compiler assumes unwinding is used. Until
-there is a way to [disable unwinding](https://github.com/mozilla/rust/issues/10780)
-this will be extremely problematic. Rust will output code for running
-destructors during table-based unwinding with a dependency on the runtime for
-segmented stack support. LLVM can optimize most of this away thanks to
-link-time optimization, but Rust provides no way to mark external functions as
-not throwing. As soon as calls are made to external functions not hard-wired
-into LLVM as `nounwind`, the ability to use Rust without the runtime breaks
-down.
+# Macros
+
+It is currently not possible to export macros from crates, so they are provided
+in a standalone `macros.rs` module to include anywhere they are needed.
 
 # Freestanding usage
 

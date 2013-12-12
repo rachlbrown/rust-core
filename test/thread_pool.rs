@@ -9,15 +9,12 @@
 // except according to those terms.
 
 #[no_std];
-#[feature(macro_rules)];
 
-use core::clone::Clone;
+extern mod core;
+
 use core::thread::{Pool};
 use core::io::stderr;
 use core::os::sleep;
-
-#[path = "../core/mod.rs"]
-mod core;
 
 #[start]
 fn main(_: int, _: **u8) -> int {

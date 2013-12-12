@@ -1,12 +1,10 @@
 #[no_std];
-#[feature(macro_rules)];
+
+extern mod core;
 
 use core::container::Container;
 use core::fail::abort;
 use core::priority_queue::PriorityQueue;
-
-#[path = "../core/mod.rs"]
-mod core;
 
 fn test_new() {
     let xs = PriorityQueue::<int>::new();

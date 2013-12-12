@@ -1,9 +1,8 @@
 #[no_std];
-#[feature(macro_rules)];
+
+extern mod core;
 
 use core::vec::Vec;
-
-mod core;
 
 #[start]
 fn main(_: int, _: **u8) -> int {

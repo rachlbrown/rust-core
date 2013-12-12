@@ -10,10 +10,10 @@
 
 //! Task-local reference counted smart pointers
 
-use super::mem::transmute;
-use super::ops::Drop;
-use super::cmp::{Eq, Ord};
-use super::clone::{Clone, DeepClone};
+use mem::transmute;
+use ops::Drop;
+use cmp::{Eq, Ord};
+use clone::{Clone, DeepClone};
 
 struct RcBox<T> {
     value: T,

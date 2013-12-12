@@ -11,53 +11,53 @@
 #[cfg(target_word_size = "32")]
 #[inline(always)]
 pub fn add_with_overflow(x: uint, y: uint) -> (uint, bool) {
-    let (a, b) = super::u32::add_with_overflow(x as u32, y as u32);
+    let (a, b) = ::u32::add_with_overflow(x as u32, y as u32);
     (a as uint, b)
 }
 
 #[cfg(target_word_size = "64")]
 #[inline(always)]
 pub fn add_with_overflow(x: uint, y: uint) -> (uint, bool) {
-    let (a, b) = super::u64::add_with_overflow(x as u64, y as u64);
+    let (a, b) = ::u64::add_with_overflow(x as u64, y as u64);
     (a as uint, b)
 }
 
 #[cfg(target_word_size = "32")]
 #[inline(always)]
 pub fn sub_with_overflow(x: uint, y: uint) -> (uint, bool) {
-    let (a, b) = super::u32::sub_with_overflow(x as u32, y as u32);
+    let (a, b) = ::u32::sub_with_overflow(x as u32, y as u32);
     (a as uint, b)
 }
 
 #[cfg(target_word_size = "64")]
 #[inline(always)]
 pub fn sub_with_overflow(x: uint, y: uint) -> (uint, bool) {
-    let (a, b) = super::u64::sub_with_overflow(x as u64, y as u64);
+    let (a, b) = ::u64::sub_with_overflow(x as u64, y as u64);
     (a as uint, b)
 }
 
 #[cfg(target_word_size = "32")]
 #[inline(always)]
 pub fn mul_with_overflow(x: uint, y: uint) -> (uint, bool) {
-    let (a, b) = super::u32::mul_with_overflow(x as u32, y as u32);
+    let (a, b) = ::u32::mul_with_overflow(x as u32, y as u32);
     (a as uint, b)
 }
 
 #[cfg(target_word_size = "64")]
 #[inline(always)]
 pub fn mul_with_overflow(x: uint, y: uint) -> (uint, bool) {
-    let (a, b) = super::u64::mul_with_overflow(x as u64, y as u64);
+    let (a, b) = ::u64::mul_with_overflow(x as u64, y as u64);
     (a as uint, b)
 }
 
 #[cfg(target_word_size = "32")]
 pub fn bswap(x: uint) -> uint {
-    super::i32::bswap(x as i32) as uint
+    ::i32::bswap(x as i32) as uint
 }
 
 #[cfg(target_word_size = "64")]
 pub fn bswap(x: uint) -> uint {
-    super::i64::bswap(x as i64) as uint
+    ::i64::bswap(x as i64) as uint
 }
 
 #[cfg(target_endian = "big")]

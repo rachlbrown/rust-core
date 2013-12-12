@@ -10,13 +10,13 @@
 
 //! A priority queue implemented with a binary heap
 
-use super::container::Container;
-use super::heap::Heap;
-use super::vec::Vec;
-use super::cmp::Ord;
-use super::option::{Option, Some, None};
-use super::mem::swap;
-use super::slice;
+use container::Container;
+use heap::Heap;
+use vec::Vec;
+use cmp::Ord;
+use option::{Option, Some, None};
+use mem::swap;
+use slice;
 
 /// A priority queue implemented with a binary heap
 pub struct PriorityQueue<T> {

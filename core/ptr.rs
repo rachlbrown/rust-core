@@ -8,8 +8,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::mem::{forget, uninit};
-use super::cmp::{Eq, Ord};
+use mem::{forget, uninit};
+use cmp::{Eq, Ord};
 
 extern "rust-intrinsic" {
     pub fn offset<T>(dst: *T, offset: int) -> *T;

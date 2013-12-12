@@ -8,15 +8,15 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::container::Container;
-use super::iter::Iterator;
-use super::slice::iter;
-use super::option::{None, Option, Some};
-use super::fail::abort;
-use super::cmp::{Eq, max};
-use super::vec::Vec;
-use super::mem::replace;
-use super::heap::Heap;
+use container::Container;
+use iter::Iterator;
+use slice::iter;
+use option::{None, Option, Some};
+use fail::abort;
+use cmp::{Eq, max};
+use vec::Vec;
+use mem::{replace, size_of};
+use heap::Heap;
 
 pub trait Hash {
     fn hash(&self, k0: u64, k1: u64) -> u64;
@@ -643,7 +643,6 @@ impl<K: Hash + Eq, V> HashMap<K, V> {
 }
 
 fn next_power_of_two(n: uint) -> uint {
-    use super::mem::size_of;
     let halfbits: uint = size_of::<uint>() * 4u;
     let mut tmp: uint = n - 1u;
     let mut shift: uint = 1u;

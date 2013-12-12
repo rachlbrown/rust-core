@@ -8,11 +8,12 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::fail::assert;
-use super::mem::size_of;
-use super::heap::malloc_raw;
+use fail::assert;
+use mem::size_of;
+use heap::malloc_raw;
 
 #[lang="opaque"]
+#[allow(dead_code)]
 enum Opaque {}
 
 type Disr = u64;

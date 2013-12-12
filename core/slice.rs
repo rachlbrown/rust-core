@@ -8,13 +8,13 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::mem::{nonzero_size_of, size_of, transmute};
-use super::ptr::{offset, read_ptr, swap_ptr};
-use super::fail::abort;
-use super::container::Container;
-use super::option::{Option, Some, None};
-use super::clone::Clone;
-use super::iter::Iterator;
+use mem::{nonzero_size_of, size_of, transmute};
+use ptr::{offset, read_ptr, swap_ptr};
+use fail::abort;
+use container::Container;
+use option::{Option, Some, None};
+use clone::Clone;
+use iter::Iterator;
 
 pub struct Slice<T> {
     data: *T,
@@ -150,13 +150,13 @@ pub fn mut_iter<'a, T>(xs: &'a mut [T]) -> VecMutIterator<'a, T> {
 macro_rules! iterator {
     (struct $name:ident -> $ptr:ty, $elem:ty) => {
         /// An iterator for iterating over a slice.
-        pub struct $name<'self, T> {
+        pub struct $name<'a, T> {
             priv ptr: $ptr,
             priv end: $ptr,
             priv lifetime: Option<$elem> // https://github.com/mozilla/rust/issues/5922
         }
 
-        impl<'self, T> Iterator<$elem> for $name<'self, T> {
+        impl<'a, T> Iterator<$elem> for $name<'a, T> {
             #[inline]
             fn next(&mut self) -> Option<$elem> {
                 // could be implemented with slices, but this avoids bounds checks
@@ -187,8 +187,8 @@ macro_rules! iterator {
     }
 }
 
-iterator!{struct VecIterator -> *T, &'self T}
-iterator!{struct VecMutIterator -> *mut T, &'self mut T}
+iterator!{struct VecIterator -> *T, &'a T}
+iterator!{struct VecMutIterator -> *mut T, &'a mut T}
 
 impl<'a, T> Clone for VecIterator<'a, T> {
     fn clone(&self) -> VecIterator<'a, T> {

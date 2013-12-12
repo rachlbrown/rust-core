@@ -9,12 +9,10 @@
 // except according to those terms.
 
 #[no_std];
-#[feature(macro_rules)];
+
+extern mod core;
 
 use core::io::{stdout, stderr};
-
-#[path = "../core/mod.rs"]
-mod core;
 
 #[start]
 fn main(_: int, _: **u8) -> int {

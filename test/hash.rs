@@ -11,12 +11,11 @@
 #[no_std];
 #[feature(macro_rules)];
 
+extern mod core;
+
 use core::hash::{Hash, HashBytes, State};
 use core::fail::abort;
 use core::vec::Vec;
-
-#[path = "../core/mod.rs"]
-mod core;
 
 macro_rules! u8to64_le (
     ($buf:expr, $i:expr) =>

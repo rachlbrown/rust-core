@@ -8,10 +8,10 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::c_types::{c_int, c_uint};
+use c_types::{c_int, c_uint};
 
 mod detail {
-    use super::super::c_types::{c_int, c_uint};
+    use c_types::{c_int, c_uint};
     extern {
         pub fn exit(status: c_int) -> !;
         pub fn sleep(seconds: c_uint) -> c_int;

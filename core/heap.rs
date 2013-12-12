@@ -8,8 +8,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::fail::out_of_memory;
-use super::mem::Allocator;
+use fail::out_of_memory;
+use mem::Allocator;
 
 mod detail {
     extern {

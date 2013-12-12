@@ -1,12 +1,10 @@
 #[no_std];
-#[feature(macro_rules)];
+
+extern mod core;
 
 use core::container::Container;
 use core::deque::Deque;
 use core::fail::abort;
-
-#[path = "../core/mod.rs"]
-mod core;
 
 fn test_new() {
     let xs = Deque::<int>::new();

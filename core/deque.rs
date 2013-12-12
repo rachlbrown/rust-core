@@ -15,15 +15,15 @@
 // reduces the size of the queue by 2x for types without a compact `Option<T>` representation like
 // non-nullable pointers.
 
-use super::container::Container;
-use super::mem::move_val_init;
-use super::ptr::read_ptr;
-use super::ops::Drop;
-use super::heap::Heap;
-use super::vec::Vec;
-use super::slice::{unchecked_get, unchecked_mut_get, unchecked_swap};
-use super::fail::{abort, assert};
-use super::option::{Option, Some, None};
+use container::Container;
+use mem::move_val_init;
+use ptr::read_ptr;
+use ops::Drop;
+use heap::Heap;
+use vec::Vec;
+use slice::{unchecked_get, unchecked_mut_get, unchecked_swap};
+use fail::{abort, assert};
+use option::{Option, Some, None};
 
 pub struct Deque<T> {
     priv nelts: uint,

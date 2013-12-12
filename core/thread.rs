@@ -8,18 +8,18 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::container::Container;
-use super::c_types::{c_int, pthread_t, pthread_attr_t, pthread_mutex_t, pthread_mutex_attr_t};
-use super::c_types::{pthread_cond_t, pthread_cond_attr_t};
-use super::fail::{abort, assert};
-use super::ops::Drop;
-use super::kinds::Send;
-use super::mem::{forget, uninit, transmute};
-use super::concurrent::Queue;
-use super::vec::Vec;
-use super::heap::Heap;
-use super::option::{Option, Some, None};
-use super::clone::Clone;
+use container::Container;
+use c_types::{c_int, pthread_t, pthread_attr_t, pthread_mutex_t, pthread_mutex_attr_t};
+use c_types::{pthread_cond_t, pthread_cond_attr_t};
+use fail::{abort, assert};
+use ops::Drop;
+use kinds::Send;
+use mem::{forget, uninit, transmute};
+use concurrent::Queue;
+use vec::Vec;
+use heap::Heap;
+use option::{Option, Some, None};
+use clone::Clone;
 
 extern {
     fn pthread_create(thread: *mut pthread_t, attr: *pthread_attr_t,
@@ -51,6 +51,7 @@ extern {
 }
 
 static PTHREAD_CREATE_DETACHED: c_int = 1;
+#[cfg(debug)]
 static PTHREAD_MUTEX_ERRORCHECK: c_int = 2;
 static EBUSY: c_int = 16;
 

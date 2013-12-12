@@ -8,8 +8,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::container::Container;
-use super::mem::transmute;
+use container::Container;
+use mem::transmute;
 
 impl<'a> Container for &'a str {
     #[no_split_stack]

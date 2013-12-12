@@ -11,11 +11,13 @@
 #[no_std];
 #[feature(macro_rules)];
 
+extern mod core;
+
 use core::fail::abort;
 use core::cmp::expect;
 
-#[path = "../core/mod.rs"]
-mod core;
+#[path = "../macros.rs"]
+mod macros;
 
 #[start]
 fn main(argc: int, _: **u8) -> int {

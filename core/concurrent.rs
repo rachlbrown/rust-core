@@ -13,19 +13,19 @@
 //! This module defines mutable concurrent data structures built on top of
 //! atomic reference counting (`core::arc`).
 
-use super::container::Container;
-use super::clone::Clone;
-use super::arc::Arc;
-use super::deque::Deque;
-use super::priority_queue::PriorityQueue;
-use super::mem::transmute;
-use super::thread::{Mutex, Cond};
-use super::cmp::{Eq, Ord};
-use super::option::Option;
-use super::hash::{Hash, HashMap};
-use super::heap::Heap;
-use super::vec::Vec;
-use super::kinds::Send;
+use container::Container;
+use clone::Clone;
+use arc::Arc;
+use deque::Deque;
+use priority_queue::PriorityQueue;
+use mem::transmute;
+use thread::{Mutex, Cond};
+use cmp::{Eq, Ord};
+use option::Option;
+use hash::{Hash, HashMap};
+use heap::Heap;
+use vec::Vec;
+use kinds::Send;
 
 trait GenericQueue<T>: Container {
     fn generic_push(&mut self, item: T);

@@ -8,11 +8,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::c_types::c_int;
-use super::mem::uninit;
+use c_types::c_int;
+use mem::uninit;
 
 mod detail {
-    use super::super::c_types::c_int;
+    use c_types::c_int;
 
     extern {
         #[link_name = "llvm.sqrt.f64"]

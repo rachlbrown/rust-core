@@ -8,13 +8,13 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::thread::Mutex;
-use super::mem::{replace, transmute};
-use super::kinds::{Freeze, Send};
-use super::clone::{Clone, DeepClone};
-use super::ops::Drop;
-use super::cmp::{Eq, Ord};
-use super::atomic::{atomic_fence_acq, atomic_xadd_relaxed, atomic_xsub_rel};
+use thread::Mutex;
+use mem::{replace, transmute};
+use kinds::{Freeze, Send};
+use clone::{Clone, DeepClone};
+use ops::Drop;
+use cmp::{Eq, Ord};
+use atomic::{atomic_fence_acq, atomic_xadd_relaxed, atomic_xsub_rel};
 
 struct ArcBox<T> {
     value: T,

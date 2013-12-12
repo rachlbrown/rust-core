@@ -8,7 +8,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::option::{Option, Some, None};
+use option::{Option, Some, None};
 
 pub trait Iterator<A> {
     fn next(&mut self) -> Option<A>;

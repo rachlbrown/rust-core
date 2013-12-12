@@ -4,10 +4,14 @@ INTERMEDIATES = $(patsubst %.rs,%.bc,$(SOURCES))
 
 all: $(BINARIES)
 
-%: %.rs
-	rustc $< --emit-llvm --cfg libc -O
+%: %.rs core
+	rustc $< --emit-llvm --cfg libc -O -Z no-landing-pads -Z lto -L .
 	clang $@.bc -o $@ -O2 -lpthread
 	./$@
 
+core:
+	rustc --cfg libc ../core/lib.rs --out-dir . -O -Z no-landing-pads
+	touch core
+
 clean:
-	rm -f $(BINARIES) $(INTERMEDIATES)
+	rm -f $(BINARIES) $(INTERMEDIATES) *.rlib core

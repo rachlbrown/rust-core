@@ -8,19 +8,20 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::container::Container;
-use super::mem::{Allocator, move_val_init, size_of, transmute};
-use super::fail::out_of_memory;
+use container::Container;
+use mem::{Allocator, move_val_init, size_of, transmute};
+use fail::out_of_memory;
 #[cfg(libc)]
-use super::heap::{Heap, free};
-use super::ops::Drop;
-use super::slice::{Slice, iter, unchecked_get};
-use super::ptr::{offset, read_ptr};
-use super::uint::mul_with_overflow;
-use super::option::{Option, Some, None};
-use super::iter::Iterator;
-use super::cmp::expect;
+use heap::{Heap, free};
+use ops::Drop;
+use slice::{Slice, iter, unchecked_get};
+use ptr::{offset, read_ptr};
+use uint::mul_with_overflow;
+use option::{Option, Some, None};
+use iter::Iterator;
+use cmp::expect;
 
+#[path = "../macros.rs"]
 mod macros;
 
 pub struct Vec<T, A> {

@@ -11,10 +11,11 @@
 #[no_std];
 #[allow(ctypes)];
 #[link(name = "core")];
-#[allow(attribute_usage)];
+#[pkgid = "core"];
+#[crate_type = "rlib"];
 #[feature(macro_rules)];
-#[macro_escape];
 
+#[cfg(libc)]
 pub mod arc;
 pub mod rc;
 #[cfg(libc)]
@@ -38,7 +39,6 @@ pub mod iter;
 pub mod kinds;
 #[cfg(libc)]
 pub mod lru;
-pub mod macros;
 pub mod mem;
 pub mod ops;
 pub mod option;

@@ -33,12 +33,12 @@
 //! assert!(cache.get(&2).is_none());
 //! ```
 
-use super::container::Container;
-use super::hash::{HashMap, HashBytes};
-use super::mem::transmute;
-use super::option::{Some, None, Option};
-use super::cmp::Eq;
-use super::ops::Drop;
+use container::Container;
+use hash::{HashMap, HashBytes};
+use mem::transmute;
+use option::{Some, None, Option};
+use cmp::Eq;
+use ops::Drop;
 
 struct KeyRef<K> { priv k: *K }
 

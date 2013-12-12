@@ -9,15 +9,13 @@
 // except according to those terms.
 
 #[no_std];
-#[feature(macro_rules)];
+
+extern mod core;
 
 use core::clone::Clone;
 use core::thread::{spawn, spawn_detached};
 use core::fail::abort;
 use core::concurrent::Queue;
-
-#[path = "../core/mod.rs"]
-mod core;
 
 fn foo() -> int {
     10

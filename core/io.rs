@@ -8,9 +8,9 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::container::Container;
-use super::c_types::c_int;
-use super::slice::{to_mut_ptr, to_ptr};
+use container::Container;
+use c_types::c_int;
+use slice::{to_mut_ptr, to_ptr};
 
 enum FILE {}
 

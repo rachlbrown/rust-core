@@ -10,13 +10,13 @@
 
 //! Task-local reference counted smart pointers with weak pointer support
 
-use super::mem::transmute;
-use super::ops::Drop;
-use super::cmp::{Eq, Ord};
-use super::clone::{Clone, DeepClone};
-use super::heap::free;
-use super::ptr::read_ptr;
-use super::option::{Option, Some, None};
+use mem::transmute;
+use ops::Drop;
+use cmp::{Eq, Ord};
+use clone::{Clone, DeepClone};
+use heap::free;
+use ptr::read_ptr;
+use option::{Option, Some, None};
 
 struct RcBox<T> {
     value: T,

@@ -8,8 +8,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::option::{None, Some, Option};
-use super::mem::transmute;
+use option::{None, Some, Option};
+use mem::transmute;
 
 /// The highest valid code point
 pub static MAX: char = '\U0010ffff';

@@ -8,7 +8,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::ptr::copy_nonoverlapping_memory;
+use ptr::copy_nonoverlapping_memory;
 
 mod detail {
     extern "rust-intrinsic" {

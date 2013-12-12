@@ -11,12 +11,14 @@
 #[no_std];
 #[feature(macro_rules)];
 
+extern mod core;
+
 use core::clone::Clone;
 use core::thread::spawn;
 use core::fail::abort;
 
-#[path = "../core/mod.rs"]
-mod core;
+#[path = "../macros.rs"]
+mod macros;
 
 thread_local!(foo, int, 5)
 

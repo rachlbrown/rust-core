@@ -9,15 +9,12 @@
 // except according to those terms.
 
 #[no_std];
-#[feature(macro_rules)];
 
-use core::clone::Clone;
+extern mod core;
+
 use core::weak::Strong;
 use core::ignore;
 use core::fail::abort;
-
-#[path = "../core/mod.rs"]
-mod core;
 
 fn test_live() {
     let x = Strong::new(5);
