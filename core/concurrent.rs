@@ -18,14 +18,22 @@ use clone::Clone;
 use arc::Arc;
 use deque::Deque;
 use priority_queue::PriorityQueue;
-use mem::transmute;
-use thread::{Mutex, Cond};
+use mem::{transmute, uninit};
+use thread::{Mutex, Cond, Timeout};
 use cmp::{Eq, Ord};
-use option::Option;
+use option::{Some, None, Option};
 use hash::{Hash, HashMap};
 use heap::Heap;
 use vec::Vec;
 use kinds::Send;
+use fail::abort;
+use c_types::{c_int, clockid_t, timespec};
+
+static CLOCK_MONOTONIC: clockid_t = 1;
+
+extern {
+    fn clock_gettime(clk_id: clockid_t, tp: *mut timespec) -> c_int;
+}
 
 trait GenericQueue<T>: Container {
     fn generic_push(&mut self, item: T);
@@ -72,6 +80,26 @@ impl<A: Send, T: GenericQueue<A>> QueuePtr<T> {
         }
     }
 
+    fn pop_timeout(&self, reltime: timespec) -> Option<A> {
+        unsafe {
+            let mut abstime = uninit();
+            if clock_gettime(CLOCK_MONOTONIC, &mut abstime) != 0 {
+                abort()
+            }
+            abstime.tv_sec += reltime.tv_sec;
+            abstime.tv_nsec += reltime.tv_nsec;
+
+            let box: &mut QueueBox<T> = transmute(self.ptr.borrow());
+            let mut guard = box.mutex.lock_guard();
+            while box.queue.is_empty() {
+                if box.not_empty.wait_until_guard(&mut guard, abstime) == Timeout {
+                    return None
+                }
+            }
+            Some(box.queue.generic_pop().get())
+        }
+    }
+
     fn push(&self, item: A) {
         unsafe {
             let box: &mut QueueBox<T> = transmute(self.ptr.borrow());
@@ -105,6 +133,12 @@ impl<T: Send> Queue<T> {
         self.ptr.pop()
     }
 
+    /// Pop a value from the front of the queue, blocking until the queue is not empty or the
+    /// timeout expires.
+    pub fn pop_timeout(&self, reltime: timespec) -> Option<T> {
+        self.ptr.pop_timeout(reltime)
+    }
+
     /// Push a value to the back of the queue
     pub fn push(&self, item: T) {
         self.ptr.push(item)
@@ -132,6 +166,12 @@ impl<T: Ord + Send> BlockingPriorityQueue<T> {
     /// Pop the largest value from the queue, blocking until the queue is not empty
     pub fn pop(&self) -> T {
         self.ptr.pop()
+    }
+
+    /// Pop the largest value from the queue, blocking until the queue is not empty or the timeout
+    /// expires.
+    pub fn pop_timeout(&self, reltime: timespec) -> Option<T> {
+        self.ptr.pop_timeout(reltime)
     }
 
     /// Push a value into the queue
