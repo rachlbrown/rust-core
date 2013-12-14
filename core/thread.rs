@@ -9,8 +9,8 @@
 // except according to those terms.
 
 use container::Container;
-use c_types::{c_int, pthread_t, pthread_attr_t, pthread_mutex_t, pthread_mutex_attr_t};
-use c_types::{pthread_cond_t, pthread_cond_attr_t};
+use c_types::{c_int, pthread_t, pthread_attr_t, pthread_mutex_t, pthread_mutexattr_t};
+use c_types::{pthread_cond_t, pthread_condattr_t, clockid_t, timespec};
 use fail::{abort, assert};
 use ops::Drop;
 use kinds::Send;
@@ -20,6 +20,22 @@ use vec::Vec;
 use heap::Heap;
 use option::{Option, Some, None};
 use clone::Clone;
+use cmp::Eq;
+
+pub enum TimeoutStatus {
+    NoTimeout,
+    Timeout
+}
+
+impl Eq for TimeoutStatus {
+    fn eq(&self, other: &TimeoutStatus) -> bool {
+        match (*self, *other) {
+            (Timeout, Timeout) => true,
+            (NoTimeout, NoTimeout) => true,
+            _ => false
+        }
+    }
+}
 
 extern {
     fn pthread_create(thread: *mut pthread_t, attr: *pthread_attr_t,
@@ -33,27 +49,36 @@ extern {
     fn pthread_attr_destroy(attr: *mut pthread_attr_t) -> c_int;
     fn pthread_attr_setdetachstate(attr: *mut pthread_attr_t, detachstate: c_int) -> c_int;
 
-    fn pthread_mutexattr_init(attr: *mut pthread_mutex_attr_t) -> c_int;
-    fn pthread_mutexattr_destroy(attr: *mut pthread_mutex_attr_t) -> c_int;
-    fn pthread_mutexattr_settype(attr: *mut pthread_mutex_attr_t, ty: c_int) -> c_int;
+    fn pthread_mutexattr_init(attr: *mut pthread_mutexattr_t) -> c_int;
+    fn pthread_mutexattr_destroy(attr: *mut pthread_mutexattr_t) -> c_int;
+    fn pthread_mutexattr_settype(attr: *mut pthread_mutexattr_t, ty: c_int) -> c_int;
 
-    fn pthread_mutex_init(mutex: *mut pthread_mutex_t, attr: *pthread_mutex_attr_t) -> c_int;
+    fn pthread_mutex_init(mutex: *mut pthread_mutex_t, attr: *pthread_mutexattr_t) -> c_int;
     fn pthread_mutex_destroy(mutex: *mut pthread_mutex_t) -> c_int;
     fn pthread_mutex_lock(mutex: *mut pthread_mutex_t) -> c_int;
     fn pthread_mutex_trylock(mutex: *mut pthread_mutex_t) -> c_int;
     fn pthread_mutex_unlock(mutex: *mut pthread_mutex_t) -> c_int;
 
-    fn pthread_cond_init(cond: *mut pthread_cond_t, attr: *pthread_cond_attr_t) -> c_int;
+    fn pthread_condattr_init(attr: *mut pthread_condattr_t) -> c_int;
+    fn pthread_condattr_destroy(attr: *mut pthread_condattr_t) -> c_int;
+    fn pthread_condattr_setclock(attr: *mut pthread_condattr_t, clock_id: clockid_t) -> c_int;
+
+    fn pthread_cond_init(cond: *mut pthread_cond_t, attr: *pthread_condattr_t) -> c_int;
     fn pthread_cond_destroy(cond: *mut pthread_cond_t) -> c_int;
     fn pthread_cond_signal(cond: *mut pthread_cond_t) -> c_int;
     fn pthread_cond_broadcast(cond: *mut pthread_cond_t) -> c_int;
+    fn pthread_cond_timedwait(cond: *mut pthread_cond_t, mutex: *mut pthread_mutex_t,
+                              abstime: *timespec) -> c_int;
     fn pthread_cond_wait(cond: *mut pthread_cond_t, mutex: *mut pthread_mutex_t) -> c_int;
 }
 
+static CLOCK_MONOTONIC: clockid_t = 1;
 static PTHREAD_CREATE_DETACHED: c_int = 1;
 #[cfg(debug)]
 static PTHREAD_MUTEX_ERRORCHECK: c_int = 2;
+
 static EBUSY: c_int = 16;
+static ETIMEDOUT: c_int = 110;
 
 /// An owned thread type, joined in the destructor.
 pub struct Thread<A> {
@@ -144,7 +169,7 @@ impl Mutex {
     pub fn new() -> Mutex {
         unsafe {
             let mut mutex = uninit();
-            if pthread_mutex_init(&mut mutex, 0 as *pthread_mutex_attr_t) != 0 {
+            if pthread_mutex_init(&mut mutex, 0 as *pthread_mutexattr_t) != 0 {
                 abort()
             }
             Mutex { mutex: mutex }
@@ -212,10 +237,16 @@ pub struct Cond {
 impl Cond {
     pub fn new() -> Cond {
         unsafe {
-            let mut cond = uninit();
-            if pthread_cond_init(&mut cond, 0 as *pthread_cond_attr_t) != 0 {
+            let mut attr = uninit();
+            if pthread_condattr_init(&mut attr) != 0 {
                 abort()
             }
+            assert(pthread_condattr_setclock(&mut attr, CLOCK_MONOTONIC) == 0);
+            let mut cond = uninit();
+            if pthread_cond_init(&mut cond, &attr) != 0 {
+                abort()
+            }
+            assert(pthread_condattr_destroy(&mut attr) == 0);
             Cond { cond: cond }
         }
     }
@@ -234,6 +265,27 @@ impl Cond {
     /// returning, the mutex will be owned again. Note that spurious wakeups may occur.
     pub unsafe fn wait(&mut self, mutex: &mut Mutex) {
         assert(pthread_cond_wait(&mut self.cond, &mut mutex.mutex) == 0)
+    }
+
+    /// Block on the condition variable, releasing ownership of the mutex until notified or the
+    /// timeout expires. Upon returning, the mutex will be owned again. Note that spurious wakeups
+    /// may occur. Return `Timeout` if a timeout occurs, otherwise `NoTimeout`.
+    pub unsafe fn wait_until(&mut self, mutex: &mut Mutex, abstime: timespec) -> TimeoutStatus {
+        let ret = pthread_cond_timedwait(&mut self.cond, &mut mutex.mutex, &abstime);
+        if ret == ETIMEDOUT {
+            Timeout
+        } else {
+            assert(ret == 0);
+            NoTimeout
+        }
+    }
+
+    /// Block on the condition variable, releasing ownership of the mutex until notified or the
+    /// timeout expires. Upon returning, the mutex will be owned by the `LockGuard` again. Note that
+    /// spurious wakeups may occur. Return `Timeout` if a timeout occurs, otherwise `NoTimeout`.
+    pub unsafe fn wait_until_guard(&mut self, guard: &mut LockGuard,
+                                   abstime: timespec) -> TimeoutStatus {
+        self.wait_until(guard.mutex, abstime)
     }
 
     /// Block on the condition variable, releasing ownership of the mutex until notified. Upon
