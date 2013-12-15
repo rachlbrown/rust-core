@@ -103,9 +103,8 @@ impl<A: Send, T: GenericQueue<A>> QueuePtr<T> {
     fn push(&self, item: A) {
         unsafe {
             let box: &mut QueueBox<T> = transmute(self.ptr.borrow());
-            box.mutex.lock();
+            let _guard = box.mutex.lock_guard();
             box.queue.generic_push(item);
-            box.mutex.unlock();
             box.not_empty.signal()
         }
     }
@@ -212,12 +211,11 @@ impl<A: Send, T: GenericQueue<A>> BoundedQueuePtr<T> {
     fn pop(&self) -> A {
         unsafe {
             let box: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
-            box.mutex.lock();
+            let mut guard = box.mutex.lock_guard();
             while box.deque.is_empty() {
-                box.not_empty.wait(&mut box.mutex)
+                box.not_empty.wait_guard(&mut guard)
             }
             let item = box.deque.generic_pop().get();
-            box.mutex.unlock();
             box.not_full.signal();
             item
         }
@@ -226,12 +224,11 @@ impl<A: Send, T: GenericQueue<A>> BoundedQueuePtr<T> {
     fn push(&self, item: A) {
         unsafe {
             let box: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
-            box.mutex.lock();
+            let mut guard = box.mutex.lock_guard();
             while box.deque.len() == box.maximum {
-                box.not_full.wait(&mut box.mutex)
+                box.not_full.wait_guard(&mut guard)
             }
             box.deque.generic_push(item);
-            box.mutex.unlock();
             box.not_empty.signal()
         }
     }
