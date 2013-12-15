@@ -16,7 +16,6 @@ use fail::abort;
 use cmp::{Eq, max};
 use vec::Vec;
 use mem::{replace, size_of};
-use heap::Heap;
 
 pub trait Hash {
     fn hash(&self, k0: u64, k1: u64) -> u64;
@@ -329,7 +328,7 @@ pub struct HashMap<K,V> {
     priv k1: u64,
     priv resize_at: uint,
     priv size: uint,
-    priv buckets: Vec<Option<Bucket<K, V>>, Heap>
+    priv buckets: Vec<Option<Bucket<K, V>>>
 }
 
 enum SearchResult {

@@ -23,7 +23,6 @@ use thread::{Mutex, Cond, Timeout};
 use cmp::{Eq, Ord};
 use option::{Some, None, Option};
 use hash::{Hash, HashMap};
-use heap::Heap;
 use vec::Vec;
 use kinds::Send;
 use fail::abort;
@@ -458,7 +457,7 @@ impl<K, V> Clone for ConcurrentHashMap<K, V> {
 
 #[no_freeze]
 struct ShardMapBox<K, V> {
-    priv maps: Vec<LockedHashMap<K, V>, Heap>,
+    priv maps: Vec<LockedHashMap<K, V>>,
     priv k0: u64,
     priv k1: u64
 }

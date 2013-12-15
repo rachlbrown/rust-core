@@ -58,16 +58,5 @@ unavailable without the Rust runtime.
 
 # Allocators
 
-Allocators are not yet working due to [issue #4252](https://github.com/mozilla/rust/issues/4252).
-
-The `core::mem::Allocator` trait defines the allocator interface. A generic
-container takes an allocator type parameter, with `core::heap::Heap` as the
-default allocator for a container constructed with the `new` static method.
-
-A container can be constructed using `Container::with_alloc(allocator)`, and
-will store the allocator instance internally. Since Rust has zero-size types,
-this has no overhead for allocators with no instance state.
-
-Sharing stateful allocator instances between containers can be done with
-`core::rc` or `core::arc . Containers are already expensive to clone, so
-a reference count on container copies shouldn't be an issue.
+Allocators are not yet included due to language deficiencies. See
+[issue #31](https://github.com/thestinger/rust-core/issues/31) for details.

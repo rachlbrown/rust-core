@@ -17,7 +17,6 @@ use kinds::Send;
 use mem::{forget, uninit, transmute};
 use concurrent::Queue;
 use vec::Vec;
-use heap::Heap;
 use option::{Option, Some, None};
 use clone::Clone;
 use cmp::Eq;
@@ -49,8 +48,11 @@ extern {
     fn pthread_attr_destroy(attr: *mut pthread_attr_t) -> c_int;
     fn pthread_attr_setdetachstate(attr: *mut pthread_attr_t, detachstate: c_int) -> c_int;
 
+    #[cfg(debug)]
     fn pthread_mutexattr_init(attr: *mut pthread_mutexattr_t) -> c_int;
+    #[cfg(debug)]
     fn pthread_mutexattr_destroy(attr: *mut pthread_mutexattr_t) -> c_int;
+    #[cfg(debug)]
     fn pthread_mutexattr_settype(attr: *mut pthread_mutexattr_t, ty: c_int) -> c_int;
 
     fn pthread_mutex_init(mutex: *mut pthread_mutex_t, attr: *pthread_mutexattr_t) -> c_int;
@@ -321,7 +323,7 @@ impl<'a> Drop for LockGuard<'a> {
 /// A pool of worker threads
 pub struct Pool {
     priv queue: Queue<Option<proc()>>,
-    priv pool: Vec<Thread<()>, Heap>
+    priv pool: Vec<Thread<()>>
 }
 
 impl Pool {

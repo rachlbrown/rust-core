@@ -19,7 +19,6 @@ use container::Container;
 use mem::move_val_init;
 use ptr::read_ptr;
 use ops::Drop;
-use heap::Heap;
 use vec::Vec;
 use slice::{unchecked_get, unchecked_mut_get, unchecked_swap};
 use fail::{abort, assert};
@@ -28,7 +27,7 @@ use option::{Option, Some, None};
 pub struct Deque<T> {
     priv nelts: uint,
     priv lo: uint,
-    priv elts: Vec<T, Heap>
+    priv elts: Vec<T>
 }
 
 fn raw_index(lo: uint, len: uint, index: uint) -> uint {
@@ -170,7 +169,7 @@ impl<T> Drop for Deque<T> {
     }
 }
 
-fn grow<T>(nelts: uint, loptr: &mut uint, elts: &mut Vec<T, Heap>) {
+fn grow<T>(nelts: uint, loptr: &mut uint, elts: &mut Vec<T>) {
     assert(nelts == elts.capacity());
     let lo = *loptr;
     let mut newlen = nelts * 2;

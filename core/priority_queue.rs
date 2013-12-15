@@ -11,7 +11,6 @@
 //! A priority queue implemented with a binary heap
 
 use container::Container;
-use heap::Heap;
 use vec::Vec;
 use cmp::Ord;
 use option::{Option, Some, None};
@@ -20,7 +19,7 @@ use slice;
 
 /// A priority queue implemented with a binary heap
 pub struct PriorityQueue<T> {
-    priv data: Vec<T, Heap>
+    priv data: Vec<T>
 }
 
 impl<T> Container for PriorityQueue<T> {
@@ -67,11 +66,11 @@ impl<T: Ord> PriorityQueue<T> {
         }
     }
 
-    pub fn to_vec(self) -> Vec<T, Heap> {
+    pub fn to_vec(self) -> Vec<T> {
         self.data
     }
 
-    pub fn to_sorted_vec(self) -> Vec<T, Heap> {
+    pub fn to_sorted_vec(self) -> Vec<T> {
         let mut q = self;
         let mut end = q.len();
         while end > 1 {
@@ -92,7 +91,7 @@ impl<T: Ord> PriorityQueue<T> {
         PriorityQueue { data: Vec::with_capacity(capacity) }
     }
 
-    pub fn from_vec(xs: Vec<T, Heap>) -> PriorityQueue<T> {
+    pub fn from_vec(xs: Vec<T>) -> PriorityQueue<T> {
         let mut q = PriorityQueue { data: xs };
         let mut n = q.len() / 2;
         while n > 0 {

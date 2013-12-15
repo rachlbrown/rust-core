@@ -9,10 +9,9 @@
 // except according to those terms.
 
 use container::Container;
-use mem::{Allocator, move_val_init, size_of, transmute};
+use mem::{move_val_init, size_of, transmute};
 use fail::out_of_memory;
-#[cfg(libc)]
-use heap::{Heap, free};
+use heap::{free, malloc_raw, realloc_raw};
 use ops::Drop;
 use slice::{Slice, iter, unchecked_get};
 use ptr::{offset, read_ptr};
@@ -24,56 +23,41 @@ use cmp::expect;
 #[path = "../macros.rs"]
 mod macros;
 
-pub struct Vec<T, A> {
+pub struct Vec<T> {
     priv len: uint,
     priv cap: uint,
-    priv ptr: *mut T,
-    priv alloc: A
+    priv ptr: *mut T
 }
 
 #[cfg(libc)]
-impl<T> Vec<T, Heap> {
+impl<T> Vec<T> {
     #[inline(always)]
-    pub fn new() -> Vec<T, Heap> {
-        Vec::with_alloc(Heap)
+    pub fn new() -> Vec<T> {
+        Vec { len: 0, cap: 0, ptr: 0 as *mut T }
     }
 
-    #[inline(always)]
-    pub fn with_capacity(capacity: uint) -> Vec<T, Heap> {
-        Vec::with_alloc_capacity(Heap, capacity)
-    }
-}
-
-// FIXME: broken with non-default allocators until generic destructors are fixed:
-// https://github.com/mozilla/rust/issues/4252
-impl<T, A: Allocator> Vec<T, A> {
-    #[inline(always)]
-    pub fn with_alloc(alloc: A) -> Vec<T, A> {
-        Vec { len: 0, cap: 0, ptr: 0 as *mut T, alloc: alloc }
-    }
-
-    pub fn with_alloc_capacity(mut alloc: A, capacity: uint) -> Vec<T, A> {
+    pub fn with_capacity(capacity: uint) -> Vec<T> {
         if capacity == 0 {
-            Vec::with_alloc(alloc)
+            Vec::new()
         } else {
             let (size, overflow) = mul_with_overflow(capacity, size_of::<T>());
             if overflow {
                 out_of_memory();
             }
-            let (ptr, _) = unsafe { alloc.alloc(size) };
-            Vec { len: 0, cap: capacity, ptr: ptr as *mut T, alloc: alloc }
+            let ptr = unsafe { malloc_raw(size) };
+            Vec { len: 0, cap: capacity, ptr: ptr as *mut T }
         }
     }
 }
 
-impl<T, A: Allocator> Container for Vec<T, A> {
+impl<T> Container for Vec<T> {
     #[inline(always)]
     fn len(&self) -> uint {
         self.len
     }
 }
 
-impl<T, A: Allocator> Vec<T, A> {
+impl<T> Vec<T> {
     #[inline(always)]
     pub fn capacity(&self) -> uint {
         self.cap
@@ -87,8 +71,7 @@ impl<T, A: Allocator> Vec<T, A> {
             }
             self.cap = capacity;
             unsafe {
-                let (ptr, _) = self.alloc.realloc(self.ptr as *mut u8, size);
-                self.ptr = ptr as *mut T;
+                self.ptr = realloc_raw(self.ptr as *mut u8, size) as *mut T;
             }
         }
     }
@@ -97,12 +80,11 @@ impl<T, A: Allocator> Vec<T, A> {
     pub fn shrink_to_fit(&mut self) {
         unsafe {
             if self.len == 0 {
-                self.alloc.free(self.ptr as *mut u8);
+                free(self.ptr as *mut u8);
                 self.cap = 0;
                 self.ptr = 0 as *mut T;
             } else {
-                let (ptr, _) = self.alloc.realloc(self.ptr as *mut u8, self.len * size_of::<T>());
-                self.ptr = ptr as *mut T;
+                self.ptr = realloc_raw(self.ptr as *mut u8, self.len * size_of::<T>()) as *mut T;
                 self.cap = self.len;
             }
         }
@@ -128,8 +110,7 @@ impl<T, A: Allocator> Vec<T, A> {
             let size = old_size * 2;
             if old_size > size { out_of_memory() }
             unsafe {
-                let (ptr, _) = self.alloc.realloc(self.ptr as *mut u8, size);
-                self.ptr = ptr as *mut T;
+                self.ptr = realloc_raw(self.ptr as *mut u8, size) as *mut T;
             }
         }
 
@@ -154,11 +135,8 @@ impl<T, A: Allocator> Vec<T, A> {
 }
 
 
-// FIXME: broken with non-default allocators until generic destructors are fixed:
-// https://github.com/mozilla/rust/issues/4252
-#[cfg(libc)]
 #[unsafe_destructor]
-impl<T> Drop for Vec<T, Heap> {
+impl<T> Drop for Vec<T> {
     fn drop(&mut self) {
         unsafe {
             for x in iter(self.as_mut_slice()) {

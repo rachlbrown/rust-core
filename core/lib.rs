@@ -49,6 +49,7 @@ pub mod slice;
 pub mod str;
 #[cfg(libc)]
 pub mod thread;
+#[cfg(libc)]
 pub mod vec;
 
 pub mod uint;
