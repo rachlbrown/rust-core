@@ -176,11 +176,9 @@ impl<T> Iterator<T> for MoveIterator<T> {
 #[unsafe_destructor]
 impl<T> Drop for MoveIterator<T> {
     fn drop(&mut self) {
+        // destroy the remaining elements
+        for _x in *self {}
         unsafe {
-            // destroy the remaining elements
-            for x in self.iter {
-                read_ptr(x);
-            }
             free(self.allocation)
         }
     }
