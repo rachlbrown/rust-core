@@ -114,17 +114,17 @@ pub struct MutexArc<T> {
 
 impl<T: Send> MutexArc<T> {
     pub fn new(value: T) -> MutexArc<T> {
-        let box = MutexArcBox { mutex: Mutex::new(), value: value };
+        let b = MutexArcBox { mutex: Mutex::new(), value: value };
         unsafe {
-            MutexArc { ptr: Arc::new_unchecked(box) }
+            MutexArc { ptr: Arc::new_unchecked(b) }
         }
     }
 
     pub fn swap(&self, value: T) -> T {
         unsafe {
-            let box: &mut MutexArcBox<T> = transmute(self.ptr.borrow());
-            let _guard = box.mutex.lock_guard();
-            replace(&mut box.value, value)
+            let ptr: &mut MutexArcBox<T> = transmute(self.ptr.borrow());
+            let _guard = ptr.mutex.lock_guard();
+            replace(&mut ptr.value, value)
         }
     }
 }

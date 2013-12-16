@@ -152,8 +152,8 @@ pub unsafe fn closure_exchange_malloc(td: *u8, size: uint) -> *u8 {
     let total_size = get_box_size(size, (*td).align);
     let p = malloc_raw(total_size as uint);
 
-    let box = p as *mut Box<()>;
-    (*box).type_desc = td;
+    let ptr = p as *mut Box<()>;
+    (*ptr).type_desc = td;
 
-    box as *u8
+    ptr as *u8
 }

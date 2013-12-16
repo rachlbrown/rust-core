@@ -63,19 +63,19 @@ struct QueuePtr<T> {
 impl<A: Send, T: GenericQueue<A>> QueuePtr<T> {
     fn new(queue: T) -> QueuePtr<T> {
         unsafe {
-            let box = QueueBox { queue: queue, mutex: Mutex::new(), not_empty: Cond::new() };
-            QueuePtr { ptr: Arc::new_unchecked(box) }
+            let b = QueueBox { queue: queue, mutex: Mutex::new(), not_empty: Cond::new() };
+            QueuePtr { ptr: Arc::new_unchecked(b) }
         }
     }
 
     fn pop(&self) -> A {
         unsafe {
-            let box: &mut QueueBox<T> = transmute(self.ptr.borrow());
-            let mut guard = box.mutex.lock_guard();
-            while box.queue.is_empty() {
-                box.not_empty.wait_guard(&mut guard)
+            let ptr: &mut QueueBox<T> = transmute(self.ptr.borrow());
+            let mut guard = ptr.mutex.lock_guard();
+            while ptr.queue.is_empty() {
+                ptr.not_empty.wait_guard(&mut guard)
             }
-            box.queue.generic_pop().get()
+            ptr.queue.generic_pop().get()
         }
     }
 
@@ -88,23 +88,23 @@ impl<A: Send, T: GenericQueue<A>> QueuePtr<T> {
             abstime.tv_sec += reltime.tv_sec;
             abstime.tv_nsec += reltime.tv_nsec;
 
-            let box: &mut QueueBox<T> = transmute(self.ptr.borrow());
-            let mut guard = box.mutex.lock_guard();
-            while box.queue.is_empty() {
-                if box.not_empty.wait_until_guard(&mut guard, abstime) == Timeout {
+            let ptr: &mut QueueBox<T> = transmute(self.ptr.borrow());
+            let mut guard = ptr.mutex.lock_guard();
+            while ptr.queue.is_empty() {
+                if ptr.not_empty.wait_until_guard(&mut guard, abstime) == Timeout {
                     return None
                 }
             }
-            Some(box.queue.generic_pop().get())
+            Some(ptr.queue.generic_pop().get())
         }
     }
 
     fn push(&self, item: A) {
         unsafe {
-            let box: &mut QueueBox<T> = transmute(self.ptr.borrow());
-            let _guard = box.mutex.lock_guard();
-            box.queue.generic_push(item);
-            box.not_empty.signal()
+            let ptr: &mut QueueBox<T> = transmute(self.ptr.borrow());
+            let _guard = ptr.mutex.lock_guard();
+            ptr.queue.generic_push(item);
+            ptr.not_empty.signal()
         }
     }
 }
@@ -201,21 +201,21 @@ struct BoundedQueuePtr<T> {
 impl<A: Send, T: GenericQueue<A>> BoundedQueuePtr<T> {
     fn new(maximum: uint, queue: T) -> BoundedQueuePtr<T> {
         unsafe {
-            let box = BoundedQueueBox { deque: queue, mutex: Mutex::new(), not_empty: Cond::new(),
-                                        not_full: Cond::new(), maximum: maximum };
-            BoundedQueuePtr { ptr: Arc::new_unchecked(box) }
+            let b = BoundedQueueBox { deque: queue, mutex: Mutex::new(), not_empty: Cond::new(),
+                                      not_full: Cond::new(), maximum: maximum };
+            BoundedQueuePtr { ptr: Arc::new_unchecked(b) }
         }
     }
 
     fn pop(&self) -> A {
         unsafe {
-            let box: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
-            let mut guard = box.mutex.lock_guard();
-            while box.deque.is_empty() {
-                box.not_empty.wait_guard(&mut guard)
+            let ptr: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
+            let mut guard = ptr.mutex.lock_guard();
+            while ptr.deque.is_empty() {
+                ptr.not_empty.wait_guard(&mut guard)
             }
-            let item = box.deque.generic_pop().get();
-            box.not_full.signal();
+            let item = ptr.deque.generic_pop().get();
+            ptr.not_full.signal();
             item
         }
     }
@@ -229,28 +229,28 @@ impl<A: Send, T: GenericQueue<A>> BoundedQueuePtr<T> {
             abstime.tv_sec += reltime.tv_sec;
             abstime.tv_nsec += reltime.tv_nsec;
 
-            let box: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
-            let mut guard = box.mutex.lock_guard();
-            while box.deque.is_empty() {
-                if box.not_empty.wait_until_guard(&mut guard, abstime) == Timeout {
+            let ptr: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
+            let mut guard = ptr.mutex.lock_guard();
+            while ptr.deque.is_empty() {
+                if ptr.not_empty.wait_until_guard(&mut guard, abstime) == Timeout {
                     return None
                 }
             }
-            let item = box.deque.generic_pop().get();
-            box.not_full.signal();
+            let item = ptr.deque.generic_pop().get();
+            ptr.not_full.signal();
             Some(item)
         }
     }
 
     fn push(&self, item: A) {
         unsafe {
-            let box: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
-            let mut guard = box.mutex.lock_guard();
-            while box.deque.len() == box.maximum {
-                box.not_full.wait_guard(&mut guard)
+            let ptr: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
+            let mut guard = ptr.mutex.lock_guard();
+            while ptr.deque.len() == ptr.maximum {
+                ptr.not_full.wait_guard(&mut guard)
             }
-            box.deque.generic_push(item);
-            box.not_empty.signal()
+            ptr.deque.generic_push(item);
+            ptr.not_empty.signal()
         }
     }
 
@@ -263,15 +263,15 @@ impl<A: Send, T: GenericQueue<A>> BoundedQueuePtr<T> {
             abstime.tv_sec += reltime.tv_sec;
             abstime.tv_nsec += reltime.tv_nsec;
 
-            let box: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
-            let mut guard = box.mutex.lock_guard();
-            while box.deque.len() == box.maximum {
-                if box.not_full.wait_until_guard(&mut guard, abstime) == Timeout {
+            let ptr: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
+            let mut guard = ptr.mutex.lock_guard();
+            while ptr.deque.len() == ptr.maximum {
+                if ptr.not_full.wait_until_guard(&mut guard, abstime) == Timeout {
                     return Some(item)
                 }
             }
-            box.deque.generic_push(item);
-            box.not_empty.signal();
+            ptr.deque.generic_push(item);
+            ptr.not_empty.signal();
             None
         }
     }
@@ -412,25 +412,25 @@ impl<K: Hash + Eq + Send, V: Send> ConcurrentHashMap<K, V> {
     /// Create a new `ConcurrentHashMap` with the specified 128-bit hash key (`k0` and `k1`) and
     /// initial `capacity`.
     pub fn with_capacity_and_keys(k0: u64, k1: u64, capacity: uint) -> ConcurrentHashMap<K, V> {
-        let box = LockedHashMap::with_capacity_and_keys(k0, k1, capacity);
+        let b = LockedHashMap::with_capacity_and_keys(k0, k1, capacity);
         unsafe {
-            ConcurrentHashMap { ptr: Arc::new_unchecked(box) }
+            ConcurrentHashMap { ptr: Arc::new_unchecked(b) }
         }
     }
 
     /// Insert a key-value pair into the hash table. Return the old value corresponding to the key.
     pub fn swap(&self, k: K, v: V) -> Option<V> {
         unsafe {
-            let box: &mut LockedHashMap<K, V> = transmute(self.ptr.borrow());
-            box.swap(k, v)
+            let ptr: &mut LockedHashMap<K, V> = transmute(self.ptr.borrow());
+            ptr.swap(k, v)
         }
     }
 
     /// Remove a key-value pair from the map. Return the value corresponding to the key.
     pub fn pop(&self, k: &K) -> Option<V> {
         unsafe {
-            let box: &mut LockedHashMap<K, V> = transmute(self.ptr.borrow());
-            box.pop(k)
+            let ptr: &mut LockedHashMap<K, V> = transmute(self.ptr.borrow());
+            ptr.pop(k)
         }
     }
 }
@@ -442,8 +442,8 @@ impl<K: Hash + Eq, V: Clone> ConcurrentHashMap<K, V> {
     /// the function.
     pub fn find(&self, k: &K) -> Option<V> {
         unsafe {
-            let box: &mut LockedHashMap<K, V> = transmute(self.ptr.borrow());
-            box.find(k)
+            let ptr: &mut LockedHashMap<K, V> = transmute(self.ptr.borrow());
+            ptr.find(k)
         }
     }
 }
@@ -483,27 +483,26 @@ impl<K: Hash + Eq + Send, V: Send> ShardMap<K, V> {
             xs.push(LockedHashMap::with_capacity_and_keys(k0, k1, capacity));
             i += 1;
         }
-        let box = ShardMapBox { maps: xs, k0: k0, k1: k1 };
         unsafe {
-            ShardMap { ptr: Arc::new_unchecked(box) }
+            ShardMap { ptr: Arc::new_unchecked(ShardMapBox { maps: xs, k0: k0, k1: k1 }) }
         }
     }
 
     /// Insert a key-value pair into the hash table. Return the old value corresponding to the key.
     pub fn swap(&self, k: K, v: V) -> Option<V> {
         unsafe {
-            let box: &mut ShardMapBox<K, V> = transmute(self.ptr.borrow());
-            let shard = box.get_shard(&k);
-            box.maps.as_mut_slice()[shard].swap(k, v)
+            let ptr: &mut ShardMapBox<K, V> = transmute(self.ptr.borrow());
+            let shard = ptr.get_shard(&k);
+            ptr.maps.as_mut_slice()[shard].swap(k, v)
         }
     }
 
     /// Remove a key-value pair from the map. Return the value corresponding to the key.
     pub fn pop(&self, k: &K) -> Option<V> {
         unsafe {
-            let box: &mut ShardMapBox<K, V> = transmute(self.ptr.borrow());
-            let shard = box.get_shard(k);
-            box.maps.as_mut_slice()[shard].pop(k)
+            let ptr: &mut ShardMapBox<K, V> = transmute(self.ptr.borrow());
+            let shard = ptr.get_shard(k);
+            ptr.maps.as_mut_slice()[shard].pop(k)
         }
     }
 }
@@ -515,9 +514,9 @@ impl<K: Hash + Eq, V: Clone> ShardMap<K, V> {
     /// the function.
     pub fn find(&self, k: &K) -> Option<V> {
         unsafe {
-            let box: &mut ShardMapBox<K, V> = transmute(self.ptr.borrow());
-            let shard = box.get_shard(k);
-            box.maps.as_mut_slice()[shard].find(k)
+            let ptr: &mut ShardMapBox<K, V> = transmute(self.ptr.borrow());
+            let shard = ptr.get_shard(k);
+            ptr.maps.as_mut_slice()[shard].find(k)
         }
     }
 }

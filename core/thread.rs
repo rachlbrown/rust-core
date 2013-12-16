@@ -87,8 +87,8 @@ pub struct Thread<A> {
     priv thread: pthread_t
 }
 
-extern "C" fn shim(box: *mut u8) -> *mut u8 {
-    let start_routine = unsafe { *transmute::<*mut u8, ~proc() -> *mut u8>(box) };
+extern "C" fn shim(ptr: *mut u8) -> *mut u8 {
+    let start_routine = unsafe { *transmute::<*mut u8, ~proc() -> *mut u8>(ptr) };
     start_routine()
 }
 
@@ -99,17 +99,17 @@ pub fn spawn<A: Send>(start_routine: proc() -> A) -> Thread<A> {
         // FIXME: this wrapper should be unnecessary, shim should be a generic function instead
         // https://github.com/mozilla/rust/issues/10353
         let wrapper: proc() -> ~A = proc() ~start_routine();
-        let box: *mut u8 = transmute(~wrapper);
+        let ptr: *mut u8 = transmute(~wrapper);
         let mut thread = uninit();
-        if pthread_create(&mut thread, 0 as *pthread_attr_t, shim, box) != 0 {
+        if pthread_create(&mut thread, 0 as *pthread_attr_t, shim, ptr) != 0 {
             abort()
         }
         Thread { thread: thread }
     }
 }
 
-extern "C" fn detached_shim(box: *mut u8) -> *mut u8 {
-    let start_routine = unsafe { *transmute::<*mut u8, ~proc()>(box) };
+extern "C" fn detached_shim(ptr: *mut u8) -> *mut u8 {
+    let start_routine = unsafe { *transmute::<*mut u8, ~proc()>(ptr) };
     start_routine();
     0 as *mut u8
 }
@@ -118,14 +118,14 @@ extern "C" fn detached_shim(box: *mut u8) -> *mut u8 {
 /// immediately even if there are unfinished detached threads.
 pub fn spawn_detached(start_routine: proc()) {
     unsafe {
-        let box: *mut u8 = transmute(~start_routine);
+        let ptr: *mut u8 = transmute(~start_routine);
         let mut attr = uninit();
         if pthread_attr_init(&mut attr) != 0 {
             abort()
         }
         pthread_attr_setdetachstate(&mut attr, PTHREAD_CREATE_DETACHED);
         let mut thread = uninit();
-        if pthread_create(&mut thread, &attr, detached_shim, box) != 0 {
+        if pthread_create(&mut thread, &attr, detached_shim, ptr) != 0 {
             abort()
         }
         assert(pthread_attr_destroy(&mut attr) == 0);
