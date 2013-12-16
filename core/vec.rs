@@ -9,11 +9,11 @@
 // except according to those terms.
 
 use container::Container;
-use mem::{move_val_init, size_of, transmute};
+use mem::{forget, move_val_init, size_of, transmute};
 use fail::out_of_memory;
 use heap::{free, malloc_raw, realloc_raw};
 use ops::Drop;
-use slice::{Slice, iter, unchecked_get};
+use slice::{VecIterator, Slice, iter, unchecked_get};
 use ptr::{offset, read_ptr};
 use uint::mul_with_overflow;
 use option::{Option, Some, None};
@@ -132,6 +132,15 @@ impl<T> Vec<T> {
         let slice = Slice { data: self.ptr as *T, len: self.len };
         unsafe { transmute(slice) }
     }
+
+    pub fn move_iter(self) -> MoveIterator<T> {
+        unsafe {
+            let iter = transmute(iter(self.as_slice()));
+            let ptr = self.ptr as *mut u8;
+            forget(self);
+            MoveIterator { allocation: ptr, iter: iter }
+        }
+    }
 }
 
 
@@ -143,6 +152,36 @@ impl<T> Drop for Vec<T> {
                 read_ptr(x);
             }
             free(self.ptr as *mut u8)
+        }
+    }
+}
+
+pub struct MoveIterator<T> {
+    priv allocation: *mut u8, // the block of memory allocated for the vector
+    priv iter: VecIterator<'static, T>
+}
+
+impl<T> Iterator<T> for MoveIterator<T> {
+    fn next(&mut self) -> Option<T> {
+        unsafe {
+            self.iter.next().map(|x| read_ptr(x))
+        }
+    }
+
+    fn size_hint(&self) -> (uint, Option<uint>) {
+        self.iter.size_hint()
+    }
+}
+
+#[unsafe_destructor]
+impl<T> Drop for MoveIterator<T> {
+    fn drop(&mut self) {
+        unsafe {
+            // destroy the remaining elements
+            for x in self.iter {
+                read_ptr(x);
+            }
+            free(self.allocation)
         }
     }
 }
