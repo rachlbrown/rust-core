@@ -15,10 +15,34 @@ use container::Container;
 use option::{Option, Some, None};
 use clone::Clone;
 use iter::Iterator;
+use cmp::{Ord, Ordering, Equal, Less, Greater};
 
 pub struct Slice<T> {
     data: *T,
     len: uint
+}
+
+pub fn bsearch<T: Ord>(xs: &[T], value: &T) -> Option<uint> {
+    bsearch_with(xs, |x| x.cmp(value))
+}
+
+pub fn bsearch_with<T>(xs: &[T], cmp: |&T| -> Ordering) -> Option<uint> {
+    let mut base: uint = 0;
+    let mut lim: uint = xs.len();
+
+    while lim != 0 {
+        let ix = base + (lim >> 1);
+        match cmp(&xs[ix]) {
+            Equal => return Some(ix),
+            Less => {
+                base = ix + 1;
+                lim -= 1;
+            }
+            Greater => ()
+        }
+        lim >>= 1;
+    }
+    None
 }
 
 pub unsafe fn unchecked_get<'a, T>(xs: &'a [T], index: uint) -> &'a T {
