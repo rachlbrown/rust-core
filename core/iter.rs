@@ -8,6 +8,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use clone::Clone;
 use option::{Option, Some, None};
 
 pub trait Iterator<A> {
@@ -42,4 +43,36 @@ pub trait Iterator<A> {
         for x in *self { if f(x) { return true; } }
         false
     }
+}
+
+pub trait DoubleEndedIterator<A>: Iterator<A> {
+    fn next_back(&mut self) -> Option<A>;
+
+    #[inline(always)]
+    fn invert(self) -> Invert<Self> {
+        Invert { iter: self }
+    }
+}
+
+pub struct Invert<T> {
+    priv iter: T
+}
+
+impl<T: Clone> Clone for Invert<T> {
+    fn clone(&self) -> Invert<T> {
+        Invert { iter: self.iter.clone() }
+    }
+}
+
+impl<A, T: DoubleEndedIterator<A>> Iterator<A> for Invert<T> {
+    #[inline(always)]
+    fn next(&mut self) -> Option<A> { self.iter.next_back() }
+
+    #[inline(always)]
+    fn size_hint(&self) -> (uint, Option<uint>) { self.iter.size_hint() }
+}
+
+impl<A, T: DoubleEndedIterator<A>> DoubleEndedIterator<A> for Invert<T> {
+    #[inline(always)]
+    fn next_back(&mut self) -> Option<A> { self.iter.next() }
 }

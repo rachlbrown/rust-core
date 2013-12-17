@@ -14,7 +14,7 @@ use fail::abort;
 use container::Container;
 use option::{Option, Some, None};
 use clone::Clone;
-use iter::Iterator;
+use iter::{Iterator, DoubleEndedIterator};
 use cmp::{Ord, Ordering, Equal, Less, Greater};
 
 pub struct Slice<T> {
@@ -183,7 +183,7 @@ macro_rules! iterator {
         impl<'a, T> Iterator<$elem> for $name<'a, T> {
             #[inline]
             fn next(&mut self) -> Option<$elem> {
-                // could be implemented with slices, but this avoids bounds checks
+                // could be implemented with slices, but this is leaner
                 unsafe {
                     if self.ptr == self.end {
                         None
@@ -206,6 +206,26 @@ macro_rules! iterator {
                 let diff = (self.end as uint) - (self.ptr as uint);
                 let exact = diff / nonzero_size_of::<T>();
                 (exact, Some(exact))
+            }
+        }
+
+        impl<'a, T> DoubleEndedIterator<$elem> for $name<'a, T> {
+            #[inline]
+            fn next_back(&mut self) -> Option<$elem> {
+                // could be implemented with slices, but this is leaner
+                unsafe {
+                    if self.end == self.ptr {
+                        None
+                    } else {
+                        self.end = if size_of::<T>() == 0 {
+                            // `offset` will return the same pointer for 0-size types
+                            transmute(self.end as uint - 1)
+                        } else {
+                            offset(self.end as *T, -1) as $ptr
+                        };
+                        Some(transmute(self.end))
+                    }
+                }
             }
         }
     }

@@ -17,7 +17,7 @@ use slice::{VecIterator, Slice, iter, unchecked_get};
 use ptr::{offset, read_ptr};
 use uint::mul_with_overflow;
 use option::{Option, Some, None};
-use iter::Iterator;
+use iter::{Iterator, DoubleEndedIterator};
 use cmp::expect;
 
 #[path = "../macros.rs"]
@@ -170,6 +170,14 @@ impl<T> Iterator<T> for MoveIterator<T> {
 
     fn size_hint(&self) -> (uint, Option<uint>) {
         self.iter.size_hint()
+    }
+}
+
+impl<T> DoubleEndedIterator<T> for MoveIterator<T> {
+    fn next_back(&mut self) -> Option<T> {
+        unsafe {
+            self.iter.next_back().map(|x| read_ptr(x))
+        }
     }
 }
 
