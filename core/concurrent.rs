@@ -18,21 +18,15 @@ use clone::Clone;
 use arc::Arc;
 use deque::Deque;
 use priority_queue::PriorityQueue;
-use mem::{transmute, uninit};
+use mem::transmute;
 use thread::{Mutex, Cond, Timeout};
 use cmp::{Eq, Ord};
 use option::{Some, None, Option};
 use hash::{Hash, HashMap};
 use vec::Vec;
 use kinds::Send;
-use fail::abort;
-use c_types::{c_int, clockid_t, timespec};
-
-static CLOCK_MONOTONIC: clockid_t = 1;
-
-extern {
-    fn clock_gettime(clk_id: clockid_t, tp: *mut timespec) -> c_int;
-}
+use c_types::timespec;
+use time::monotonic;
 
 trait GenericQueue<T>: Container {
     fn generic_push(&mut self, item: T);
@@ -81,10 +75,7 @@ impl<A: Send, T: GenericQueue<A>> QueuePtr<T> {
 
     fn pop_timeout(&self, reltime: timespec) -> Option<A> {
         unsafe {
-            let mut abstime = uninit();
-            if clock_gettime(CLOCK_MONOTONIC, &mut abstime) != 0 {
-                abort()
-            }
+            let mut abstime = monotonic();
             abstime.tv_sec += reltime.tv_sec;
             abstime.tv_nsec += reltime.tv_nsec;
 
@@ -222,10 +213,7 @@ impl<A: Send, T: GenericQueue<A>> BoundedQueuePtr<T> {
 
     fn pop_timeout(&self, reltime: timespec) -> Option<A> {
         unsafe {
-            let mut abstime = uninit();
-            if clock_gettime(CLOCK_MONOTONIC, &mut abstime) != 0 {
-                abort()
-            }
+            let mut abstime = monotonic();
             abstime.tv_sec += reltime.tv_sec;
             abstime.tv_nsec += reltime.tv_nsec;
 
@@ -256,10 +244,7 @@ impl<A: Send, T: GenericQueue<A>> BoundedQueuePtr<T> {
 
     fn push_timeout(&self, item: A, reltime: timespec) -> Option<A> {
         unsafe {
-            let mut abstime = uninit();
-            if clock_gettime(CLOCK_MONOTONIC, &mut abstime) != 0 {
-                abort()
-            }
+            let mut abstime = monotonic();
             abstime.tv_sec += reltime.tv_sec;
             abstime.tv_nsec += reltime.tv_nsec;
 
