@@ -8,6 +8,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use c_types::c_int;
+
 mod detail {
     extern {
         #[link_name = "llvm.trap"]
@@ -56,3 +58,7 @@ pub fn assert(b: bool) {
 #[inline(always)]
 pub fn assert(_: bool) {
 }
+
+pub static EINTR: c_int = 4;
+pub static EBUSY: c_int = 16;
+pub static ETIMEDOUT: c_int = 110;

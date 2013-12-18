@@ -11,7 +11,7 @@
 use container::Container;
 use c_types::{c_int, pthread_t, pthread_attr_t, pthread_mutex_t, pthread_mutexattr_t};
 use c_types::{pthread_cond_t, pthread_condattr_t, clockid_t, timespec};
-use fail::{abort, assert};
+use fail::{EBUSY, ETIMEDOUT, abort, assert};
 use ops::Drop;
 use kinds::Send;
 use mem::{forget, uninit, transmute};
@@ -78,9 +78,6 @@ static CLOCK_MONOTONIC: clockid_t = 1;
 static PTHREAD_CREATE_DETACHED: c_int = 1;
 #[cfg(debug)]
 static PTHREAD_MUTEX_ERRORCHECK: c_int = 2;
-
-static EBUSY: c_int = 16;
-static ETIMEDOUT: c_int = 110;
 
 /// An owned thread type, joined in the destructor.
 pub struct Thread<A> {

@@ -8,22 +8,17 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use c_types::{c_int, c_uint};
+use c_types::c_int;
 
 mod detail {
-    use c_types::{c_int, c_uint};
+    use c_types::c_int;
     extern {
         pub fn exit(status: c_int) -> !;
-        pub fn sleep(seconds: c_uint) -> c_int;
     }
 }
 
 pub fn exit(status: c_int) -> ! {
     unsafe { detail::exit(status) }
-}
-
-pub fn sleep(seconds: c_uint) {
-    unsafe { detail::sleep(seconds); }
 }
 
 #[cfg(unix)]

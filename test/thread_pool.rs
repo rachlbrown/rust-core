@@ -12,9 +12,10 @@
 
 extern mod core;
 
-use core::thread::{Pool};
+use core::thread::Pool;
 use core::io::stderr;
-use core::os::sleep;
+use core::time::sleep;
+use core::c_types::timespec;
 
 #[start]
 fn main(_: int, _: **u8) -> int {
@@ -23,7 +24,7 @@ fn main(_: int, _: **u8) -> int {
     while i < 16 {
         pool.submit(proc() {
             stderr().write(bytes!("sleeping\n"));
-            sleep(2);
+            sleep(timespec { tv_sec: 1, tv_nsec: 0 });
             stderr().write(bytes!("waking\n"));
         });
         i += 1
