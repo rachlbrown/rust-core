@@ -81,8 +81,7 @@ pub enum Ordering {
 /// Total ordering
 #[lang="ord"]
 pub trait Ord: Eq {
-    #[inline(always)]
-    fn lt(&self, other: &Self) -> bool { other.gt(self) }
+    fn lt(&self, other: &Self) -> bool;
 
     #[inline(always)]
     fn le(&self, other: &Self) -> bool { !other.lt(self) }

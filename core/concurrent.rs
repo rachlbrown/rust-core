@@ -25,8 +25,7 @@ use option::{Some, None, Option};
 use hash::{Hash, HashMap};
 use vec::Vec;
 use kinds::Send;
-use c_types::timespec;
-use time::monotonic;
+use time::{Time, monotonic};
 
 trait GenericQueue<T>: Container {
     fn generic_push(&mut self, item: T);
@@ -73,16 +72,16 @@ impl<A: Send, T: GenericQueue<A>> QueuePtr<T> {
         }
     }
 
-    fn pop_timeout(&self, reltime: timespec) -> Option<A> {
+    fn pop_timeout(&self, reltime: Time) -> Option<A> {
         unsafe {
-            let mut abstime = monotonic();
-            abstime.tv_sec += reltime.tv_sec;
-            abstime.tv_nsec += reltime.tv_nsec;
+            let mut abstime = monotonic().to_timespec();
+            abstime.tv_sec += reltime.to_timespec().tv_sec;
+            abstime.tv_nsec += reltime.to_timespec().tv_nsec;
 
             let ptr: &mut QueueBox<T> = transmute(self.ptr.borrow());
             let mut guard = ptr.mutex.lock_guard();
             while ptr.queue.is_empty() {
-                if ptr.not_empty.wait_until_guard(&mut guard, abstime) == Timeout {
+                if ptr.not_empty.wait_until_guard(&mut guard, Time::from_timespec(abstime)) == Timeout {
                     return None
                 }
             }
@@ -124,7 +123,7 @@ impl<T: Send> Queue<T> {
 
     /// Pop a value from the front of the queue, blocking until the queue is not empty or the
     /// timeout expires.
-    pub fn pop_timeout(&self, reltime: timespec) -> Option<T> {
+    pub fn pop_timeout(&self, reltime: Time) -> Option<T> {
         self.ptr.pop_timeout(reltime)
     }
 
@@ -159,7 +158,7 @@ impl<T: Ord + Send> BlockingPriorityQueue<T> {
 
     /// Pop the largest value from the queue, blocking until the queue is not empty or the timeout
     /// expires.
-    pub fn pop_timeout(&self, reltime: timespec) -> Option<T> {
+    pub fn pop_timeout(&self, reltime: Time) -> Option<T> {
         self.ptr.pop_timeout(reltime)
     }
 
@@ -211,16 +210,16 @@ impl<A: Send, T: GenericQueue<A>> BoundedQueuePtr<T> {
         }
     }
 
-    fn pop_timeout(&self, reltime: timespec) -> Option<A> {
+    fn pop_timeout(&self, reltime: Time) -> Option<A> {
         unsafe {
-            let mut abstime = monotonic();
-            abstime.tv_sec += reltime.tv_sec;
-            abstime.tv_nsec += reltime.tv_nsec;
+            let mut abstime = monotonic().to_timespec();
+            abstime.tv_sec += reltime.to_timespec().tv_sec;
+            abstime.tv_nsec += reltime.to_timespec().tv_nsec;
 
             let ptr: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
             let mut guard = ptr.mutex.lock_guard();
             while ptr.deque.is_empty() {
-                if ptr.not_empty.wait_until_guard(&mut guard, abstime) == Timeout {
+                if ptr.not_empty.wait_until_guard(&mut guard, Time::from_timespec(abstime)) == Timeout {
                     return None
                 }
             }
@@ -242,16 +241,16 @@ impl<A: Send, T: GenericQueue<A>> BoundedQueuePtr<T> {
         }
     }
 
-    fn push_timeout(&self, item: A, reltime: timespec) -> Option<A> {
+    fn push_timeout(&self, item: A, reltime: Time) -> Option<A> {
         unsafe {
-            let mut abstime = monotonic();
-            abstime.tv_sec += reltime.tv_sec;
-            abstime.tv_nsec += reltime.tv_nsec;
+            let mut abstime = monotonic().to_timespec();
+            abstime.tv_sec += reltime.to_timespec().tv_sec;
+            abstime.tv_nsec += reltime.to_timespec().tv_nsec;
 
             let ptr: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
             let mut guard = ptr.mutex.lock_guard();
             while ptr.deque.len() == ptr.maximum {
-                if ptr.not_full.wait_until_guard(&mut guard, abstime) == Timeout {
+                if ptr.not_full.wait_until_guard(&mut guard, Time::from_timespec(abstime)) == Timeout {
                     return Some(item)
                 }
             }
@@ -286,7 +285,7 @@ impl<T: Send> BoundedQueue<T> {
 
     /// Pop a value from the front of the queue, blocking until the queue is not empty or the
     /// timeout expires.
-    pub fn pop_timeout(&self, reltime: timespec) -> Option<T> {
+    pub fn pop_timeout(&self, reltime: Time) -> Option<T> {
         self.ptr.pop_timeout(reltime)
     }
 
@@ -297,7 +296,7 @@ impl<T: Send> BoundedQueue<T> {
 
     /// Push a value to the back of the queue, blocking until the queue is not full or the timeout
     /// expires. If the timeout expires, return `Some(item)`.
-    pub fn push_timeout(&self, item: T, reltime: timespec) -> Option<T> {
+    pub fn push_timeout(&self, item: T, reltime: Time) -> Option<T> {
         self.ptr.push_timeout(item, reltime)
     }
 }
@@ -327,7 +326,7 @@ impl<T: Ord + Send> BoundedPriorityQueue<T> {
 
     /// Pop the largest value from the queue, blocking until the queue is not empty or the timeout
     /// expires.
-    pub fn pop_timeout(&self, reltime: timespec) -> Option<T> {
+    pub fn pop_timeout(&self, reltime: Time) -> Option<T> {
         self.ptr.pop_timeout(reltime)
     }
 
@@ -338,7 +337,7 @@ impl<T: Ord + Send> BoundedPriorityQueue<T> {
 
     /// Push a value into the queue, blocking until the queue is not full or the timeout expires. If
     /// the timeout expires, return `Some(item)`.
-    pub fn push_timeout(&self, item: T, reltime: timespec) -> Option<T> {
+    pub fn push_timeout(&self, item: T, reltime: Time) -> Option<T> {
         self.ptr.push_timeout(item, reltime)
     }
 }

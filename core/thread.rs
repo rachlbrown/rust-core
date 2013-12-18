@@ -11,6 +11,7 @@
 use container::Container;
 use c_types::{c_int, pthread_t, pthread_attr_t, pthread_mutex_t, pthread_mutexattr_t};
 use c_types::{pthread_cond_t, pthread_condattr_t, clockid_t, timespec};
+use time::Time;
 use fail::{EBUSY, ETIMEDOUT, abort, assert};
 use ops::Drop;
 use kinds::Send;
@@ -269,8 +270,8 @@ impl Cond {
     /// Block on the condition variable, releasing ownership of the mutex until notified or the
     /// timeout expires. Upon returning, the mutex will be owned again. Note that spurious wakeups
     /// may occur. Return `Timeout` if a timeout occurs, otherwise `NoTimeout`.
-    pub unsafe fn wait_until(&mut self, mutex: &mut Mutex, abstime: timespec) -> TimeoutStatus {
-        let ret = pthread_cond_timedwait(&mut self.cond, &mut mutex.mutex, &abstime);
+    pub unsafe fn wait_until(&mut self, mutex: &mut Mutex, abstime: Time) -> TimeoutStatus {
+        let ret = pthread_cond_timedwait(&mut self.cond, &mut mutex.mutex, &abstime.to_timespec());
         if ret == ETIMEDOUT {
             Timeout
         } else {
@@ -283,7 +284,7 @@ impl Cond {
     /// timeout expires. Upon returning, the mutex will be owned by the `LockGuard` again. Note that
     /// spurious wakeups may occur. Return `Timeout` if a timeout occurs, otherwise `NoTimeout`.
     pub unsafe fn wait_until_guard(&mut self, guard: &mut LockGuard,
-                                   abstime: timespec) -> TimeoutStatus {
+                                   abstime: Time) -> TimeoutStatus {
         self.wait_until(guard.mutex, abstime)
     }
 
