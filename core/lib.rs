@@ -65,12 +65,7 @@ pub mod i16;
 pub mod i32;
 pub mod i64;
 
-#[cfg(target_os="linux", target_arch="x86")]
-#[path="platform/linux-x86/c_types.rs"]
-pub mod c_types;
-
-#[cfg(target_os="linux", target_arch="x86_64")]
-#[path="platform/linux-x86_64/c_types.rs"]
+#[cfg(target_os="linux")]
 pub mod c_types;
 
 #[cfg(libc)]

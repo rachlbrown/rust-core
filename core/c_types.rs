@@ -8,26 +8,33 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-/// i386 Linux is a 32-bit platform with 64-bit long long.
+// Supported:
+// - x86-linux-gnu
+// - x86_64-linux-gnu
+// - arm-linux-gnueabi
 
-pub type c_short     = i16;
-pub type c_ushort    = u16;
+pub type c_short = i16;
+pub type c_ushort = u16;
 
-pub type c_int       = i32;
-pub type c_uint      = u32;
+pub type c_int = i32;
+pub type c_uint = u32;
 
-pub type c_long      = i32;
-pub type c_ulong     = u32;
+#[cfg(target_word_size = "32")]
+pub type c_long = i32;
+#[cfg(target_word_size = "32")]
+pub type c_ulong = u32;
 
-pub type c_longlong  = i64;
+#[cfg(target_word_size = "64")]
+pub type c_long = i64;
+#[cfg(target_word_size = "64")]
+pub type c_ulong = u64;
+
+pub type c_longlong = i64;
 pub type c_ulonglong = u64;
 
-pub type ssize_t     = i32;
-pub type size_t      = u32;
+pub type clockid_t = i32;
 
-pub type clockid_t   = i32;
-
-pub type time_t      = c_long;
+pub type time_t = c_long;
 
 pub struct timespec {
     tv_sec: time_t,
@@ -38,12 +45,22 @@ pub struct pthread_t {
     priv size: c_ulong
 }
 
+#[cfg(target_word_size = "32")]
 pub struct pthread_attr_t {
     priv size: [u32, ..9]
 }
+#[cfg(target_word_size = "64")]
+pub struct pthread_attr_t {
+    priv size: [u64, ..7]
+}
 
+#[cfg(target_word_size = "32")]
 pub struct pthread_mutex_t {
     priv size: [u32, ..6]
+}
+#[cfg(target_word_size = "64")]
+pub struct pthread_mutex_t {
+    priv size: [u64, ..5]
 }
 
 pub struct pthread_mutexattr_t {
