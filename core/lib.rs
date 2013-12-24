@@ -8,10 +8,9 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+#[crate_id = "core"];
 #[no_std];
 #[allow(ctypes)];
-#[link(name = "core")];
-#[pkgid = "core"];
 #[crate_type = "rlib"];
 #[feature(macro_rules)];
 

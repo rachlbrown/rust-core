@@ -15,7 +15,6 @@ extern mod core;
 use core::thread::Pool;
 use core::io::stderr;
 use core::time::{Time, sleep};
-use core::c_types::timespec;
 
 #[start]
 fn main(_: int, _: **u8) -> int {
