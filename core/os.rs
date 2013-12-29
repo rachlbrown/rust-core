@@ -23,7 +23,7 @@ pub fn exit(status: c_int) -> ! {
 
 #[cfg(unix)]
 /// Returns the platform-specific value of errno
-pub fn errno() -> int {
+pub fn errno() -> c_int {
     extern {
         #[cfg(target_os = "linux")]
         #[cfg(target_os = "android")]
@@ -36,19 +36,19 @@ pub fn errno() -> int {
     }
 
     unsafe {
-        (*__errno_location()) as int
+        *__errno_location()
     }
 }
 
 #[cfg(windows)]
 /// Returns the platform-specific value of errno
-pub fn errno() -> uint {
+pub fn errno() -> c_int {
     #[link_name = "kernel32"]
     extern "system" {
         fn GetLastError() -> u32;
     }
 
     unsafe {
-        GetLastError() as uint
+        GetLastError() as c_int
     }
 }
