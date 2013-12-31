@@ -72,6 +72,14 @@ impl<A: Send, T: GenericQueue<A>> QueuePtr<T> {
         }
     }
 
+    fn try_pop(&self) -> Option<A> {
+        unsafe {
+            let ptr: &mut QueueBox<T> = transmute(self.ptr.borrow());
+            let _guard = ptr.mutex.lock_guard();
+            ptr.queue.generic_pop()
+        }
+    }
+
     fn pop_timeout(&self, reltime: Time) -> Option<A> {
         unsafe {
             let mut abstime = monotonic().to_timespec();
@@ -121,6 +129,11 @@ impl<T: Send> Queue<T> {
         self.ptr.pop()
     }
 
+    /// Pop a value from the front of the queue, or return None if the queue is empty.
+    pub fn try_pop(&self) -> Option<T> {
+        self.ptr.try_pop()
+    }
+
     /// Pop a value from the front of the queue, blocking until the queue is not empty or the
     /// timeout expires.
     pub fn pop_timeout(&self, reltime: Time) -> Option<T> {
@@ -154,6 +167,11 @@ impl<T: Ord + Send> BlockingPriorityQueue<T> {
     /// Pop the largest value from the queue, blocking until the queue is not empty.
     pub fn pop(&self) -> T {
         self.ptr.pop()
+    }
+
+    /// Pop the largest value from the queue, or return None if the queue is empty.
+    pub fn try_pop(&self) -> Option<T> {
+        self.ptr.try_pop()
     }
 
     /// Pop the largest value from the queue, blocking until the queue is not empty or the timeout
@@ -210,6 +228,20 @@ impl<A: Send, T: GenericQueue<A>> BoundedQueuePtr<T> {
         }
     }
 
+    fn try_pop(&self) -> Option<A> {
+        unsafe {
+            let ptr: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
+            let _guard = ptr.mutex.lock_guard();
+            match ptr.deque.generic_pop() {
+                Some(x) => {
+                    ptr.not_full.signal();
+                    Some(x)
+                }
+                None => None
+            }
+        }
+    }
+
     fn pop_timeout(&self, reltime: Time) -> Option<A> {
         unsafe {
             let mut abstime = monotonic().to_timespec();
@@ -238,6 +270,20 @@ impl<A: Send, T: GenericQueue<A>> BoundedQueuePtr<T> {
             }
             ptr.deque.generic_push(item);
             ptr.not_empty.signal()
+        }
+    }
+
+    fn try_push(&self, item: A) -> Option<A> {
+        unsafe {
+            let ptr: &mut BoundedQueueBox<T> = transmute(self.ptr.borrow());
+            let _guard = ptr.mutex.lock_guard();
+            if ptr.deque.len() == ptr.maximum {
+                Some(item)
+            } else {
+                ptr.deque.generic_push(item);
+                ptr.not_empty.signal();
+                None
+            }
         }
     }
 
@@ -283,6 +329,11 @@ impl<T: Send> BoundedQueue<T> {
         self.ptr.pop()
     }
 
+    /// Pop a value from the front of the queue, or return `None` if the queue is empty.
+    pub fn try_pop(&self) -> Option<T> {
+        self.ptr.try_pop()
+    }
+
     /// Pop a value from the front of the queue, blocking until the queue is not empty or the
     /// timeout expires.
     pub fn pop_timeout(&self, reltime: Time) -> Option<T> {
@@ -292,6 +343,11 @@ impl<T: Send> BoundedQueue<T> {
     /// Push a value to the back of the queue, blocking until the queue is not full.
     pub fn push(&self, item: T) {
         self.ptr.push(item)
+    }
+
+    /// Push a value to the back of the queue, or return `Some(item)` if the queue is full.
+    pub fn try_push(&self, item: T) -> Option<T> {
+        self.ptr.try_push(item)
     }
 
     /// Push a value to the back of the queue, blocking until the queue is not full or the timeout
@@ -324,6 +380,11 @@ impl<T: Ord + Send> BoundedPriorityQueue<T> {
         self.ptr.pop()
     }
 
+    /// Pop the largest value from the queue, or return `None` if the queue is empty.
+    pub fn try_pop(&self) -> Option<T> {
+        self.ptr.try_pop()
+    }
+
     /// Pop the largest value from the queue, blocking until the queue is not empty or the timeout
     /// expires.
     pub fn pop_timeout(&self, reltime: Time) -> Option<T> {
@@ -333,6 +394,11 @@ impl<T: Ord + Send> BoundedPriorityQueue<T> {
     /// Push a value into the queue, blocking until the queue is not full.
     pub fn push(&self, item: T) {
         self.ptr.push(item)
+    }
+
+    /// Push a value into the queue, or return `Some(item)` if the queue is full.
+    pub fn try_push(&self, item: T) -> Option<T> {
+        self.ptr.try_push(item)
     }
 
     /// Push a value into the queue, blocking until the queue is not full or the timeout expires. If
