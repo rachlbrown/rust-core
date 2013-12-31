@@ -83,3 +83,9 @@ pub mod heap_closure;
 pub mod os;
 
 pub fn ignore<T>(_: T) {}
+
+// FIXME: for deriving
+mod std {
+    pub use cmp;
+    pub use clone;
+}

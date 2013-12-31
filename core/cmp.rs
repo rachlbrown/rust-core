@@ -72,6 +72,7 @@ impl<T: Eq> Eq for ~T {
     fn ne(&self, other: &~T) -> bool { **self != **other }
 }
 
+#[deriving(Eq, Ord, Clone)]
 pub enum Ordering {
     Less,
     Equal,
@@ -169,4 +170,8 @@ pub fn max<T: Ord>(x: T, y: T) -> T {
 #[inline(always)]
 pub fn min<T: Ord>(x: T, y: T) -> T {
     if x < y { x } else { y }
+}
+
+pub fn clamp<T: Ord>(value: T, low: T, high: T) -> T {
+    max(low, min(value, high))
 }

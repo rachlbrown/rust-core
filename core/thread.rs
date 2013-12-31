@@ -20,21 +20,11 @@ use concurrent::Queue;
 use vec::Vec;
 use option::{Option, Some, None};
 use clone::Clone;
-use cmp::Eq;
 
+#[deriving(Eq, Clone)]
 pub enum TimeoutStatus {
     NoTimeout,
     Timeout
-}
-
-impl Eq for TimeoutStatus {
-    fn eq(&self, other: &TimeoutStatus) -> bool {
-        match (*self, *other) {
-            (Timeout, Timeout) => true,
-            (NoTimeout, NoTimeout) => true,
-            _ => false
-        }
-    }
 }
 
 extern {
@@ -76,7 +66,12 @@ extern {
 }
 
 static CLOCK_MONOTONIC: clockid_t = 1;
+#[cfg(target_os = "android")]
+#[cfg(target_os = "freebsd")]
+#[cfg(target_os = "linux")]
 static PTHREAD_CREATE_DETACHED: c_int = 1;
+#[cfg(target_os = "macos")]
+static PTHREAD_CREATE_DETACHED: c_int = 2;
 #[cfg(debug)]
 static PTHREAD_MUTEX_ERRORCHECK: c_int = 2;
 

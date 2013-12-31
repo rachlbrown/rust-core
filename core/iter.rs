@@ -8,7 +8,6 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use clone::Clone;
 use option::{Option, Some, None};
 
 pub trait Iterator<A> {
@@ -54,14 +53,9 @@ pub trait DoubleEndedIterator<A>: Iterator<A> {
     }
 }
 
+#[deriving(Clone)]
 pub struct Invert<T> {
     priv iter: T
-}
-
-impl<T: Clone> Clone for Invert<T> {
-    fn clone(&self) -> Invert<T> {
-        Invert { iter: self.iter.clone() }
-    }
 }
 
 impl<A, T: DoubleEndedIterator<A>> Iterator<A> for Invert<T> {

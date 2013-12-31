@@ -9,6 +9,7 @@
 // except according to those terms.
 
 use ptr::copy_nonoverlapping_memory;
+use cmp::min;
 
 mod detail {
     extern "rust-intrinsic" {
@@ -23,9 +24,18 @@ pub fn size_of<T>() -> uint {
     unsafe { detail::size_of::<T>() }
 }
 
+#[inline(always)]
+pub fn size_of_val<T>(_: &T) -> uint {
+    size_of::<T>()
+}
+
 pub fn nonzero_size_of<T>() -> uint {
-    let s = size_of::<T>();
-    if s == 0 { 1 } else { s }
+    min(size_of::<T>(), 1)
+}
+
+#[inline(always)]
+pub fn nonzero_size_of_val<T>(_: &T) -> uint {
+    nonzero_size_of::<T>()
 }
 
 #[inline(always)]
@@ -34,8 +44,18 @@ pub fn min_align_of<T>() -> uint {
 }
 
 #[inline(always)]
+pub fn min_align_of_val<T>(_: &T) -> uint {
+    min_align_of::<T>()
+}
+
+#[inline(always)]
 pub fn pref_align_of<T>() -> uint {
     unsafe { detail::pref_align_of::<T>() }
+}
+
+#[inline(always)]
+pub fn pref_align_of_val<T>(_: &T) -> uint {
+    pref_align_of::<T>()
 }
 
 extern "rust-intrinsic" {

@@ -78,6 +78,25 @@ clone_impl!(())
 clone_impl!(bool)
 clone_impl!(char)
 
+macro_rules! extern_fn_clone(
+    ($($A:ident),*) => (
+        impl<$($A,)* ReturnType> Clone for extern "Rust" fn($($A),*) -> ReturnType {
+            #[inline]
+            fn clone(&self) -> extern "Rust" fn($($A),*) -> ReturnType { *self }
+        }
+    )
+)
+
+extern_fn_clone!()
+extern_fn_clone!(A)
+extern_fn_clone!(A, B)
+extern_fn_clone!(A, B, C)
+extern_fn_clone!(A, B, C, D)
+extern_fn_clone!(A, B, C, D, E)
+extern_fn_clone!(A, B, C, D, E, F)
+extern_fn_clone!(A, B, C, D, E, F, G)
+extern_fn_clone!(A, B, C, D, E, F, G, H)
+
 pub trait DeepClone: Clone {
     fn deep_clone(&self) -> Self;
 
@@ -122,3 +141,23 @@ deep_clone_impl!(f64)
 deep_clone_impl!(())
 deep_clone_impl!(bool)
 deep_clone_impl!(char)
+
+macro_rules! extern_fn_deep_clone(
+    ($($A:ident),*) => (
+        impl<$($A,)* ReturnType> DeepClone for extern "Rust" fn($($A),*) -> ReturnType {
+            /// Return a copy of a function pointer
+            #[inline]
+            fn deep_clone(&self) -> extern "Rust" fn($($A),*) -> ReturnType { *self }
+        }
+    )
+)
+
+extern_fn_deep_clone!()
+extern_fn_deep_clone!(A)
+extern_fn_deep_clone!(A, B)
+extern_fn_deep_clone!(A, B, C)
+extern_fn_deep_clone!(A, B, C, D)
+extern_fn_deep_clone!(A, B, C, D, E)
+extern_fn_deep_clone!(A, B, C, D, E, F)
+extern_fn_deep_clone!(A, B, C, D, E, F, G)
+extern_fn_deep_clone!(A, B, C, D, E, F, G, H)
