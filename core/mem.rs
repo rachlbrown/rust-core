@@ -64,6 +64,8 @@ extern "rust-intrinsic" {
     pub fn init<T>() -> T;
     pub fn uninit<T>() -> T;
     pub fn move_val_init<T>(dst: &mut T, src: T);
+    pub fn volatile_load<T>(src: *T) -> T;
+    pub fn volatile_store<T>(dst: *mut T, val: T);
 }
 
 pub fn swap<T>(x: &mut T, y: &mut T) {
