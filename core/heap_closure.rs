@@ -24,9 +24,7 @@ struct TyDesc {
     align: uint,
     take_glue: extern "Rust" fn(*i8),
     drop_glue: extern "Rust" fn(*i8),
-    free_glue: extern "Rust" fn(*i8),
     visit_glue: extern "Rust" fn(*i8),
-    borrow_offset: uint,
     name: &'static str
 }
 
@@ -60,7 +58,6 @@ trait TyVisitor {
 
     fn visit_box(&mut self, mtbl: uint, inner: *TyDesc) -> bool;
     fn visit_uniq(&mut self, mtbl: uint, inner: *TyDesc) -> bool;
-    fn visit_uniq_managed(&mut self, mtbl: uint, inner: *TyDesc) -> bool;
     fn visit_ptr(&mut self, mtbl: uint, inner: *TyDesc) -> bool;
     fn visit_rptr(&mut self, mtbl: uint, inner: *TyDesc) -> bool;
 
@@ -68,7 +65,6 @@ trait TyVisitor {
     fn visit_unboxed_vec(&mut self, mtbl: uint, inner: *TyDesc) -> bool;
     fn visit_evec_box(&mut self, mtbl: uint, inner: *TyDesc) -> bool;
     fn visit_evec_uniq(&mut self, mtbl: uint, inner: *TyDesc) -> bool;
-    fn visit_evec_uniq_managed(&mut self, mtbl: uint, inner: *TyDesc) -> bool;
     fn visit_evec_slice(&mut self, mtbl: uint, inner: *TyDesc) -> bool;
     fn visit_evec_fixed(&mut self, n: uint, sz: uint, align: uint,
                         mtbl: uint, inner: *TyDesc) -> bool;
