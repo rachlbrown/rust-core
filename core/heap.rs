@@ -32,35 +32,52 @@ pub unsafe fn free(ptr: *mut u8) {
 #[inline]
 #[lang = "exchange_malloc"]
 pub unsafe fn malloc_raw(size: uint) -> *mut u8 {
-    let ptr = malloc(size);
-    if ptr == 0 as *mut u8 {
-        out_of_memory()
+    if size == 0 {
+        0 as *mut u8
+    } else {
+        let ptr = malloc(size);
+        if ptr == 0 as *mut u8 {
+            out_of_memory()
+        }
+        ptr
     }
-    ptr
 }
 
 pub unsafe fn calloc_raw(count: uint, size: uint) -> *mut u8 {
-    let ptr = calloc(count, size);
-    if ptr == 0 as *mut u8 {
-        out_of_memory()
+    if size == 0 {
+        0 as *mut u8
+    } else {
+        let ptr = calloc(count, size);
+        if ptr == 0 as *mut u8 {
+            out_of_memory()
+        }
+        ptr
     }
-    ptr
 }
 
 #[inline]
 pub unsafe fn aligned_alloc_raw(align: uint, size: uint) -> *mut u8 {
-    let ptr = aligned_alloc(align, size);
-    if ptr == 0 as *mut u8 {
-        out_of_memory()
+    if size == 0 {
+        0 as *mut u8
+    } else {
+        let ptr = aligned_alloc(align, size);
+        if ptr == 0 as *mut u8 {
+            out_of_memory()
+        }
+        ptr
     }
-    ptr
 }
 
 #[inline]
 pub unsafe fn realloc_raw(ptr: *mut u8, size: uint) -> *mut u8 {
-    let ptr = realloc(ptr, size);
-    if ptr == 0 as *mut u8 {
-        out_of_memory()
+    if size == 0 {
+        free(ptr);
+        0 as *mut u8
+    } else {
+        let ptr = realloc(ptr, size);
+        if ptr == 0 as *mut u8 {
+            out_of_memory()
+        }
+        ptr
     }
-    ptr
 }
