@@ -149,24 +149,24 @@ impl<'a, T> Container for &'a [T] {
     }
 }
 
-pub fn iter<'a, T>(xs: &'a [T]) -> VecIterator<'a, T> {
+pub fn iter<'a, T>(xs: &'a [T]) -> Items<'a, T> {
     unsafe {
         let p = to_ptr(xs);
         if size_of::<T>() == 0 {
-            VecIterator { ptr: p, end: (p as uint + xs.len()) as *T, lifetime: None }
+            Items { ptr: p, end: (p as uint + xs.len()) as *T, lifetime: None }
         } else {
-            VecIterator { ptr: p, end: offset(p, xs.len() as int), lifetime: None}
+            Items { ptr: p, end: offset(p, xs.len() as int), lifetime: None }
         }
     }
 }
 
-pub fn mut_iter<'a, T>(xs: &'a mut [T]) -> VecMutIterator<'a, T> {
+pub fn mut_iter<'a, T>(xs: &'a mut [T]) -> MutItems<'a, T> {
     unsafe {
         let p = to_mut_ptr(xs);
         if size_of::<T>() == 0 {
-            VecMutIterator{ptr: p, end: (p as uint + xs.len()) as *mut T, lifetime: None}
+            MutItems { ptr: p, end: (p as uint + xs.len()) as *mut T, lifetime: None }
         } else {
-            VecMutIterator{ptr: p, end: offset(p as *T, xs.len() as int) as *mut T, lifetime: None}
+            MutItems { ptr: p, end: offset(p as *T, xs.len() as int) as *mut T, lifetime: None }
         }
     }
 }
@@ -231,11 +231,11 @@ macro_rules! iterator {
     }
 }
 
-iterator!{struct VecIterator -> *T, &'a T}
-iterator!{struct VecMutIterator -> *mut T, &'a mut T}
+iterator!{struct Items -> *T, &'a T}
+iterator!{struct MutItems -> *mut T, &'a mut T}
 
-impl<'a, T> Clone for VecIterator<'a, T> {
-    fn clone(&self) -> VecIterator<'a, T> {
+impl<'a, T> Clone for Items<'a, T> {
+    fn clone(&self) -> Items<'a, T> {
         *self
     }
 }

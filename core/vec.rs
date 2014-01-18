@@ -13,7 +13,7 @@ use mem::{forget, move_val_init, size_of, transmute};
 use fail::out_of_memory;
 use heap::{free, malloc_raw, realloc_raw};
 use ops::Drop;
-use slice::{VecIterator, Slice, iter, unchecked_get, unchecked_mut_get};
+use slice::{Items, Slice, iter, unchecked_get, unchecked_mut_get};
 use ptr::{offset, read_ptr};
 use uint::mul_with_overflow;
 use option::{Option, Some, None};
@@ -160,12 +160,12 @@ impl<T> Vec<T> {
         unsafe { transmute(slice) }
     }
 
-    pub fn move_iter(self) -> MoveIterator<T> {
+    pub fn move_iter(self) -> MoveItems<T> {
         unsafe {
             let iter = transmute(iter(self.as_slice()));
             let ptr = self.ptr as *mut u8;
             forget(self);
-            MoveIterator { allocation: ptr, iter: iter }
+            MoveItems { allocation: ptr, iter: iter }
         }
     }
 
@@ -187,12 +187,12 @@ impl<T> Drop for Vec<T> {
     }
 }
 
-pub struct MoveIterator<T> {
+pub struct MoveItems<T> {
     priv allocation: *mut u8, // the block of memory allocated for the vector
-    priv iter: VecIterator<'static, T>
+    priv iter: Items<'static, T>
 }
 
-impl<T> Iterator<T> for MoveIterator<T> {
+impl<T> Iterator<T> for MoveItems<T> {
     fn next(&mut self) -> Option<T> {
         unsafe {
             self.iter.next().map(|x| read_ptr(x))
@@ -204,7 +204,7 @@ impl<T> Iterator<T> for MoveIterator<T> {
     }
 }
 
-impl<T> DoubleEndedIterator<T> for MoveIterator<T> {
+impl<T> DoubleEndedIterator<T> for MoveItems<T> {
     fn next_back(&mut self) -> Option<T> {
         unsafe {
             self.iter.next_back().map(|x| read_ptr(x))
@@ -213,7 +213,7 @@ impl<T> DoubleEndedIterator<T> for MoveIterator<T> {
 }
 
 #[unsafe_destructor]
-impl<T> Drop for MoveIterator<T> {
+impl<T> Drop for MoveItems<T> {
     fn drop(&mut self) {
         // destroy the remaining elements
         for _x in *self {}
