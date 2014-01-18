@@ -13,12 +13,13 @@ use mem::{forget, move_val_init, size_of, transmute};
 use fail::out_of_memory;
 use heap::{free, malloc_raw, realloc_raw};
 use ops::Drop;
-use slice::{VecIterator, Slice, iter, unchecked_get};
+use slice::{VecIterator, Slice, iter, unchecked_get, unchecked_mut_get};
 use ptr::{offset, read_ptr};
 use uint::mul_with_overflow;
 use option::{Option, Some, None};
 use iter::{Iterator, DoubleEndedIterator};
 use cmp::expect;
+use clone::Clone;
 
 #[path = "../macros.rs"]
 mod macros;
@@ -29,7 +30,6 @@ pub struct Vec<T> {
     priv ptr: *mut T
 }
 
-#[cfg(libc)]
 impl<T> Vec<T> {
     #[inline(always)]
     pub fn new() -> Vec<T> {
@@ -46,6 +46,21 @@ impl<T> Vec<T> {
             }
             let ptr = unsafe { malloc_raw(size) };
             Vec { len: 0, cap: capacity, ptr: ptr as *mut T }
+        }
+    }
+}
+
+impl<T: Clone> Vec<T> {
+    pub fn from_elem(length: uint, value: T) -> Vec<T> {
+        unsafe {
+            let mut xs = Vec::with_capacity(length);
+            xs.len = length;
+            let mut i = 0;
+            while i < length {
+                move_val_init(unchecked_mut_get(xs.as_mut_slice(), i), value.clone());
+                i += 1;
+            }
+            xs
         }
     }
 }
@@ -121,6 +136,18 @@ impl<T> Vec<T> {
         }
     }
 
+    pub fn truncate(&mut self, len: uint) {
+        unsafe {
+            let mut i = len;
+            // drop any extra elements
+            while i < self.len {
+                read_ptr(unchecked_get(self.as_slice(), i));
+                i += 1;
+            }
+        }
+        self.len = len;
+    }
+
     #[inline]
     pub fn as_slice<'a>(&'a self) -> &'a [T] {
         let slice = Slice { data: self.ptr as *T, len: self.len };
@@ -140,6 +167,10 @@ impl<T> Vec<T> {
             forget(self);
             MoveIterator { allocation: ptr, iter: iter }
         }
+    }
+
+    pub unsafe fn set_len(&mut self, len: uint) {
+        self.len = len;
     }
 }
 
