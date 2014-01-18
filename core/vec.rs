@@ -54,11 +54,20 @@ impl<T: Clone> Vec<T> {
     pub fn from_elem(length: uint, value: T) -> Vec<T> {
         unsafe {
             let mut xs = Vec::with_capacity(length);
-            xs.len = length;
-            let mut i = 0;
-            while i < length {
-                move_val_init(unchecked_mut_get(xs.as_mut_slice(), i), value.clone());
-                i += 1;
+            while xs.len < length {
+                move_val_init(unchecked_mut_get(xs.as_mut_slice(), xs.len), value.clone());
+                xs.len += 1;
+            }
+            xs
+        }
+    }
+
+    pub fn from_fn(length: uint, op: |uint| -> T) -> Vec<T> {
+        unsafe {
+            let mut xs = Vec::with_capacity(length);
+            while xs.len < length {
+                move_val_init(unchecked_mut_get(xs.as_mut_slice(), xs.len), op(xs.len));
+                xs.len += 1;
             }
             xs
         }
