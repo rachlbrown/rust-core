@@ -48,40 +48,7 @@ impl<T> Vec<T> {
             Vec { len: 0, cap: capacity, ptr: ptr as *mut T }
         }
     }
-}
 
-impl<T: Clone> Vec<T> {
-    pub fn from_elem(length: uint, value: T) -> Vec<T> {
-        unsafe {
-            let mut xs = Vec::with_capacity(length);
-            while xs.len < length {
-                move_val_init(unchecked_mut_get(xs.as_mut_slice(), xs.len), value.clone());
-                xs.len += 1;
-            }
-            xs
-        }
-    }
-
-    pub fn from_fn(length: uint, op: |uint| -> T) -> Vec<T> {
-        unsafe {
-            let mut xs = Vec::with_capacity(length);
-            while xs.len < length {
-                move_val_init(unchecked_mut_get(xs.as_mut_slice(), xs.len), op(xs.len));
-                xs.len += 1;
-            }
-            xs
-        }
-    }
-}
-
-impl<T> Container for Vec<T> {
-    #[inline(always)]
-    fn len(&self) -> uint {
-        self.len
-    }
-}
-
-impl<T> Vec<T> {
     #[inline(always)]
     pub fn capacity(&self) -> uint {
         self.cap
@@ -102,15 +69,16 @@ impl<T> Vec<T> {
 
     #[inline]
     pub fn shrink_to_fit(&mut self) {
-        unsafe {
-            if self.len == 0 {
-                free(self.ptr as *mut u8);
-                self.cap = 0;
-                self.ptr = 0 as *mut T;
-            } else {
+        if self.len == 0 {
+            unsafe { free(self.ptr as *mut u8) };
+            self.cap = 0;
+            self.ptr = 0 as *mut T;
+        } else {
+            unsafe {
+                // Overflow check is unnecessary as the vector is already at least this large.
                 self.ptr = realloc_raw(self.ptr as *mut u8, self.len * size_of::<T>()) as *mut T;
-                self.cap = self.len;
             }
+            self.cap = self.len;
         }
     }
 
@@ -183,6 +151,36 @@ impl<T> Vec<T> {
     }
 }
 
+impl<T: Clone> Vec<T> {
+    pub fn from_elem(length: uint, value: T) -> Vec<T> {
+        unsafe {
+            let mut xs = Vec::with_capacity(length);
+            while xs.len < length {
+                move_val_init(unchecked_mut_get(xs.as_mut_slice(), xs.len), value.clone());
+                xs.len += 1;
+            }
+            xs
+        }
+    }
+
+    pub fn from_fn(length: uint, op: |uint| -> T) -> Vec<T> {
+        unsafe {
+            let mut xs = Vec::with_capacity(length);
+            while xs.len < length {
+                move_val_init(unchecked_mut_get(xs.as_mut_slice(), xs.len), op(xs.len));
+                xs.len += 1;
+            }
+            xs
+        }
+    }
+}
+
+impl<T> Container for Vec<T> {
+    #[inline(always)]
+    fn len(&self) -> uint {
+        self.len
+    }
+}
 
 #[unsafe_destructor]
 impl<T> Drop for Vec<T> {
