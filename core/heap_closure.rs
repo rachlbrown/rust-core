@@ -13,7 +13,6 @@ use mem::size_of;
 use heap::malloc_raw;
 
 #[lang="opaque"]
-#[allow(dead_code)]
 enum Opaque {}
 
 type Disr = u64;
