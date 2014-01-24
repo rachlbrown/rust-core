@@ -43,6 +43,52 @@ pub trait Neg<Result> {
     fn neg(&self) -> Result;
 }
 
+macro_rules! num_impl(
+    ($T:ty) => {
+        impl Add<$T,$T> for $T {
+            #[inline]
+            fn add(&self, other: &$T) -> $T { *self + *other }
+        }
+
+        impl Sub<$T,$T> for $T {
+            #[inline]
+            fn sub(&self, other: &$T) -> $T { *self - *other }
+        }
+
+        impl Mul<$T,$T> for $T {
+            #[inline]
+            fn mul(&self, other: &$T) -> $T { *self * *other }
+        }
+
+        impl Div<$T,$T> for $T {
+            #[inline]
+            fn div(&self, other: &$T) -> $T { *self / *other }
+        }
+
+        impl Rem<$T,$T> for $T {
+            #[inline]
+            fn rem(&self, other: &$T) -> $T { *self % *other }
+        }
+
+        impl Neg<$T> for $T {
+            #[inline]
+            fn neg(&self) -> $T { -*self }
+        }
+    }
+)
+
+num_impl!(int)
+num_impl!(i8)
+num_impl!(i16)
+num_impl!(i32)
+num_impl!(i64)
+
+num_impl!(uint)
+num_impl!(u8)
+num_impl!(u16)
+num_impl!(u32)
+num_impl!(u64)
+
 #[lang="not"]
 pub trait Not<Result> {
     fn not(&self) -> Result;
@@ -72,6 +118,52 @@ pub trait Shl<RHS, Result> {
 pub trait Shr<RHS, Result> {
     fn shr(&self, rhs: &RHS) -> Result;
 }
+
+macro_rules! bitwise_impl(
+        ($T:ty) => {
+        impl Not<$T> for $T {
+                #[inline]
+                fn not(&self) -> $T { !*self }
+        }
+
+        impl BitAnd<$T,$T> for $T {
+                #[inline]
+                fn bitand(&self, other: &$T) -> $T { *self & *other }
+        }
+
+        impl BitOr<$T,$T> for $T {
+                #[inline]
+                fn bitor(&self, other: &$T) -> $T { *self | *other }
+        }
+
+        impl BitXor<$T,$T> for $T {
+                #[inline]
+                fn bitxor(&self, other: &$T) -> $T { *self ^ *other }
+        }
+
+        impl Shl<$T,$T> for $T {
+                #[inline]
+                fn shl(&self, other: &$T) -> $T { *self << *other }
+        }
+
+        impl Shr<$T,$T> for $T {
+                #[inline]
+                fn shr(&self, other: &$T) -> $T { *self >> *other }
+        }
+    }
+)
+
+bitwise_impl!(int)
+bitwise_impl!(i8)
+bitwise_impl!(i16)
+bitwise_impl!(i32)
+bitwise_impl!(i64)
+
+bitwise_impl!(uint)
+bitwise_impl!(u8)
+bitwise_impl!(u16)
+bitwise_impl!(u32)
+bitwise_impl!(u64)
 
 #[lang="index"]
 pub trait Index<Index, Result> {
