@@ -507,9 +507,9 @@ impl<K, V> Clone for ConcurrentHashMap<K, V> {
 
 #[no_freeze]
 struct ShardMapBox<K, V> {
-    priv maps: Vec<LockedHashMap<K, V>>,
-    priv k0: u64,
-    priv k1: u64
+    maps: Vec<LockedHashMap<K, V>>,
+    k0: u64,
+    k1: u64
 }
 
 impl<K: Hash + Eq, V> ShardMapBox<K, V> {

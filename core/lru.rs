@@ -40,13 +40,13 @@ use option::{Some, None, Option};
 use cmp::Eq;
 use ops::Drop;
 
-struct KeyRef<K> { priv k: *K }
+struct KeyRef<K> { k: *K }
 
 struct LruEntry<K, V> {
-    priv key: Option<K>,
-    priv value: Option<V>,
-    priv next: *mut LruEntry<K, V>,
-    priv prev: *mut LruEntry<K, V>,
+    key: Option<K>,
+    value: Option<V>,
+    next: *mut LruEntry<K, V>,
+    prev: *mut LruEntry<K, V>,
 }
 
 /// An LRU Cache.
