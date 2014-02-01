@@ -12,10 +12,7 @@ use c_types::c_int;
 
 mod detail {
     extern {
-        #[link_name = "llvm.trap"]
         pub fn abort() -> !;
-
-        #[link_name = "llvm.debugtrap"]
         pub fn breakpoint();
     }
 }

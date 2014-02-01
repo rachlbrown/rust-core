@@ -9,9 +9,7 @@
 // except according to those terms.
 
 extern "rust-intrinsic" {
-    #[link_name = "llvm.bswap.i64"]
     fn bswap64(x: i64) -> i64;
-    #[link_name = "llvm.ctpop.i64"]
     pub fn ctpop64(x: i64) -> i64;
     pub fn ctlz64(x: i64) -> i64;
     pub fn cttz64(x: i64) -> i64;

@@ -9,7 +9,6 @@
 // except according to those terms.
 
 extern "rust-intrinsic" {
-    #[link_name = "llvm.ctpop.i8"]
     pub fn ctpop8(x: i8) -> i8;
     pub fn ctlz8(x: i8) -> i8;
     pub fn cttz8(x: i8) -> i8;
