@@ -20,7 +20,6 @@ extern {
     pub fn calloc(nmemb: uint, size: uint) -> *mut u8;
     pub fn malloc(size: uint) -> *mut u8;
     pub fn realloc(ptr: *mut u8, size: uint) -> *mut u8;
-    pub fn aligned_alloc(align: uint, size: uint) -> *mut u8;
 }
 
 #[inline(always)]
@@ -48,19 +47,6 @@ pub unsafe fn calloc_raw(count: uint, size: uint) -> *mut u8 {
         0 as *mut u8
     } else {
         let ptr = calloc(count, size);
-        if ptr == 0 as *mut u8 {
-            out_of_memory()
-        }
-        ptr
-    }
-}
-
-#[inline]
-pub unsafe fn aligned_alloc_raw(align: uint, size: uint) -> *mut u8 {
-    if size == 0 {
-        0 as *mut u8
-    } else {
-        let ptr = aligned_alloc(align, size);
         if ptr == 0 as *mut u8 {
             out_of_memory()
         }
