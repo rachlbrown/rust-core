@@ -11,7 +11,7 @@
 use container::Container;
 use mem::{forget, move_val_init, size_of, transmute};
 use fail::out_of_memory;
-use heap::{free, malloc_raw, realloc_raw};
+use heap::{free, alloc, realloc};
 use ops::Drop;
 use slice::{Items, Slice, iter, unchecked_get, unchecked_mut_get};
 use ptr::{offset, read_ptr};
@@ -44,7 +44,7 @@ impl<T> Vec<T> {
             if overflow {
                 out_of_memory();
             }
-            let ptr = unsafe { malloc_raw(size) };
+            let ptr = unsafe { alloc(size) };
             Vec { len: 0, cap: capacity, ptr: ptr as *mut T }
         }
     }
@@ -62,7 +62,7 @@ impl<T> Vec<T> {
             }
             self.cap = capacity;
             unsafe {
-                self.ptr = realloc_raw(self.ptr as *mut u8, size) as *mut T;
+                self.ptr = realloc(self.ptr as *mut u8, size) as *mut T;
             }
         }
     }
@@ -76,7 +76,7 @@ impl<T> Vec<T> {
         } else {
             unsafe {
                 // Overflow check is unnecessary as the vector is already at least this large.
-                self.ptr = realloc_raw(self.ptr as *mut u8, self.len * size_of::<T>()) as *mut T;
+                self.ptr = realloc(self.ptr as *mut u8, self.len * size_of::<T>()) as *mut T;
             }
             self.cap = self.len;
         }
@@ -102,7 +102,7 @@ impl<T> Vec<T> {
             let size = old_size * 2;
             if old_size > size { out_of_memory() }
             unsafe {
-                self.ptr = realloc_raw(self.ptr as *mut u8, size) as *mut T;
+                self.ptr = realloc(self.ptr as *mut u8, size) as *mut T;
             }
         }
 

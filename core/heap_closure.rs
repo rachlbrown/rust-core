@@ -10,7 +10,7 @@
 
 use fail::assert;
 use mem::size_of;
-use heap::malloc_raw;
+use heap::alloc;
 
 #[lang="opaque"]
 enum Opaque {}
@@ -145,7 +145,7 @@ pub unsafe fn closure_exchange_malloc(td: *u8, size: uint) -> *u8 {
     assert(td as uint != 0);
 
     let total_size = get_box_size(size, (*td).align);
-    let p = malloc_raw(total_size as uint);
+    let p = alloc(total_size as uint);
 
     let ptr = p as *mut Box<()>;
     (*ptr).type_desc = td;

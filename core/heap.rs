@@ -13,13 +13,13 @@ use fail::out_of_memory;
 mod detail {
     extern {
         pub fn free(ptr: *mut u8);
+        pub fn realloc(ptr: *mut u8, size: uint) -> *mut u8;
     }
 }
 
 extern {
-    pub fn calloc(nmemb: uint, size: uint) -> *mut u8;
-    pub fn malloc(size: uint) -> *mut u8;
-    pub fn realloc(ptr: *mut u8, size: uint) -> *mut u8;
+    fn calloc(nmemb: uint, size: uint) -> *mut u8;
+    fn malloc(size: uint) -> *mut u8;
 }
 
 #[inline(always)]
@@ -30,7 +30,7 @@ pub unsafe fn free(ptr: *mut u8) {
 
 #[inline]
 #[lang = "exchange_malloc"]
-pub unsafe fn malloc_raw(size: uint) -> *mut u8 {
+pub unsafe fn alloc(size: uint) -> *mut u8 {
     if size == 0 {
         0 as *mut u8
     } else {
@@ -42,11 +42,12 @@ pub unsafe fn malloc_raw(size: uint) -> *mut u8 {
     }
 }
 
-pub unsafe fn calloc_raw(count: uint, size: uint) -> *mut u8 {
+#[inline]
+pub unsafe fn zero_alloc(size: uint) -> *mut u8 {
     if size == 0 {
         0 as *mut u8
     } else {
-        let ptr = calloc(count, size);
+        let ptr = calloc(1, size);
         if ptr == 0 as *mut u8 {
             out_of_memory()
         }
@@ -55,12 +56,12 @@ pub unsafe fn calloc_raw(count: uint, size: uint) -> *mut u8 {
 }
 
 #[inline]
-pub unsafe fn realloc_raw(ptr: *mut u8, size: uint) -> *mut u8 {
+pub unsafe fn realloc(ptr: *mut u8, size: uint) -> *mut u8 {
     if size == 0 {
         free(ptr);
         0 as *mut u8
     } else {
-        let ptr = realloc(ptr, size);
+        let ptr = detail::realloc(ptr, size);
         if ptr == 0 as *mut u8 {
             out_of_memory()
         }
