@@ -10,7 +10,7 @@
 
 use thread::Mutex;
 use mem::{replace, transmute};
-use kinds::{Freeze, Send};
+use kinds::{Freeze, Send, marker};
 use clone::{Clone, DeepClone};
 use ops::Drop;
 use cmp::{Eq, Ord};
@@ -102,10 +102,10 @@ impl<T: Ord> Ord for Arc<T> {
     fn ge(&self, other: &Arc<T>) -> bool { *self.borrow() >= *other.borrow() }
 }
 
-#[no_freeze]
 struct MutexArcBox<T> {
     mutex: Mutex,
-    value: T
+    value: T,
+    no_freeze: marker::NoFreeze
 }
 
 pub struct MutexArc<T> {
@@ -114,7 +114,7 @@ pub struct MutexArc<T> {
 
 impl<T: Send> MutexArc<T> {
     pub fn new(value: T) -> MutexArc<T> {
-        let b = MutexArcBox { mutex: Mutex::new(), value: value };
+        let b = MutexArcBox { mutex: Mutex::new(), value: value, no_freeze: marker::NoFreeze };
         unsafe {
             MutexArc { ptr: Arc::new_unchecked(b) }
         }

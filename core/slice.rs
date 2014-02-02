@@ -16,6 +16,7 @@ use option::{Option, Some, None};
 use clone::Clone;
 use iter::{Iterator, DoubleEndedIterator};
 use cmp::{Ord, Ordering, Equal, Less, Greater};
+use kinds::marker::ContravariantLifetime;
 
 pub struct Slice<T> {
     data: *T,
@@ -153,9 +154,11 @@ pub fn iter<'a, T>(xs: &'a [T]) -> Items<'a, T> {
     unsafe {
         let p = to_ptr(xs);
         if size_of::<T>() == 0 {
-            Items { ptr: p, end: (p as uint + xs.len()) as *T, lifetime: None }
+            Items { ptr: p, end: (p as uint + xs.len()) as *T,
+                    lifetime: ContravariantLifetime::<'a> }
         } else {
-            Items { ptr: p, end: offset(p, xs.len() as int), lifetime: None }
+            Items { ptr: p, end: offset(p, xs.len() as int),
+                    lifetime: ContravariantLifetime::<'a> }
         }
     }
 }
@@ -164,9 +167,11 @@ pub fn mut_iter<'a, T>(xs: &'a mut [T]) -> MutItems<'a, T> {
     unsafe {
         let p = to_mut_ptr(xs);
         if size_of::<T>() == 0 {
-            MutItems { ptr: p, end: (p as uint + xs.len()) as *mut T, lifetime: None }
+            MutItems { ptr: p, end: (p as uint + xs.len()) as *mut T,
+                       lifetime: ContravariantLifetime::<'a> }
         } else {
-            MutItems { ptr: p, end: offset(p as *T, xs.len() as int) as *mut T, lifetime: None }
+            MutItems { ptr: p, end: offset(p as *T, xs.len() as int) as *mut T,
+                       lifetime: ContravariantLifetime::<'a> }
         }
     }
 }
@@ -177,7 +182,7 @@ macro_rules! iterator {
         pub struct $name<'a, T> {
             priv ptr: $ptr,
             priv end: $ptr,
-            priv lifetime: Option<$elem> // https://github.com/mozilla/rust/issues/5922
+            priv lifetime: ContravariantLifetime<'a>
         }
 
         impl<'a, T> Iterator<$elem> for $name<'a, T> {

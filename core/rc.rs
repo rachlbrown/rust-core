@@ -14,22 +14,23 @@ use mem::transmute;
 use ops::Drop;
 use cmp::{Eq, Ord};
 use clone::{Clone, DeepClone};
+use kinds::marker::NoSend;
 
 struct RcBox<T> {
     value: T,
-    count: uint
+    count: uint,
+    no_send: NoSend
 }
 
 #[unsafe_no_drop_flag]
-#[no_send]
 pub struct Rc<T> {
-    priv ptr: *mut RcBox<T>
+    priv ptr: *mut RcBox<T>,
 }
 
 impl<T> Rc<T> {
     pub fn new(value: T) -> Rc<T> {
         unsafe {
-            Rc { ptr: transmute(~RcBox { value: value, count: 1 }) }
+            Rc { ptr: transmute(~RcBox { value: value, count: 1, no_send: NoSend }) }
         }
     }
 

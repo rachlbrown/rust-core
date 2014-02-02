@@ -17,15 +17,16 @@ use clone::{Clone, DeepClone};
 use heap::free;
 use ptr::read_ptr;
 use option::{Option, Some, None};
+use kinds::marker::NoSend;
 
 struct RcBox<T> {
     value: T,
     strong: uint,
-    weak: uint
+    weak: uint,
+    no_send: NoSend
 }
 
 #[unsafe_no_drop_flag]
-#[no_send]
 pub struct Strong<T> {
     priv ptr: *mut RcBox<T>
 }
@@ -33,7 +34,7 @@ pub struct Strong<T> {
 impl<T> Strong<T> {
     pub fn new(value: T) -> Strong<T> {
         unsafe {
-            Strong { ptr: transmute(~RcBox { value: value, strong: 1, weak: 0 }) }
+            Strong { ptr: transmute(~RcBox { value: value, strong: 1, weak: 0, no_send: NoSend }) }
         }
     }
 
@@ -107,7 +108,6 @@ impl<T: Ord> Ord for Strong<T> {
 }
 
 #[unsafe_no_drop_flag]
-#[no_send]
 pub struct Weak<T> {
     priv ptr: *mut RcBox<T>
 }

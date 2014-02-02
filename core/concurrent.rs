@@ -25,6 +25,7 @@ use option::{Some, None, Option};
 use hash::{Hash, HashMap};
 use vec::Vec;
 use kinds::Send;
+use kinds::marker::NoFreeze;
 use time::{Time, monotonic};
 
 trait GenericQueue<T>: Container {
@@ -42,11 +43,11 @@ impl<T: Ord> GenericQueue<T> for PriorityQueue<T> {
     fn generic_pop(&mut self) -> Option<T> { self.pop() }
 }
 
-#[no_freeze]
 struct QueueBox<T> {
     queue: T,
     mutex: Mutex,
-    not_empty: Cond
+    not_empty: Cond,
+    no_freeze: NoFreeze
 }
 
 struct QueuePtr<T> {
@@ -56,7 +57,8 @@ struct QueuePtr<T> {
 impl<A: Send, T: GenericQueue<A>> QueuePtr<T> {
     fn new(queue: T) -> QueuePtr<T> {
         unsafe {
-            let b = QueueBox { queue: queue, mutex: Mutex::new(), not_empty: Cond::new() };
+            let b = QueueBox { queue: queue, mutex: Mutex::new(), not_empty: Cond::new(),
+                               no_freeze: NoFreeze };
             QueuePtr { ptr: Arc::new_unchecked(b) }
         }
     }
@@ -193,13 +195,13 @@ impl<T> Clone for BlockingPriorityQueue<T> {
     }
 }
 
-#[no_freeze]
 struct BoundedQueueBox<T> {
     deque: T,
     mutex: Mutex,
     not_empty: Cond,
     not_full: Cond,
-    maximum: uint
+    maximum: uint,
+    no_freeze: NoFreeze
 }
 
 struct BoundedQueuePtr<T> {
@@ -210,7 +212,8 @@ impl<A: Send, T: GenericQueue<A>> BoundedQueuePtr<T> {
     fn new(maximum: uint, queue: T) -> BoundedQueuePtr<T> {
         unsafe {
             let b = BoundedQueueBox { deque: queue, mutex: Mutex::new(), not_empty: Cond::new(),
-                                      not_full: Cond::new(), maximum: maximum };
+                                      not_full: Cond::new(), maximum: maximum,
+                                      no_freeze: NoFreeze };
             BoundedQueuePtr { ptr: Arc::new_unchecked(b) }
         }
     }
@@ -415,17 +418,18 @@ impl<T> Clone for BoundedPriorityQueue<T> {
     }
 }
 
-#[no_freeze]
 struct LockedHashMap<K, V> {
     map: HashMap<K, V>,
-    mutex: Mutex
+    mutex: Mutex,
+    no_freeze: NoFreeze
 }
 
 impl<K: Hash + Eq, V> LockedHashMap<K, V> {
     fn with_capacity_and_keys(k0: u64, k1: u64, capacity: uint) -> LockedHashMap<K, V> {
         LockedHashMap {
             map: HashMap::with_capacity_and_keys(k0, k1, capacity),
-            mutex: Mutex::new()
+            mutex: Mutex::new(),
+            no_freeze: NoFreeze
         }
     }
 
@@ -505,11 +509,11 @@ impl<K, V> Clone for ConcurrentHashMap<K, V> {
     }
 }
 
-#[no_freeze]
 struct ShardMapBox<K, V> {
     maps: Vec<LockedHashMap<K, V>>,
     k0: u64,
-    k1: u64
+    k1: u64,
+    no_freeze: NoFreeze
 }
 
 impl<K: Hash + Eq, V> ShardMapBox<K, V> {
@@ -533,8 +537,9 @@ impl<K: Hash + Eq + Send, V: Send> ShardMap<K, V> {
             xs.push(LockedHashMap::with_capacity_and_keys(k0, k1, capacity));
             i += 1;
         }
+        let inner = ShardMapBox { maps: xs, k0: k0, k1: k1, no_freeze: NoFreeze };
         unsafe {
-            ShardMap { ptr: Arc::new_unchecked(ShardMapBox { maps: xs, k0: k0, k1: k1 }) }
+            ShardMap { ptr: Arc::new_unchecked(inner) }
         }
     }
 
