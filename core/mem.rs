@@ -68,6 +68,10 @@ extern "rust-intrinsic" {
     pub fn volatile_store<T>(dst: *mut T, val: T);
 }
 
+/// Coerce an immutable reference to be mutable.
+#[inline(always)]
+pub unsafe fn transmute_mut<'a,T>(ptr: &'a T) -> &'a mut T { transmute(ptr) }
+
 pub fn swap<T>(x: &mut T, y: &mut T) {
     unsafe {
         let mut tmp: T = uninit();

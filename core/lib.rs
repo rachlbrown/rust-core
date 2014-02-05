@@ -23,6 +23,7 @@ pub mod weak;
 pub mod atomic;
 #[cfg(libc)]
 pub mod deque;
+pub mod cell;
 pub mod char;
 pub mod clone;
 pub mod cmp;
