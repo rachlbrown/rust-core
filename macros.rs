@@ -44,7 +44,7 @@ macro_rules! thread_local(
             #[inline(always)]
             pub fn get() -> $t {
                 unsafe {
-                    VALUE.clone()
+                    VALUE
                 }
             }
         }

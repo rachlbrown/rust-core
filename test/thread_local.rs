@@ -13,7 +13,6 @@
 
 extern mod core;
 
-use core::clone::Clone;
 use core::thread::spawn;
 use core::fail::abort;
 
