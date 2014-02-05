@@ -12,9 +12,12 @@
 
 extern mod core;
 
-use core::weak::Strong;
+use core::option::{Option, Some, None};
+use core::weak::{Strong, Weak};
 use core::ignore;
 use core::fail::abort;
+use core::cell::RefCell;
+use core::clone::Clone;
 
 fn test_live() {
     let x = Strong::new(5);
@@ -29,9 +32,20 @@ fn test_dead() {
     if y.upgrade().is_some() { abort() }
 }
 
+fn weak_self_cyclic() {
+    struct Cycle {
+        x: RefCell<Option<Weak<Cycle>>>
+    }
+
+    let a = Strong::new(Cycle { x: RefCell::new(None) });
+    let b = a.clone().downgrade();
+    *a.borrow().x.borrow_mut().get() = Some(b);
+}
+
 #[start]
 fn main(_: int, _: **u8) -> int {
     test_live();
     test_dead();
+    weak_self_cyclic();
     0
 }

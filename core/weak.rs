@@ -34,7 +34,9 @@ pub struct Strong<T> {
 impl<T> Strong<T> {
     pub fn new(value: T) -> Strong<T> {
         unsafe {
-            Strong { ptr: transmute(~RcBox { value: value, strong: 1, weak: 0, no_send: NoSend }) }
+            // The `Strong` pointers share a single `weak` reference count.  This prevents the
+            // premature deallocation of the box when the last weak pointer is freed.
+            Strong { ptr: transmute(~RcBox { value: value, strong: 1, weak: 1, no_send: NoSend }) }
         }
     }
 
@@ -59,6 +61,7 @@ impl<T> Drop for Strong<T> {
                 (*self.ptr).strong -= 1;
                 if (*self.ptr).strong == 0 {
                     read_ptr(self.borrow()); // destroy the contained object
+                    (*self.ptr).weak -= 1;
                     if (*self.ptr).weak == 0 {
                         free(self.ptr as *mut u8)
                     }
@@ -131,7 +134,7 @@ impl<T> Drop for Weak<T> {
         unsafe {
             if self.ptr != 0 as *mut RcBox<T> {
                 (*self.ptr).weak -= 1;
-                if (*self.ptr).weak == 0 && (*self.ptr).strong == 0 {
+                if (*self.ptr).weak == 0 {
                     free(self.ptr as *mut u8)
                 }
             }
