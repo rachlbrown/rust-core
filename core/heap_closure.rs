@@ -121,7 +121,7 @@ trait TyVisitor {
 
 struct Box<T> {
     ref_count: uint,
-    type_desc: *TyDesc,
+    drop_glue: fn(ptr: *mut u8),
     prev: *mut Box<T>,
     next: *mut Box<T>,
     data: T
@@ -139,16 +139,12 @@ fn align_to(size: uint, align: uint) -> uint {
 }
 
 #[lang="closure_exchange_malloc"]
-pub unsafe fn closure_exchange_malloc(td: *u8, size: uint) -> *u8 {
-    let td = td as *TyDesc;
-
-    assert(td as uint != 0);
-
-    let total_size = get_box_size(size, (*td).align);
-    let p = alloc(total_size as uint);
+pub unsafe fn closure_exchange_malloc(drop_glue: fn(*mut u8), size: uint, align: uint) -> *u8 {
+    let total_size = get_box_size(size, align);
+    let p = alloc(total_size);
 
     let ptr = p as *mut Box<()>;
-    (*ptr).type_desc = td;
+    (*ptr).drop_glue = drop_glue;
 
     ptr as *u8
 }
