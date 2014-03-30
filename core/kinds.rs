@@ -19,8 +19,8 @@ pub trait Send {}
 pub trait Freeze {}
 
 /// **P**lain **o**ld **d**ata types without move semantics.
-#[lang="pod"]
-pub trait Pod {}
+#[lang="copy"]
+pub trait Copy {}
 
 /// Marker types are special types that are used with unsafe code to
 /// inform the compiler of special constraints. Marker types should
@@ -199,9 +199,9 @@ pub mod marker {
     /// A type which is considered "not POD", meaning that it is not
     /// implicitly copyable. This is typically embedded in other types to
     /// ensure that they are never copied, even if they lack a destructor.
-    #[lang="no_pod_bound"]
+    #[lang="no_copy_bound"]
     #[deriving(Eq,Clone)]
-    pub struct NoPod;
+    pub struct NoCopy;
 
     /// A type which is considered managed by the GC. This is typically
     /// embedded in other types.

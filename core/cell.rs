@@ -11,7 +11,7 @@
 //! Types dealing with dynamic mutability
 
 use mem::transmute_mut;
-use kinds::{marker, Pod};
+use kinds::{marker, Copy};
 use fail::{abort, assert};
 use clone::{Clone, DeepClone};
 use ops::{Deref, DerefMut, Drop};
@@ -25,7 +25,7 @@ pub struct Cell<T> {
     priv no_freeze: marker::NoFreeze,
 }
 
-impl<T: Pod> Cell<T> {
+impl<T: Copy> Cell<T> {
     /// Creates a new `Cell` containing the given value.
     pub fn new(value: T) -> Cell<T> {
         Cell {
@@ -50,7 +50,7 @@ impl<T: Pod> Cell<T> {
     }
 }
 
-impl<T: Pod> Clone for Cell<T> {
+impl<T: Copy> Clone for Cell<T> {
     fn clone(&self) -> Cell<T> {
         Cell::new(self.get())
     }
@@ -62,7 +62,7 @@ pub struct RefCell<T> {
     priv borrow: BorrowFlag,
     priv invariant: marker::InvariantType<T>,
     priv no_freeze: marker::NoFreeze,
-    priv no_pod: marker::NoPod,
+    priv no_copy: marker::NoCopy,
 }
 
 // Values [1, MAX-1] represent the number of `Ref` active
@@ -77,7 +77,7 @@ impl<T> RefCell<T> {
         RefCell {
             invariant: marker::InvariantType::<T>,
             no_freeze: marker::NoFreeze,
-            no_pod: marker::NoPod,
+            no_copy: marker::NoCopy,
             value: value,
             borrow: UNUSED,
         }

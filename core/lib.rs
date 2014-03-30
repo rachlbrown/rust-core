@@ -8,11 +8,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#[crate_id = "core"];
-#[no_std];
-#[allow(ctypes)];
-#[crate_type = "rlib"];
-#[feature(macro_rules)];
+#![crate_id = "core"]
+#![no_std]
+#![allow(ctypes)]
+#![crate_type = "rlib"]
+#![feature(macro_rules)]
 
 #[cfg(libc)]
 pub mod arc;
