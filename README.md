@@ -17,26 +17,28 @@ making use of `clang`.
 
 ```
 rustc --cfg libc core/lib.rs --out-dir . -O -Z no-landing-pads
-rustc --emit-llvm example.rs -O -Z no-landing-pads -L .
+rustc --emit=bc example.rs -O -Z no-landing-pads -L .
 clang -O2 -flto -o example example.bc
 ```
 
 # Macros
 
-It is currently not possible to export macros from crates, so they are provided
-in a standalone `macros.rs` module to include anywhere they are needed.
+Importing macros from crates is currently feature gated. If you wish to load
+macros in addition to normal linkage, use the following attributes:
+```rust
+#[feature(phase)];
+#[phase(syntax, link)]
+extern crate core;
+```
 
 # Freestanding usage
 
 For freestanding use, simply omit the `libc` configuration switch.
 
-LLVM will emit calls to `memcpy`, `memmove` and `memset`. Until [the
-fix](https://github.com/mozilla/rust/pull/9945) for symbol visibility lands,
-these must be provided by the auxilliary `support.rs` module.
-
-The `support.rs` module must be compiled with `rustc --lib --emit-llvm -passes
-inline` and then linked against the bytecode for the main module with `clang
--flto -O2 main.bc support.bc`.
+LLVM will emit calls to `memcpy`, `memmove` and `memset`. The `support.rs`
+module provides these functions, and must be compiled with `rustc --lib
+--emit-llvm -passes inline` and then linked against the bytecode for the main
+module with `clang -flto -O2 main.bc support.bc`.
 
 The `inline` pass *must* be run separately to due to
 [issue #10116](https://github.com/mozilla/rust/issues/10116) or LLVM will

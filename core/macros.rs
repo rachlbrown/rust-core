@@ -8,8 +8,9 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#[macro_escape];
+#[macro_escape]
 
+#[macro_export]
 macro_rules! likely(
     ($val:expr) => {
         {
@@ -19,6 +20,7 @@ macro_rules! likely(
     }
 )
 
+#[macro_export]
 macro_rules! unlikely(
     ($val:expr) => {
         {
@@ -28,6 +30,7 @@ macro_rules! unlikely(
     }
 )
 
+#[macro_export]
 macro_rules! thread_local(
     ($name:ident, $t:ty, $init:expr) => {
         mod $name {
